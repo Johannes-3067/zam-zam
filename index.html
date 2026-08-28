@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zam Zam Döner — Frisch vom Spieß</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@500;700&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --char: #17120f;
+    --char-2: #221b16;
+    --flame: #e8542a;
+    --flame-2: #ff7040;
+    --sumac: #a31621;
+    --yogurt: #f6efe4;
+    --yogurt-dim: #cfc6b8;
+    --herb: #7c9a5d;
+    --gold: #d9a441;
+    --radius: 18px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--char);
+    color:var(--yogurt);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  h1,h2,h3, .display{
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    letter-spacing:0.01em;
+    text-transform:uppercase;
+    line-height:0.95;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px;}
+  ::selection{background:var(--flame);color:var(--char);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+
+  /* -------- NAV -------- */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(23,18,15,0.9);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(246,239,228,0.08);
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 24px;max-width:1100px;margin:0 auto;
+  }
+  .nav-logo{font-family:'Anton',sans-serif;font-size:1.3rem;text-transform:uppercase;color:var(--yogurt);}
+  .nav-logo span{color:var(--flame);}
+  .nav-ticket{display:flex;gap:2px;list-style:none;}
+  .nav-ticket a{
+    display:flex;align-items:baseline;gap:6px;
+    padding:8px 12px;font-size:0.78rem;font-weight:600;
+    color:var(--yogurt-dim);border-radius:10px;
+    transition:color .2s, background .2s;
+    white-space:nowrap;
+  }
+  .nav-ticket a:hover{color:var(--yogurt);background:rgba(246,239,228,0.06);}
+  .nav-ticket .num{font-family:'JetBrains Mono',monospace;color:var(--flame);font-weight:700;}
+  .nav-cart-btn{
+    background:var(--flame);color:var(--char);font-weight:700;
+    padding:9px 16px;border-radius:10px;font-size:0.82rem;
+    display:flex;align-items:center;gap:8px;border:none;cursor:pointer;
+    font-family:'Work Sans',sans-serif;
+  }
+  .nav-cart-btn .count{
+    background:var(--char);color:var(--flame);
+    min-width:20px;height:20px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'JetBrains Mono',monospace;font-size:0.7rem;
+  }
+  @media(max-width:820px){ .nav-ticket{display:none;} }
+
+  section{padding:96px 0;position:relative;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;color:var(--flame);
+    font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;
+    display:flex;align-items:center;gap:10px;margin-bottom:18px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--flame);}
+
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1;transform:translateY(0);}
+
+  /* -------- HERO -------- */
+  .hero{
+    padding:64px 0 80px;
+    background:
+      radial-gradient(ellipse 700px 500px at 82% 20%, rgba(232,84,42,0.16), transparent 60%),
+      var(--char);
+    border-bottom:1px solid rgba(246,239,228,0.08);
+  }
+  .hero .wrap{display:grid;grid-template-columns:1.1fr 0.9fr;gap:40px;align-items:center;}
+  .hero h1{font-size:clamp(3rem, 8vw, 5.6rem);color:var(--yogurt);}
+  .hero h1 .accent{color:var(--flame);}
+  .hero-tag{
+    margin-top:22px;font-size:1.08rem;color:var(--yogurt-dim);max-width:36ch;
+  }
+  .hero-cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--flame);color:var(--char);font-weight:700;
+    padding:14px 26px;border-radius:12px;font-size:0.95rem;
+    box-shadow:0 8px 24px -8px rgba(232,84,42,0.6);
+    transition:transform .15s;
+  }
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-ghost{
+    border:1px solid rgba(246,239,228,0.25);color:var(--yogurt);
+    padding:14px 26px;border-radius:12px;font-size:0.95rem;font-weight:600;
+    transition:border-color .2s, background .2s;
+  }
+  .btn-ghost:hover{border-color:var(--flame);background:rgba(232,84,42,0.08);}
+
+  /* rotating spit — signature element */
+  .spit-stage{position:relative;height:420px;display:flex;align-items:flex-end;justify-content:center;}
+  .rod{
+    position:absolute;top:6%;bottom:8%;left:50%;width:6px;
+    background:linear-gradient(var(--yogurt-dim), #8b8378);
+    transform:translateX(-50%);border-radius:3px;z-index:3;
+  }
+  .rod::before, .rod::after{
+    content:"";position:absolute;left:50%;transform:translateX(-50%);
+    width:34px;height:8px;background:#4a453d;border-radius:4px;
+  }
+  .rod::before{top:-8px;} .rod::after{bottom:-8px;}
+  .doner-cone{
+    position:relative;width:150px;height:330px;
+    clip-path:polygon(
+      0% 12%, 3% 5%, 10% 1%, 22% 0%, 78% 0%, 90% 1%, 97% 5%, 100% 12%,
+      97% 32%, 93% 52%, 87% 70%, 79% 85%, 69% 95%, 57% 100%, 43% 100%, 31% 95%,
+      21% 85%, 13% 70%, 7% 52%, 3% 32%
+    );
+    background:repeating-linear-gradient(3deg,
+      #703419 0, #703419 7px,
+      #8f4a1f 7px, #8f4a1f 13px,
+      #a5591f 13px, #a5591f 18px,
+      #4a2510 18px, #4a2510 22px);
+    background-size:100% 42px;
+    animation:rotateMeat 3.2s linear infinite;
+    box-shadow:inset -20px 0 26px rgba(0,0,0,0.6), inset 12px 0 20px rgba(255,150,90,0.12);
+    filter:drop-shadow(0 18px 26px rgba(0,0,0,0.55));
+    z-index:2;
+  }
+  .doner-cone::before{
+    content:"";position:absolute;inset:0;
+    clip-path:inherit;
+    background:radial-gradient(ellipse 70% 40% at 50% 0%, rgba(35,17,9,0.85), rgba(35,17,9,0) 65%);
+  }
+  .doner-cone::after{
+    content:"";position:absolute;inset:0;
+    clip-path:inherit;
+    background:linear-gradient(90deg,
+      rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.12) 14%, transparent 26%,
+      transparent 46%, rgba(255,208,165,0.5) 53%, transparent 62%,
+      transparent 82%, rgba(0,0,0,0.35) 100%);
+    background-size:230% 100%;
+    mix-blend-mode:overlay;
+    animation:sweepLight 3.2s linear infinite;
+  }
+  @keyframes rotateMeat{ from{background-position-y:0;} to{background-position-y:-42px;} }
+  @keyframes sweepLight{ from{background-position-x:0%;} to{background-position-x:-230%;} }
+  .flame-glow{
+    position:absolute;bottom:2%;left:50%;transform:translateX(-50%);
+    width:220px;height:90px;
+    background:radial-gradient(ellipse at center, rgba(232,84,42,0.55), rgba(232,84,42,0) 70%);
+    filter:blur(6px);animation:pulseFlame 2.4s ease-in-out infinite;z-index:1;
+  }
+  @keyframes pulseFlame{0%,100%{opacity:0.7;transform:translateX(-50%) scale(1);}50%{opacity:1;transform:translateX(-50%) scale(1.12);}}
+  .steam{position:absolute;width:8px;height:8px;border-radius:50%;background:rgba(246,239,228,0.35);filter:blur(2px);animation:steamUp 4s ease-in infinite;}
+  .steam:nth-child(1){left:44%;bottom:60%;animation-delay:0s;}
+  .steam:nth-child(2){left:52%;bottom:55%;animation-delay:1.3s;}
+  .steam:nth-child(3){left:48%;bottom:65%;animation-delay:2.6s;}
+  @keyframes steamUp{0%{opacity:0;transform:translateY(0) scale(0.6);}30%{opacity:0.6;}100%{opacity:0;transform:translateY(-140px) scale(1.4);}}
+  @media(max-width:900px){
+    .hero .wrap{grid-template-columns:1fr;}
+    .spit-stage{height:280px;order:-1;}
+    .doner-cone{width:110px;height:220px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .doner-cone, .doner-cone::after, .flame-glow, .steam, .reveal{animation:none !important; transition:none !important; opacity:1 !important; transform:none !important;}
+  }
+
+  /* -------- MENU (section 2) -------- */
+  .menu-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:42px;}
+  .menu-head h2{font-size:clamp(2.2rem,5vw,3.2rem);}
+  .menu-cols{display:grid;grid-template-columns:1fr 1fr;gap:52px;}
+  @media(max-width:760px){.menu-cols{grid-template-columns:1fr;gap:44px;}}
+  .col-label{
+    font-family:'JetBrains Mono',monospace;font-size:0.78rem;letter-spacing:0.1em;
+    text-transform:uppercase;color:var(--gold);margin-bottom:16px;padding-bottom:10px;
+    border-bottom:1px solid rgba(246,239,228,0.12);
+  }
+  .col-label.drinks{color:var(--herb);}
+  .menu-item{
+    display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    padding:16px 0;border-bottom:1px dashed rgba(246,239,228,0.12);
+  }
+  .menu-item:last-child{border-bottom:none;}
+  .mi-name{font-weight:600;font-size:1.05rem;}
+  .mi-desc{color:var(--yogurt-dim);font-size:0.85rem;margin-top:3px;}
+  .mi-price{font-family:'JetBrains Mono',monospace;color:var(--flame);font-weight:700;white-space:nowrap;}
+
+  /* -------- RATING (section 3) -------- */
+  .rating-wrap{
+    background:var(--char-2);border-radius:24px;padding:56px;
+    display:grid;grid-template-columns:auto 1fr;gap:48px;align-items:center;
+    border:1px solid rgba(246,239,228,0.06);
+  }
+  @media(max-width:700px){.rating-wrap{grid-template-columns:1fr;padding:36px 26px;text-align:center;}}
+  .rating-big{font-size:6rem;color:var(--flame);line-height:0.8;}
+  .rating-big small{font-size:2rem;color:var(--yogurt-dim);font-family:'Work Sans',sans-serif;font-weight:600;}
+  .stars{position:relative;display:inline-block;font-size:2rem;letter-spacing:4px;margin-top:14px;}
+  .stars .base{color:rgba(246,239,228,0.18);}
+  .stars .fill{
+    position:absolute;top:0;left:0;overflow:hidden;color:var(--flame);
+    white-space:nowrap;width:86%;
+  }
+  .rating-quote{font-size:1.15rem;color:var(--yogurt-dim);max-width:44ch;}
+  .rating-quote strong{color:var(--yogurt);}
+
+  /* -------- SHOP (section 4) -------- */
+  .shop-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:36px;align-items:start;}
+  @media(max-width:900px){.shop-grid{grid-template-columns:1fr;}}
+  .shop-list{display:flex;flex-direction:column;gap:10px;}
+  .shop-row{
+    display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;
+    background:var(--char-2);border-radius:14px;padding:14px 18px;
+    border:1px solid rgba(246,239,228,0.06);
+  }
+  .shop-row .cat{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;}
+  .shop-row.drink .cat{color:var(--herb);}
+  .shop-row .name{font-weight:600;}
+  .shop-price{font-family:'JetBrains Mono',monospace;color:var(--flame);font-weight:700;font-size:0.92rem;}
+  .stepper{display:flex;align-items:center;gap:10px;background:rgba(246,239,228,0.06);border-radius:10px;padding:4px;}
+  .stepper button{
+    width:28px;height:28px;border-radius:8px;border:none;background:rgba(246,239,228,0.08);
+    color:var(--yogurt);font-size:1rem;cursor:pointer;font-family:'JetBrains Mono',monospace;
+    display:flex;align-items:center;justify-content:center;transition:background .15s;
+  }
+  .stepper button:hover{background:var(--flame);color:var(--char);}
+  .stepper .qty{min-width:16px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:700;}
+
+  .cart-card{
+    position:sticky;top:90px;background:var(--char-2);border-radius:20px;padding:28px;
+    border:1px solid rgba(246,239,228,0.08);
+  }
+  .cart-card h3{font-size:1.5rem;margin-bottom:18px;}
+  #cartEmpty{color:var(--yogurt-dim);font-size:0.92rem;}
+  .cart-line{display:flex;justify-content:space-between;font-size:0.92rem;padding:8px 0;border-bottom:1px dashed rgba(246,239,228,0.1);}
+  .cart-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;padding-top:16px;border-top:1px solid rgba(246,239,228,0.15);}
+  .cart-total .label{color:var(--yogurt-dim);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;}
+  .cart-total .amount{font-family:'JetBrains Mono',monospace;font-size:1.6rem;color:var(--flame);font-weight:700;}
+  .cart-note{font-size:0.78rem;color:var(--yogurt-dim);margin-top:10px;line-height:1.5;}
+  .checkout-btn{
+    width:100%;margin-top:18px;background:var(--flame);color:var(--char);
+    border:none;padding:15px;border-radius:12px;font-weight:700;font-size:0.95rem;
+    cursor:pointer;transition:transform .15s, opacity .15s;font-family:'Work Sans',sans-serif;
+  }
+  .checkout-btn:hover{transform:translateY(-2px);}
+  .checkout-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+
+  /* -------- LOCATION (section 5) -------- */
+  .loc-wrap{
+    display:grid;grid-template-columns:1fr 1fr;gap:0;
+    border-radius:24px;overflow:hidden;border:1px solid rgba(246,239,228,0.08);
+  }
+  @media(max-width:760px){.loc-wrap{grid-template-columns:1fr;}}
+  .loc-info{background:var(--char-2);padding:52px;}
+  .loc-info h2{font-size:2.2rem;margin-bottom:26px;}
+  .loc-line{display:flex;gap:16px;margin-bottom:22px;align-items:flex-start;}
+  .loc-icon{
+    width:38px;height:38px;border-radius:10px;background:rgba(232,84,42,0.14);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--flame);
+    font-family:'JetBrains Mono',monospace;font-weight:700;
+  }
+  .loc-line .label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--yogurt-dim);margin-bottom:4px;}
+  .loc-line .value{font-size:1.08rem;font-weight:600;}
+  .loc-line a.value:hover{color:var(--flame);}
+  .loc-visual{
+    position:relative;min-height:320px;
+    background:
+      linear-gradient(160deg, rgba(232,84,42,0.18), rgba(124,154,93,0.12)),
+      repeating-linear-gradient(45deg, rgba(246,239,228,0.03) 0 2px, transparent 2px 14px),
+      var(--char);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .loc-pin{
+    display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--yogurt-dim);
+  }
+  .loc-pin .dot{
+    width:20px;height:20px;border-radius:50%;background:var(--flame);
+    box-shadow:0 0 0 8px rgba(232,84,42,0.18);
+    animation:pulseFlame 2.4s ease-in-out infinite;
+  }
+  .loc-hours{margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;text-align:center;}
+  .loc-hours div{padding:2px 0;}
+
+  footer{padding:40px 0;text-align:center;color:var(--yogurt-dim);font-size:0.82rem;border-top:1px solid rgba(246,239,228,0.08);}
+  footer .accent{color:var(--flame);}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">ZAM ZAM<span>.</span></div>
+    <ul class="nav-ticket">
+      <li><a href="#was-sind-wir"><span class="num">01</span> Wir sind Zam Zam</a></li>
+      <li><a href="#menu"><span class="num">02</span> Menü</a></li>
+      <li><a href="#bewertung"><span class="num">03</span> Bewertung</a></li>
+      <li><a href="#shop"><span class="num">04</span> Bestellen</a></li>
+      <li><a href="#standort"><span class="num">05</span> Standort</a></li>
+    </ul>
+    <button class="nav-cart-btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">
+      Warenkorb <span class="count" id="navCount">0</span>
+    </button>
+  </div>
+</header>
+
+<!-- 1. WAS SIND WIR -->
+<section class="hero" id="was-sind-wir">
+  <div class="wrap">
+    <div class="reveal in">
+      <div class="eyebrow">01 — Wir sind Zam Zam Döner</div>
+      <h1>WIR SIND<br><span class="accent">ZAM ZAM DÖNER.</span></h1>
+      <p class="hero-tag">Ein Dönerladen mit einem klaren Auftrag: Fleisch vom Spieß, frisches Gemüse, Brot aus dem Ofen nebenan — und keine Kompromisse beim Geschmack.</p>
+      <div class="hero-cta">
+        <a href="#shop" class="btn-primary">Jetzt bestellen</a>
+        <a href="#menu" class="btn-ghost">Menü ansehen</a>
+      </div>
+    </div>
+    <div class="spit-stage">
+      <div class="rod"></div>
+      <div class="doner-cone"></div>
+      <div class="flame-glow"></div>
+      <div class="steam"></div>
+      <div class="steam"></div>
+      <div class="steam"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. WAS WIR VERKAUFEN -->
+<section id="menu">
+  <div class="wrap">
+    <div class="menu-head reveal">
+      <div>
+        <div class="eyebrow">02 — Unser Menü</div>
+        <h2>Unser Menü</h2>
+      </div>
+    </div>
+    <div class="menu-cols reveal">
+      <div>
+        <div class="col-label">Essen</div>
+        <div class="menu-item">
+          <div><div class="mi-name">Döner</div><div class="mi-desc">Klassisch mit Salat, Zwiebeln & Soße nach Wahl</div></div>
+          <div class="mi-price">6,50 €</div>
+        </div>
+        <div class="menu-item">
+          <div><div class="mi-name">Schülerdöner</div><div class="mi-desc">Kleinere Portion, gleicher Geschmack</div></div>
+          <div class="mi-price">4,50 €</div>
+        </div>
+        <div class="menu-item">
+          <div><div class="mi-name">Kebap Rolle</div><div class="mi-desc">Im Fladenbrot gerollt, ideal für unterwegs</div></div>
+          <div class="mi-price">6,00 €</div>
+        </div>
+        <div class="menu-item">
+          <div><div class="mi-name">Döner Box</div><div class="mi-desc">Fleisch, Pommes & Salat in der Box</div></div>
+          <div class="mi-price">7,50 €</div>
+        </div>
+        <div class="menu-item">
+          <div><div class="mi-name">Burger mit Pommes</div><div class="mi-desc">Hausgemacht, mit knusprigen Pommes</div></div>
+          <div class="mi-price">8,50 €</div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label drinks">Getränke</div>
+        <div class="menu-item">
+          <div><div class="mi-name">Ayran</div><div class="mi-desc">Traditionelles Joghurtgetränk</div></div>
+          <div class="mi-price">2,00 €</div>
+        </div>
+        <div class="menu-item">
+          <div><div class="mi-name">Coke</div><div class="mi-desc">0,33 l</div></div>
+          <div class="mi-price">2,50 €</div>
+        </div>
+        <div class="menu-item">
+          <div><div class="mi-name">Fanta</div><div class="mi-desc">0,33 l</div></div>
+          <div class="mi-price">2,50 €</div>
+        </div>
+        <div class="menu-item">
+          <div><div class="mi-name">Bier</div><div class="mi-desc">0,33 l</div></div>
+          <div class="mi-price">3,50 €</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. BEWERTUNG -->
+<section id="bewertung">
+  <div class="wrap">
+    <div class="eyebrow reveal">03 — Bewertung</div>
+    <div class="rating-wrap reveal">
+      <div>
+        <div class="rating-big">4.3<small>/5</small></div>
+        <div class="stars" aria-label="4.3 von 5 Sternen">
+          <span class="base">★★★★★</span>
+          <span class="fill">★★★★★</span>
+        </div>
+      </div>
+      <p class="rating-quote"><strong>Durchschnittliche Bewertung: 4,3 von 5 Sternen.</strong><br>Unsere Gäste schätzen frisches Fleisch, ehrliche Portionen und schnellen Service.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4. SHOPSYSTEM -->
+<section id="shop">
+  <div class="wrap">
+    <div class="eyebrow reveal">04 — Shopsystem</div>
+    <h2 class="reveal" style="font-size:clamp(2.2rem,5vw,3.2rem);margin-bottom:36px;">Jetzt bestellen</h2>
+
+    <div class="shop-grid reveal">
+      <div class="shop-list" id="shopList"></div>
+
+      <div class="cart-card">
+        <h3>Warenkorb</h3>
+        <div id="cartEmpty">Noch nichts ausgewählt — füge Artikel aus der Liste hinzu.</div>
+        <div id="cartLines"></div>
+        <div class="cart-total">
+          <span class="label">Gesamt</span>
+          <span class="amount mono" id="cartTotal">0,00 €</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn" disabled onclick="submitOrder()">Bestellung abschicken</button>
+        <p class="cart-note">Die Bestellung wird per WhatsApp an uns gesendet. Bezahlung erfolgt bei Abholung im Laden.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. ORT & TELEFONNUMMER -->
+<section id="standort">
+  <div class="wrap">
+    <div class="eyebrow reveal">05 — Ort & Telefonnummer</div>
+    <div class="loc-wrap reveal">
+      <div class="loc-info">
+        <h2>Besuch uns</h2>
+        <div class="loc-line">
+          <div class="loc-icon">A</div>
+          <div>
+            <div class="label">Adresse</div>
+            <a class="value" href="https://www.google.com/maps/search/?api=1&query=V%C3%B6ttinger+Str.+2+85354+Freising" target="_blank" rel="noopener">Vöttinger Str. 2, 85354 Freising</a>
+          </div>
+        </div>
+        <div class="loc-line">
+          <div class="loc-icon">T</div>
+          <div>
+            <div class="label">Telefon</div>
+            <a class="value" href="tel:+4915901067870">01590 1067870</a>
+          </div>
+        </div>
+        <div class="loc-line">
+          <div class="loc-icon">Z</div>
+          <div>
+            <div class="label">Öffnungszeiten</div>
+            <div class="loc-hours">
+              <div>Mo–Fr — 11:00–22:00</div>
+              <div>Sa–So — 12:00–23:00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="loc-visual">
+        <div class="loc-pin">
+          <div class="dot"></div>
+          <div>Vöttinger Str. 2<br>85354 Freising</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 <span class="accent">Zam Zam Döner</span> — Frisch vom Spieß.
+</footer>
+
+<script>
+  const ITEMS = [
+    {id:'doener', name:'Döner', price:6.50, cat:'essen'},
+    {id:'schueler', name:'Schülerdöner', price:4.50, cat:'essen'},
+    {id:'rolle', name:'Kebap Rolle', price:6.00, cat:'essen'},
+    {id:'box', name:'Döner Box', price:7.50, cat:'essen'},
+    {id:'burger', name:'Burger mit Pommes', price:8.50, cat:'essen'},
+    {id:'ayran', name:'Ayran', price:2.00, cat:'getraenk'},
+    {id:'coke', name:'Coke', price:2.50, cat:'getraenk'},
+    {id:'fanta', name:'Fanta', price:2.50, cat:'getraenk'},
+    {id:'bier', name:'Bier', price:3.50, cat:'getraenk'},
+  ];
+  const cart = {};
+
+  function fmt(n){ return n.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €'; }
+
+  function renderShopList(){
+    const el = document.getElementById('shopList');
+    el.innerHTML = ITEMS.map(it => `
+      <div class="shop-row ${it.cat === 'getraenk' ? 'drink' : ''}">
+        <div>
+          <div class="cat">${it.cat === 'getraenk' ? 'Getränk' : 'Essen'}</div>
+          <div class="name">${it.name}</div>
+        </div>
+        <div class="shop-price">${fmt(it.price)}</div>
+        <div class="stepper">
+          <button aria-label="Weniger ${it.name}" onclick="changeQty('${it.id}', -1)">−</button>
+          <span class="qty" id="qty-${it.id}">0</span>
+          <button aria-label="Mehr ${it.name}" onclick="changeQty('${it.id}', 1)">+</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function changeQty(id, delta){
+    const current = cart[id] || 0;
+    const next = Math.max(0, current + delta);
+    if(next === 0){ delete cart[id]; } else { cart[id] = next; }
+    document.getElementById(`qty-${id}`).textContent = next;
+    renderCart();
+  }
+
+  function renderCart(){
+    const lines = document.getElementById('cartLines');
+    const empty = document.getElementById('cartEmpty');
+    const totalEl = document.getElementById('cartTotal');
+    const btn = document.getElementById('checkoutBtn');
+    const navCount = document.getElementById('navCount');
+    const entries = Object.entries(cart);
+
+    if(entries.length === 0){
+      empty.style.display = 'block';
+      lines.innerHTML = '';
+      totalEl.textContent = fmt(0);
+      btn.disabled = true;
+      navCount.textContent = '0';
+      return;
+    }
+    empty.style.display = 'none';
+    let total = 0;
+    let count = 0;
+    lines.innerHTML = entries.map(([id, qty]) => {
+      const it = ITEMS.find(i => i.id === id);
+      const sub = it.price * qty;
+      total += sub;
+      count += qty;
+      return `<div class="cart-line"><span>${qty} × ${it.name}</span><span class="mono">${fmt(sub)}</span></div>`;
+    }).join('');
+    totalEl.textContent = fmt(total);
+    btn.disabled = false;
+    navCount.textContent = String(count);
+  }
+
+  function submitOrder(){
+    const entries = Object.entries(cart);
+    if(entries.length === 0) return;
+    let total = 0;
+    const lines = entries.map(([id, qty]) => {
+      const it = ITEMS.find(i => i.id === id);
+      total += it.price * qty;
+      return `${qty}x ${it.name}`;
+    });
+    const message = `Hallo! Ich möchte gerne bestellen:%0A${lines.join('%0A')}%0A%0AGesamt: ${fmt(total)}%0A%0AAbholung im Laden.`;
+    window.open(`https://wa.me/4915901067870?text=${message}`, '_blank');
+  }
+
+  renderShopList();
+  renderCart();
+
+  // scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, {threshold:0.15});
+  revealEls.forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>

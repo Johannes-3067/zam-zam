@@ -3,20 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Frame Studio — Websites for small businesses</title>
+<title>Helmesseiten — Websites for small businesses</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #10131a;
-    --bg-alt: #151922;
-    --panel: #171b24;
-    --text: #edeef2;
-    --text-muted: #9aa1ad;
-    --accent: #ffb238;
-    --accent-soft: rgba(255,178,56,0.13);
-    --border: #262b36;
+    --bg: #08050f;
+    --bg-alt: #0d0918;
+    --panel: #120c22;
+    --text: #f3f0ff;
+    --text-muted: #9086b8;
+    --accent: #00f6ff;
+    --accent2: #ff2ec4;
+    --accent-soft: rgba(0,246,255,0.12);
+    --accent2-soft: rgba(255,46,196,0.12);
+    --border: #2a2148;
     --radius: 10px;
   }
 
@@ -25,7 +27,11 @@
 
   body{
     margin: 0;
-    background: var(--bg);
+    background:
+      radial-gradient(ellipse 900px 500px at 12% -5%, rgba(255,46,196,0.16), transparent 60%),
+      radial-gradient(ellipse 900px 600px at 90% 15%, rgba(0,246,255,0.13), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
     color: var(--text);
     font-family: 'Inter', -apple-system, sans-serif;
     font-size: 17px;
@@ -58,9 +64,11 @@
     position: sticky;
     top: 0;
     z-index: 20;
-    background: rgba(16,19,26,0.85);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
+    background: rgba(20,15,35,0.45);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 30px rgba(0,0,0,0.25);
   }
 
   nav{
@@ -73,8 +81,11 @@
   }
 
   .wordmark{
-    font-size: 1.1rem;
+    font-size: 2rem;
     text-decoration: none;
+    color: var(--accent);
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 6px rgba(0,246,255,0.8), 0 0 22px rgba(0,246,255,0.5), 0 0 46px rgba(0,246,255,0.3);
   }
 
   .nav-links{
@@ -89,12 +100,12 @@
     font-size: 0.95rem;
     transition: color 0.15s ease;
   }
-  .nav-links a:hover{ color: var(--text); }
+  .nav-links a:hover{ color: var(--accent); text-shadow: 0 0 10px rgba(0,246,255,0.6); }
 
   .btn{
     display: inline-block;
     background: var(--accent);
-    color: #14120a;
+    color: #071014;
     font-weight: 600;
     font-size: 0.95rem;
     padding: 11px 22px;
@@ -103,17 +114,21 @@
     border: none;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
-    transition: transform 0.15s ease, background 0.15s ease;
+    box-shadow: 0 0 14px rgba(0,246,255,0.55), 0 0 34px rgba(0,246,255,0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-  .btn:hover{ background: #ffc158; transform: translateY(-1px); }
+  .btn:hover{ box-shadow: 0 0 20px rgba(0,246,255,0.8), 0 0 50px rgba(0,246,255,0.4); transform: translateY(-1px); }
 
   .btn-ghost{
-    background: transparent;
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
     color: var(--text);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255,46,196,0.4);
     padding: 10px 21px;
+    box-shadow: 0 0 10px rgba(255,46,196,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
   }
-  .btn-ghost:hover{ border-color: var(--accent); background: transparent; transform: none; }
+  .btn-ghost:hover{ box-shadow: 0 0 18px rgba(255,46,196,0.6), 0 0 40px rgba(255,46,196,0.25), inset 0 1px 0 rgba(255,255,255,0.25); background: rgba(255,255,255,0.1); transform: none; }
 
   .menu-toggle{
     display: none;
@@ -152,6 +167,7 @@
     font-size: clamp(2.3rem, 4.6vw, 3.4rem);
     line-height: 1.12;
     max-width: 12.5ch;
+    text-shadow: 0 0 28px rgba(0,246,255,0.22), 0 0 60px rgba(255,46,196,0.14);
   }
 
   .hero p{
@@ -169,29 +185,41 @@
 
   /* mock browser window */
   .mock-browser{
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 16px;
     padding: 0;
+    position: relative;
+    overflow: hidden;
     transform: rotate(-2.5deg);
-    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.55);
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7), 0 0 40px rgba(0,246,255,0.15), 0 0 70px rgba(255,46,196,0.1), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  .mock-browser::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 40%);
+    pointer-events: none;
   }
   .mock-bar{
     display: flex;
     gap: 6px;
     padding: 12px 14px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    position: relative;
   }
   .mock-bar span{
     width: 9px; height: 9px;
     border-radius: 50%;
-    background: var(--border);
+    background: rgba(255,255,255,0.25);
   }
-  .mock-body{ padding: 26px 22px 30px; }
+  .mock-body{ padding: 26px 22px 30px; position: relative; }
   .mock-line{
     height: 11px;
     border-radius: 4px;
-    background: var(--border);
+    background: rgba(255,255,255,0.14);
     margin-bottom: 10px;
   }
   .mock-line.w-70{ width: 70%; background: var(--text-muted); opacity: 0.4; }
@@ -203,11 +231,13 @@
   }
   .mock-block{
     height: 58px;
-    border-radius: 6px;
-    background: var(--accent-soft);
-    border: 1px solid rgba(255,178,56,0.3);
+    border-radius: 10px;
+    background: rgba(0,246,255,0.1);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(0,246,255,0.4);
+    box-shadow: 0 0 14px rgba(0,246,255,0.2) inset, inset 0 1px 0 rgba(255,255,255,0.25);
   }
-  .mock-block:nth-child(2){ background: var(--border); border-color: var(--border); }
+  .mock-block:nth-child(2){ background: rgba(255,46,196,0.1); border-color: rgba(255,46,196,0.4); box-shadow: 0 0 14px rgba(255,46,196,0.2) inset, inset 0 1px 0 rgba(255,255,255,0.25); }
 
   /* ---- Section shared ---- */
   section{ padding: 80px 0; border-top: 1px solid var(--border); }
@@ -251,10 +281,11 @@
   .process-item:last-child{ border-bottom: 1px solid var(--border); }
   .process-num{
     font-family: 'Space Grotesk', sans-serif;
-    color: var(--accent);
+    color: var(--accent2);
     font-size: 1rem;
     font-weight: 600;
     padding-top: 2px;
+    text-shadow: 0 0 10px rgba(255,46,196,0.7), 0 0 24px rgba(255,46,196,0.35);
   }
   .process-item h3{
     font-family: 'Space Grotesk', sans-serif;
@@ -279,9 +310,28 @@
     border-bottom: 1px solid var(--border);
     padding-bottom: 2px;
   }
-  .contact-info a:hover{ border-color: var(--accent); }
+  .contact-info a:hover{ border-color: var(--accent); color: var(--accent); text-shadow: 0 0 10px rgba(0,246,255,0.6); }
 
-  form{ display: grid; gap: 18px; }
+  .glass-card{
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 20px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .glass-card::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 35%);
+    pointer-events: none;
+  }
+
+  form{ display: grid; gap: 18px; position: relative; }
   .field-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
   label{
     display: block;
@@ -291,26 +341,34 @@
   }
   input, select, textarea{
     width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.14);
     color: var(--text);
     padding: 12px 14px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-family: 'Inter', sans-serif;
     font-size: 0.96rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
   }
-  input:focus, select:focus, textarea:focus{ border-color: var(--accent); }
+  input:focus, select:focus, textarea:focus{ border-color: var(--accent); box-shadow: 0 0 12px rgba(0,246,255,0.35); }
   textarea{ resize: vertical; min-height: 110px; }
 
   .form-success{
     display: none;
-    background: var(--accent-soft);
-    border: 1px solid rgba(255,178,56,0.35);
-    border-radius: 8px;
+    background: rgba(0,246,255,0.08);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid rgba(0,246,255,0.4);
+    box-shadow: 0 0 20px rgba(0,246,255,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+    border-radius: 14px;
     padding: 18px 20px;
     color: var(--text);
+    position: relative;
   }
   .form-success.show{ display: block; }
+  .form-success a{ color: var(--accent); text-decoration: underline; }
   form.hide{ display: none; }
 
   /* ---- Footer ---- */
@@ -324,7 +382,7 @@
     font-size: 0.9rem;
   }
   footer a{ color: var(--text-muted); text-decoration: none; }
-  footer a:hover{ color: var(--text); }
+  footer a:hover{ color: var(--accent); text-shadow: 0 0 10px rgba(0,246,255,0.6); }
 
   /* ---- Mobile ---- */
   @media (max-width: 780px){
@@ -333,8 +391,10 @@
     .nav-links{
       position: absolute;
       top: 100%; left: 0; right: 0;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
+      background: rgba(18,12,34,0.75);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
       flex-direction: column;
       align-items: flex-start;
       gap: 18px;
@@ -353,7 +413,7 @@
 
 <header>
   <nav>
-    <a href="#" class="wordmark">Frame Studio</a>
+    <a href="#" class="wordmark">Helmesseiten</a>
     <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle menu">☰</button>
     <div class="nav-links" id="navLinks">
       <a href="#services">Services</a>
@@ -443,10 +503,11 @@
           <h2>Let's build something</h2>
           <p>Tell me a bit about your project and I'll reply within a day or two.</p>
         </div>
-        <a href="mailto:hello@framestudio.com">hello@framestudio.com</a>
+        <a href="mailto:hello@helmesseiten.de">hello@helmesseiten.de</a>
+        <a href="tel:+4916093984993">+49 160 93984993</a>
       </div>
 
-      <div>
+      <div class="glass-card">
         <form id="contactForm">
           <div class="field-row">
             <div>
@@ -482,10 +543,10 @@
             <label for="message">Message</label>
             <textarea id="message" name="message" placeholder="What are you working on?" required></textarea>
           </div>
-          <button type="submit" class="btn">Send message</button>
+          <button type="submit" class="btn">Send via WhatsApp</button>
         </form>
         <div class="form-success" id="formSuccess">
-          Thanks — your message is in. I'll get back to you within a day or two.
+          Opening WhatsApp — just hit send there to reach me. If nothing opened, <a href="#" id="waFallback">tap here</a>.
         </div>
       </div>
     </div>
@@ -493,8 +554,11 @@
 </main>
 
 <footer class="wrap">
-  <span>Frame Studio © 2026</span>
-  <a href="mailto:hello@framestudio.com">hello@framestudio.com</a>
+  <span>Helmesseiten © 2026</span>
+  <span style="display:flex; gap:20px; flex-wrap:wrap;">
+    <a href="mailto:hello@helmesseiten.de">hello@helmesseiten.de</a>
+    <a href="tel:+4916093984993">+49 160 93984993</a>
+  </span>
 </footer>
 
 <script>
@@ -511,10 +575,33 @@
 
   const form = document.getElementById('contactForm');
   const success = document.getElementById('formSuccess');
+  const whatsappNumber = '4916093984993'; // +49 160 93984993, digits only, no leading 0 or +
+
+  function buildWhatsAppUrl(){
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const type = document.getElementById('type').value;
+    const budget = document.getElementById('budget').value;
+    const message = document.getElementById('message').value.trim();
+
+    const text =
+      `Hi, I'd like to get in touch about a website project.\n\n` +
+      `Name: ${name}\n` +
+      `Email: ${email}\n` +
+      `Project type: ${type}\n` +
+      `Budget: ${budget}\n\n` +
+      `${message}`;
+
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
+  }
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    const waUrl = buildWhatsAppUrl();
+    document.getElementById('waFallback').href = waUrl;
     form.classList.add('hide');
     success.classList.add('show');
+    window.open(waUrl, '_blank');
   });
 </script>
 

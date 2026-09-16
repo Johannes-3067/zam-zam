@@ -1,608 +1,473 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Helmesseiten — Websites for small businesses</title>
+<title>Pimple Pommes — Pimple Patches</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #08050f;
-    --bg-alt: #0d0918;
-    --panel: #120c22;
-    --text: #f3f0ff;
-    --text-muted: #9086b8;
-    --accent: #00f6ff;
-    --accent2: #ff2ec4;
-    --accent-soft: rgba(0,246,255,0.12);
-    --accent2-soft: rgba(255,46,196,0.12);
-    --border: #2a2148;
-    --radius: 10px;
+    --ink:#132A46;
+    --bg:#E7F1FC;
+    --card:#FFFFFF;
+    --accent:#FF6B4A;
+    --accent-dark:#E2532F;
+    --mint:#CFE1F4;
+    --mint-dark:#3E6F94;
+    --sage:#D6E8FA;
+    --line:#C4DBEF;
+    --muted:#5B7185;
   }
-
-  *{ box-sizing: border-box; }
-  html{ scroll-behavior: smooth; }
-
-  body{
-    margin: 0;
-    background:
-      radial-gradient(ellipse 900px 500px at 12% -5%, rgba(255,46,196,0.16), transparent 60%),
-      radial-gradient(ellipse 900px 600px at 90% 15%, rgba(0,246,255,0.13), transparent 60%),
-      var(--bg);
-    background-attachment: fixed;
-    color: var(--text);
-    font-family: 'Inter', -apple-system, sans-serif;
-    font-size: 17px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  h1, h2, .wordmark{
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    margin: 0;
-  }
-
-  a{ color: inherit; }
-
-  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
-
-  .wrap{
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 0 28px;
-  }
-
-  /* ---- Nav ---- */
-  header{
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background: rgba(20,15,35,0.45);
-    backdrop-filter: blur(22px) saturate(160%);
-    -webkit-backdrop-filter: blur(22px) saturate(160%);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 30px rgba(0,0,0,0.25);
-  }
-
-  nav{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 28px;
-    max-width: 1080px;
-    margin: 0 auto;
-  }
-
-  .wordmark{
-    font-size: 2rem;
-    text-decoration: none;
-    color: var(--accent);
-    letter-spacing: 0.01em;
-    text-shadow: 0 0 6px rgba(0,246,255,0.8), 0 0 22px rgba(0,246,255,0.5), 0 0 46px rgba(0,246,255,0.3);
-  }
-
-  .nav-links{
-    display: flex;
-    align-items: center;
-    gap: 32px;
-  }
-
-  .nav-links a{
-    text-decoration: none;
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    transition: color 0.15s ease;
-  }
-  .nav-links a:hover{ color: var(--accent); text-shadow: 0 0 10px rgba(0,246,255,0.6); }
-
-  .btn{
-    display: inline-block;
-    background: var(--accent);
-    color: #071014;
-    font-weight: 600;
-    font-size: 0.95rem;
-    padding: 11px 22px;
-    border-radius: 999px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    box-shadow: 0 0 14px rgba(0,246,255,0.55), 0 0 34px rgba(0,246,255,0.25);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .btn:hover{ box-shadow: 0 0 20px rgba(0,246,255,0.8), 0 0 50px rgba(0,246,255,0.4); transform: translateY(-1px); }
-
-  .btn-ghost{
-    background: rgba(255,255,255,0.07);
-    backdrop-filter: blur(14px) saturate(160%);
-    -webkit-backdrop-filter: blur(14px) saturate(160%);
-    color: var(--text);
-    border: 1px solid rgba(255,46,196,0.4);
-    padding: 10px 21px;
-    box-shadow: 0 0 10px rgba(255,46,196,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
-  }
-  .btn-ghost:hover{ box-shadow: 0 0 18px rgba(255,46,196,0.6), 0 0 40px rgba(255,46,196,0.25), inset 0 1px 0 rgba(255,255,255,0.25); background: rgba(255,255,255,0.1); transform: none; }
-
-  .menu-toggle{
-    display: none;
-    background: none;
-    border: none;
-    color: var(--text);
-    font-size: 1.4rem;
-    cursor: pointer;
-  }
-
-  /* ---- Hero ---- */
-  .hero{
-    padding: 90px 0 110px;
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 48px;
-    align-items: center;
-  }
-
-  .hero-copy{ opacity: 0; }
-  @media (prefers-reduced-motion: no-preference){
-    .hero-copy{
-      animation: rise 0.7s ease forwards;
-      animation-delay: 0.1s;
-    }
-  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Work Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Fraunces',Georgia,serif;margin:0;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  ::selection{background:var(--accent);color:#fff;}
+  img,svg{max-width:100%;}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 32px;}
+  .nav-link{color:var(--ink);font-size:15px;font-weight:500;padding:8px 0;border-bottom:1px solid transparent;transition:border-color .15s ease;}
+  .nav-link:hover{border-bottom-color:var(--ink);}
+  .btn-primary{transition:background .15s ease;}
+  .btn-primary:hover{background:var(--accent-dark) !important;}
+  .btn-ghost{border:1.5px solid var(--ink) !important;transition:background .15s ease,color .15s ease;}
+  .btn-ghost:hover{background:var(--ink);color:var(--bg) !important;}
+  .btn-add{transition:background .15s ease,border-color .15s ease;}
+  .btn-add:hover{background:var(--ink) !important;color:var(--bg) !important;}
+  .btn-added{background:var(--sage) !important;color:var(--mint-dark) !important;border-color:var(--mint) !important;}
+  .card-hover{transition:transform .18s ease,box-shadow .18s ease;}
+  .card-hover:hover{transform:translateY(-4px);box-shadow:0 16px 32px -20px rgba(19,42,70,0.35);}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  .newsletter-input::placeholder{color:#A9C3DB;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   @media (prefers-reduced-motion: reduce){
-    .hero-copy{ opacity: 1; }
+    .card-hover,.btn-primary,.btn-ghost,.btn-add,.nav-link{transition:none;}
   }
-  @keyframes rise{
-    from{ opacity: 0; transform: translateY(14px); }
-    to{ opacity: 1; transform: translateY(0); }
-  }
-
-  .hero h1{
-    font-size: clamp(2.3rem, 4.6vw, 3.4rem);
-    line-height: 1.12;
-    max-width: 12.5ch;
-    text-shadow: 0 0 28px rgba(0,246,255,0.22), 0 0 60px rgba(255,46,196,0.14);
-  }
-
-  .hero p{
-    color: var(--text-muted);
-    font-size: 1.08rem;
-    max-width: 46ch;
-    margin: 22px 0 32px;
-  }
-
-  .hero-ctas{
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-
-  /* mock browser window */
-  .mock-browser{
-    background: rgba(255,255,255,0.06);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.16);
-    border-radius: 16px;
-    padding: 0;
-    position: relative;
-    overflow: hidden;
-    transform: rotate(-2.5deg);
-    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7), 0 0 40px rgba(0,246,255,0.15), 0 0 70px rgba(255,46,196,0.1), inset 0 1px 0 rgba(255,255,255,0.3);
-  }
-  .mock-browser::before{
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 40%);
-    pointer-events: none;
-  }
-  .mock-bar{
-    display: flex;
-    gap: 6px;
-    padding: 12px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
-    position: relative;
-  }
-  .mock-bar span{
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.25);
-  }
-  .mock-body{ padding: 26px 22px 30px; position: relative; }
-  .mock-line{
-    height: 11px;
-    border-radius: 4px;
-    background: rgba(255,255,255,0.14);
-    margin-bottom: 10px;
-  }
-  .mock-line.w-70{ width: 70%; background: var(--text-muted); opacity: 0.4; }
-  .mock-line.w-40{ width: 40%; margin-bottom: 22px; }
-  .mock-grid{
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-  }
-  .mock-block{
-    height: 58px;
-    border-radius: 10px;
-    background: rgba(0,246,255,0.1);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(0,246,255,0.4);
-    box-shadow: 0 0 14px rgba(0,246,255,0.2) inset, inset 0 1px 0 rgba(255,255,255,0.25);
-  }
-  .mock-block:nth-child(2){ background: rgba(255,46,196,0.1); border-color: rgba(255,46,196,0.4); box-shadow: 0 0 14px rgba(255,46,196,0.2) inset, inset 0 1px 0 rgba(255,255,255,0.25); }
-
-  /* ---- Section shared ---- */
-  section{ padding: 80px 0; border-top: 1px solid var(--border); }
-  .section-head{ max-width: 52ch; margin-bottom: 44px; }
-  .section-head h2{ font-size: clamp(1.6rem, 3vw, 2.1rem); }
-  .section-head p{ color: var(--text-muted); margin-top: 14px; }
-
-  /* ---- Services ---- */
-  .service-row{
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 24px;
-    padding: 28px 0;
-    border-top: 1px solid var(--border);
-  }
-  .service-row:last-child{ border-bottom: 1px solid var(--border); }
-  .service-row h3{
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
-    font-size: 1.15rem;
-    margin: 0;
-  }
-  .service-row p{
-    color: var(--text-muted);
-    margin: 0;
-    max-width: 50ch;
-  }
-
-  /* ---- Process ---- */
-  .process-list{
-    display: grid;
-    gap: 0;
-  }
-  .process-item{
-    display: grid;
-    grid-template-columns: 60px 1fr;
-    gap: 20px;
-    padding: 26px 0;
-    border-top: 1px solid var(--border);
-  }
-  .process-item:last-child{ border-bottom: 1px solid var(--border); }
-  .process-num{
-    font-family: 'Space Grotesk', sans-serif;
-    color: var(--accent2);
-    font-size: 1rem;
-    font-weight: 600;
-    padding-top: 2px;
-    text-shadow: 0 0 10px rgba(255,46,196,0.7), 0 0 24px rgba(255,46,196,0.35);
-  }
-  .process-item h3{
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin: 0 0 6px;
-  }
-  .process-item p{ color: var(--text-muted); margin: 0; max-width: 54ch; }
-
-  /* ---- Contact ---- */
-  .contact-grid{
-    display: grid;
-    grid-template-columns: 0.9fr 1.1fr;
-    gap: 56px;
-  }
-  .contact-info p{ color: var(--text-muted); max-width: 34ch; }
-  .contact-info a{
-    display: inline-block;
-    margin-top: 8px;
-    color: var(--text);
-    text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 2px;
-  }
-  .contact-info a:hover{ border-color: var(--accent); color: var(--accent); text-shadow: 0 0 10px rgba(0,246,255,0.6); }
-
-  .glass-card{
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.14);
-    border-radius: 20px;
-    padding: 28px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.25);
-  }
-  .glass-card::before{
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 35%);
-    pointer-events: none;
-  }
-
-  form{ display: grid; gap: 18px; position: relative; }
-  .field-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  label{
-    display: block;
-    font-size: 0.88rem;
-    color: var(--text-muted);
-    margin-bottom: 7px;
-  }
-  input, select, textarea{
-    width: 100%;
-    background: rgba(255,255,255,0.06);
-    backdrop-filter: blur(14px) saturate(160%);
-    -webkit-backdrop-filter: blur(14px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.14);
-    color: var(--text);
-    padding: 12px 14px;
-    border-radius: 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.96rem;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
-  }
-  input:focus, select:focus, textarea:focus{ border-color: var(--accent); box-shadow: 0 0 12px rgba(0,246,255,0.35); }
-  textarea{ resize: vertical; min-height: 110px; }
-
-  .form-success{
-    display: none;
-    background: rgba(0,246,255,0.08);
-    backdrop-filter: blur(14px) saturate(160%);
-    -webkit-backdrop-filter: blur(14px) saturate(160%);
-    border: 1px solid rgba(0,246,255,0.4);
-    box-shadow: 0 0 20px rgba(0,246,255,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
-    border-radius: 14px;
-    padding: 18px 20px;
-    color: var(--text);
-    position: relative;
-  }
-  .form-success.show{ display: block; }
-  .form-success a{ color: var(--accent); text-decoration: underline; }
-  form.hide{ display: none; }
-
-  /* ---- Footer ---- */
-  footer{
-    border-top: 1px solid var(--border);
-    padding: 32px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-  }
-  footer a{ color: var(--text-muted); text-decoration: none; }
-  footer a:hover{ color: var(--accent); text-shadow: 0 0 10px rgba(0,246,255,0.6); }
-
-  /* ---- Mobile ---- */
-  @media (max-width: 780px){
-    .hero{ grid-template-columns: 1fr; padding: 56px 0 64px; }
-    .mock-browser{ transform: none; order: -1; }
-    .nav-links{
-      position: absolute;
-      top: 100%; left: 0; right: 0;
-      background: rgba(18,12,34,0.75);
-      backdrop-filter: blur(22px) saturate(160%);
-      -webkit-backdrop-filter: blur(22px) saturate(160%);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 18px;
-      padding: 20px 28px 28px;
-      display: none;
-    }
-    .nav-links.open{ display: flex; }
-    .menu-toggle{ display: block; }
-    .service-row, .contact-grid{ grid-template-columns: 1fr; gap: 12px; }
-    .field-row{ grid-template-columns: 1fr; }
-    footer{ flex-direction: column; gap: 10px; align-items: flex-start; }
+  @media (max-width: 900px){
+    .hide-mobile{display:none !important;}
+    .hero-grid{grid-template-columns:1fr !important;}
+    .product-grid{grid-template-columns:repeat(2, minmax(0,1fr)) !important;}
+    .steps-grid{grid-template-columns:1fr !important;}
+    .reviews-grid{grid-template-columns:1fr !important;}
+    .ingr-grid{grid-template-columns:1fr !important;}
+    .footer-grid{grid-template-columns:repeat(2, minmax(0,1fr)) !important;}
   }
 </style>
 </head>
 <body>
 
-<header>
-  <nav>
-    <a href="#" class="wordmark">Helmesseiten</a>
-    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle menu">☰</button>
-    <div class="nav-links" id="navLinks">
-      <a href="#services">Services</a>
-      <a href="#process">Process</a>
-      <a href="#contact" class="btn">Start a project</a>
-    </div>
-  </nav>
-</header>
+<div id="top" style="width:100%;">
 
-<main>
-  <section class="hero wrap" style="border-top:none;">
-    <div class="hero-copy">
-      <h1>Websites that make small businesses look like they've already made it.</h1>
-      <p>I design and build fast, custom websites for founders, studios, and local businesses — from first sketch to launch.</p>
-      <div class="hero-ctas">
-        <a href="#contact" class="btn">Start a project</a>
-        <a href="#process" class="btn btn-ghost">See how it works</a>
+  <!-- Announcement bar -->
+  <div style="background:var(--ink);color:var(--bg);">
+    <div class="wrap" style="display:flex;align-items:center;justify-content:center;height:40px;">
+      <p style="margin:0;font-size:13px;letter-spacing:0.02em;">Free shipping on orders over $25 &nbsp;·&nbsp; New: Invisible Dew Dots</p>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header style="position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);">
+    <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;height:84px;">
+      <a href="#top" style="font-family:'Fraunces',serif;font-weight:600;font-size:24px;letter-spacing:-0.01em;">Pimple Pommes</a>
+      <nav class="hide-mobile" style="display:flex;gap:36px;">
+        <a class="nav-link" href="#shop">Shop</a>
+        <a class="nav-link" href="#how">How it works</a>
+        <a class="nav-link" href="#reviews">Reviews</a>
+        <a class="nav-link" href="#ingredients">Ingredients</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <button aria-label="View bag" style="position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8h12l-1 12H7L6 8z"></path>
+            <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>
+          </svg>
+          <span id="cart-badge" style="display:none;position:absolute;top:2px;right:0px;background:var(--accent);color:#fff;font-size:11px;font-weight:600;min-width:17px;height:17px;border-radius:9px;align-items:center;justify-content:center;padding:0 4px;">0</span>
+        </button>
+        <a href="#shop" class="btn-primary" style="background:var(--accent);color:#fff;font-weight:600;font-size:14px;padding:11px 22px;border-radius:100px;">Shop Now</a>
       </div>
     </div>
-    <div class="mock-browser" aria-hidden="true">
-      <div class="mock-bar"><span></span><span></span><span></span></div>
-      <div class="mock-body">
-        <div class="mock-line w-70"></div>
-        <div class="mock-line w-40"></div>
-        <div class="mock-grid">
-          <div class="mock-block"></div>
-          <div class="mock-block"></div>
-          <div class="mock-block"></div>
+  </header>
+
+  <!-- Hero -->
+  <section style="padding:76px 0 88px;">
+    <div class="wrap hero-grid" style="display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:64px;align-items:center;">
+      <div>
+        <p style="margin:0 0 18px;font-size:13px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--mint-dark);">Hydrocolloid Patches</p>
+        <h1 style="font-size:56px;line-height:1.05;font-weight:600;letter-spacing:-0.02em;">Zap it before it zaps your day.</h1>
+        <p style="margin:24px 0 0;font-size:17px;line-height:1.6;color:var(--muted);max-width:440px;">Ultra-thin dots that pull out gunk while you sleep, work, or forget they're even there. No poking, no picking, no drama.</p>
+        <div style="display:flex;gap:14px;margin-top:36px;flex-wrap:wrap;">
+          <a href="#shop" class="btn-primary" style="background:var(--accent);color:#fff;font-weight:600;font-size:15px;padding:15px 28px;border-radius:100px;display:inline-block;">Shop Bestsellers</a>
+          <a href="#how" class="btn-ghost" style="color:var(--ink);font-weight:600;font-size:15px;padding:15px 28px;border-radius:100px;display:inline-block;">See How It Works</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:40px;">
+          <div style="display:flex;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+          </div>
+          <p style="margin:0;font-size:14px;color:var(--muted);">Dermatologist tested · 12,000+ happy faces</p>
+        </div>
+      </div>
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+        <div style="width:100%;aspect-ratio:1/1;max-width:440px;border-radius:32px;background:var(--sage);position:relative;overflow:hidden;">
+          <svg viewBox="0 0 440 440" style="position:absolute;inset:0;width:100%;height:100%;">
+            <circle cx="220" cy="150" r="15" fill="#FFD8CC"></circle>
+            <circle cx="150" cy="220" r="22" fill="var(--accent)" opacity="0.9"></circle>
+            <circle cx="300" cy="230" r="11" fill="#CFE1F4"></circle>
+            <circle cx="230" cy="280" r="17" fill="#FFFFFF"></circle>
+            <circle cx="330" cy="150" r="9" fill="#3E6F94"></circle>
+            <circle cx="120" cy="130" r="8" fill="var(--accent)" opacity="0.6"></circle>
+            <circle cx="270" cy="330" r="13" fill="#E7CFE0"></circle>
+            <circle cx="180" cy="320" r="10" fill="#FFFFFF"></circle>
+            <circle cx="340" cy="290" r="14" fill="#FFD8CC"></circle>
+          </svg>
+        </div>
+        <div style="position:absolute;bottom:-14px;right:8px;background:var(--card);border-radius:16px;padding:14px 20px;box-shadow:0 20px 40px -20px rgba(19,42,70,0.35);display:flex;align-items:center;gap:10px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--mint-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+          <p style="margin:0;font-size:13px;font-weight:600;">Works overnight</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="services" class="wrap">
-    <div class="section-head">
-      <h2>What I do</h2>
-      <p>Everything you need to get a website live and keep it running well.</p>
-    </div>
-    <div class="service-row">
-      <h3>Website design</h3>
-      <p>A custom design built around your business, your content, and how customers actually find you — not a stretched template.</p>
-    </div>
-    <div class="service-row">
-      <h3>Development</h3>
-      <p>Hand-coded, mobile-first builds that load fast and hold up on any device or connection.</p>
-    </div>
-    <div class="service-row">
-      <h3>Support &amp; updates</h3>
-      <p>Once your site is live, I'm around for edits, fixes, and small additions as your business changes.</p>
-    </div>
-  </section>
-
-  <section id="process" class="wrap">
-    <div class="section-head">
-      <h2>How a project runs</h2>
-      <p>Three stages, start to finish. Most sites take three to five weeks.</p>
-    </div>
-    <div class="process-list">
-      <div class="process-item">
-        <span class="process-num">01</span>
-        <div>
-          <h3>Discovery</h3>
-          <p>A call to talk through your goals, your audience, and the content you already have.</p>
-        </div>
+  <!-- Trust bar -->
+  <section style="border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:36px 0;">
+    <div class="wrap" style="display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:28px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.3 2.3 4.7-5"></path></svg>
+        <p style="margin:0;font-size:14px;font-weight:500;">Dermatologist tested</p>
       </div>
-      <div class="process-item">
-        <span class="process-num">02</span>
-        <div>
-          <h3>Design &amp; build</h3>
-          <p>You'll see a first draft, we refine it together, then I build it out and test it on real devices.</p>
-        </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21c0-8 4-14 14-16-2 10-8 14-14 16z"></path><path d="M5 21c2-3 4-5 7-7"></path></svg>
+        <p style="margin:0;font-size:14px;font-weight:500;">Vegan &amp; cruelty-free</p>
       </div>
-      <div class="process-item">
-        <span class="process-num">03</span>
-        <div>
-          <h3>Launch</h3>
-          <p>Your site goes live, and I'll walk you through how to make simple edits yourself.</p>
-        </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3h4"></path><path d="M12 3v6l5 9a2 2 0 0 1-1.8 3H8.8A2 2 0 0 1 7 18l5-9"></path></svg>
+        <p style="margin:0;font-size:14px;font-weight:500;">Hydrocolloid + salicylic acid</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.5 2"></path></svg>
+        <p style="margin:0;font-size:14px;font-weight:500;">Ships within 24 hours</p>
       </div>
     </div>
   </section>
 
-  <section id="contact" class="wrap">
-    <div class="contact-grid">
-      <div class="contact-info">
-        <div class="section-head" style="margin-bottom: 20px;">
-          <h2>Let's build something</h2>
-          <p>Tell me a bit about your project and I'll reply within a day or two.</p>
-        </div>
-        <a href="mailto:hello@helmesseiten.de">hello@helmesseiten.de</a>
-        <a href="tel:+4916093984993">+49 160 93984993</a>
+  <!-- Shop -->
+  <section id="shop" style="padding:96px 0;">
+    <div class="wrap">
+      <div style="max-width:560px;margin:0 auto 56px;text-align:center;">
+        <h2 style="font-size:38px;font-weight:600;letter-spacing:-0.01em;">Pick your patch</h2>
+        <p style="margin:16px 0 0;font-size:16px;color:var(--muted);line-height:1.6;">Four formats for every kind of breakout, from a stray chin bump to a full-blown flare-up.</p>
       </div>
+      <div class="product-grid" style="display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:24px;">
 
-      <div class="glass-card">
-        <form id="contactForm">
-          <div class="field-row">
-            <div>
-              <label for="name">Name</label>
-              <input type="text" id="name" name="name" required>
-            </div>
-            <div>
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" required>
+        <div class="card-hover" style="background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="aspect-ratio:1/1;background:var(--sage);position:relative;display:flex;align-items:center;justify-content:center;">
+            <svg width="70%" height="70%" viewBox="0 0 200 200">
+              <circle cx="70" cy="80" r="22" fill="#FFD8CC"></circle>
+              <circle cx="120" cy="60" r="12" fill="#FFFFFF"></circle>
+              <circle cx="130" cy="120" r="16" fill="#FFD8CC" opacity="0.7"></circle>
+              <circle cx="80" cy="135" r="9" fill="#FFFFFF"></circle>
+            </svg>
+            <span style="position:absolute;top:14px;left:14px;background:rgba(255,255,255,0.85);border-radius:100px;padding:5px 11px;font-size:11px;font-weight:600;">72 patches</span>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:6px;flex-grow:1;">
+            <h3 style="font-size:18px;font-weight:600;">Micro-Dot Patches</h3>
+            <p style="margin:0;font-size:13px;color:var(--muted);flex-grow:1;">For early-stage spots</p>
+            <p style="margin:2px 0 0;font-size:12px;font-weight:600;color:var(--mint-dark);">22,400+ sold</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+              <span style="font-size:17px;font-weight:600;">$8</span>
+              <button class="btn-add" data-product="micro" style="background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:10px 16px;border-radius:100px;border:1.5px solid var(--ink);">Add to Bag</button>
             </div>
           </div>
-          <div class="field-row">
-            <div>
-              <label for="type">Project type</label>
-              <select id="type" name="type">
-                <option>New website</option>
-                <option>Redesign</option>
-                <option>Landing page</option>
-                <option>Something else</option>
-              </select>
-            </div>
-            <div>
-              <label for="budget">Budget range</label>
-              <select id="budget" name="budget">
-                <option>Under $2,000</option>
-                <option>$2,000 – $5,000</option>
-                <option>$5,000 – $10,000</option>
-                <option>Not sure yet</option>
-              </select>
+        </div>
+
+        <div class="card-hover" style="background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="aspect-ratio:1/1;background:var(--sage);position:relative;display:flex;align-items:center;justify-content:center;">
+            <svg width="70%" height="70%" viewBox="0 0 200 200">
+              <circle cx="70" cy="80" r="22" fill="var(--accent)"></circle>
+              <circle cx="120" cy="60" r="12" fill="#FFFFFF"></circle>
+              <circle cx="130" cy="120" r="16" fill="var(--accent)" opacity="0.7"></circle>
+              <circle cx="80" cy="135" r="9" fill="#FFFFFF"></circle>
+            </svg>
+            <span style="position:absolute;top:14px;left:14px;background:rgba(255,255,255,0.85);border-radius:100px;padding:5px 11px;font-size:11px;font-weight:600;">24 patches</span>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:6px;flex-grow:1;">
+            <h3 style="font-size:18px;font-weight:600;">Overnight Rescue</h3>
+            <p style="margin:0;font-size:13px;color:var(--muted);flex-grow:1;">For deep, angry breakouts</p>
+            <p style="margin:2px 0 0;font-size:12px;font-weight:600;color:var(--mint-dark);">31,900+ sold</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+              <span style="font-size:17px;font-weight:600;">$11</span>
+              <button class="btn-add" data-product="overnight" style="background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:10px 16px;border-radius:100px;border:1.5px solid var(--ink);">Add to Bag</button>
             </div>
           </div>
-          <div>
-            <label for="message">Message</label>
-            <textarea id="message" name="message" placeholder="What are you working on?" required></textarea>
+        </div>
+
+        <div class="card-hover" style="background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="aspect-ratio:1/1;background:var(--sage);position:relative;display:flex;align-items:center;justify-content:center;">
+            <svg width="70%" height="70%" viewBox="0 0 200 200">
+              <circle cx="70" cy="80" r="22" fill="#CFE1F4"></circle>
+              <circle cx="120" cy="60" r="12" fill="#FFFFFF"></circle>
+              <circle cx="130" cy="120" r="16" fill="#CFE1F4" opacity="0.7"></circle>
+              <circle cx="80" cy="135" r="9" fill="#FFFFFF"></circle>
+            </svg>
+            <span style="position:absolute;top:14px;left:14px;background:rgba(255,255,255,0.85);border-radius:100px;padding:5px 11px;font-size:11px;font-weight:600;">36 patches</span>
           </div>
-          <button type="submit" class="btn">Send via WhatsApp</button>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:6px;flex-grow:1;">
+            <h3 style="font-size:18px;font-weight:600;">Invisible Dew Dots</h3>
+            <p style="margin:0;font-size:13px;color:var(--muted);flex-grow:1;">Ultra-thin, makeup-ready</p>
+            <p style="margin:2px 0 0;font-size:12px;font-weight:600;color:var(--mint-dark);">9,800+ sold</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+              <span style="font-size:17px;font-weight:600;">$9</span>
+              <button class="btn-add" data-product="invisible" style="background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:10px 16px;border-radius:100px;border:1.5px solid var(--ink);">Add to Bag</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-hover" style="background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="aspect-ratio:1/1;background:var(--sage);position:relative;display:flex;align-items:center;justify-content:center;">
+            <svg width="70%" height="70%" viewBox="0 0 200 200">
+              <circle cx="70" cy="80" r="22" fill="#E7CFE0"></circle>
+              <circle cx="120" cy="60" r="12" fill="#FFFFFF"></circle>
+              <circle cx="130" cy="120" r="16" fill="#E7CFE0" opacity="0.7"></circle>
+              <circle cx="80" cy="135" r="9" fill="#FFFFFF"></circle>
+            </svg>
+            <span style="position:absolute;top:14px;left:14px;background:rgba(255,255,255,0.85);border-radius:100px;padding:5px 11px;font-size:11px;font-weight:600;">20 patches</span>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:6px;flex-grow:1;">
+            <h3 style="font-size:18px;font-weight:600;">Body &amp; Back Patches</h3>
+            <p style="margin:0;font-size:13px;color:var(--muted);flex-grow:1;">For chest, back &amp; shoulders</p>
+            <p style="margin:2px 0 0;font-size:12px;font-weight:600;color:var(--mint-dark);">6,200+ sold</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+              <span style="font-size:17px;font-weight:600;">$13</span>
+              <button class="btn-add" data-product="body" style="background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:10px 16px;border-radius:100px;border:1.5px solid var(--ink);">Add to Bag</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" style="background:var(--sage);padding:96px 0;">
+    <div class="wrap">
+      <div style="max-width:560px;margin:0 auto 56px;text-align:center;">
+        <h2 style="font-size:38px;font-weight:600;letter-spacing:-0.01em;">How it works</h2>
+        <p style="margin:16px 0 0;font-size:16px;color:var(--muted);line-height:1.6;">Three steps between you and clear-ish skin by morning.</p>
+      </div>
+      <div class="steps-grid" style="display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:32px;">
+        <div style="text-align:center;">
+          <div style="width:56px;height:56px;border-radius:100px;background:var(--card);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-family:'Fraunces',serif;font-size:20px;font-weight:600;">1</div>
+          <h3 style="font-size:18px;font-weight:600;margin-bottom:10px;">Cleanse &amp; dry</h3>
+          <p style="margin:0;font-size:14px;color:var(--muted);line-height:1.6;">Wash the area and pat it fully dry — patches don't stick to damp skin.</p>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:56px;height:56px;border-radius:100px;background:var(--card);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-family:'Fraunces',serif;font-size:20px;font-weight:600;">2</div>
+          <h3 style="font-size:18px;font-weight:600;margin-bottom:10px;">Press &amp; forget</h3>
+          <p style="margin:0;font-size:14px;color:var(--muted);line-height:1.6;">Center the dot over the spot and leave it for 6–8 hours, ideally overnight.</p>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:56px;height:56px;border-radius:100px;background:var(--card);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-family:'Fraunces',serif;font-size:20px;font-weight:600;">3</div>
+          <h3 style="font-size:18px;font-weight:600;margin-bottom:10px;">Peel &amp; reveal</h3>
+          <p style="margin:0;font-size:14px;color:var(--muted);line-height:1.6;">Once it turns white and puffy, peel it off — that's the gunk it pulled out.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews -->
+  <section id="reviews" style="padding:96px 0;">
+    <div class="wrap">
+      <div style="max-width:560px;margin:0 auto 56px;text-align:center;">
+        <h2 style="font-size:38px;font-weight:600;letter-spacing:-0.01em;">12,000+ happy faces</h2>
+        <p style="margin:16px 0 0;font-size:16px;color:var(--muted);line-height:1.6;">Real words from people who stopped picking.</p>
+      </div>
+      <div class="reviews-grid" style="display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:24px;">
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;">
+          <div style="display:flex;gap:3px;margin-bottom:14px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+          </div>
+          <p style="margin:0 0 18px;font-size:15px;line-height:1.65;">"I put one on before bed and it's flat by breakfast. Stopped my picking habit dead."</p>
+          <p style="margin:0;font-size:13px;font-weight:600;color:var(--muted);">Maya R. — Austin, TX</p>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;">
+          <div style="display:flex;gap:3px;margin-bottom:14px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+          </div>
+          <p style="margin:0 0 18px;font-size:15px;line-height:1.65;">"The invisible ones are so thin I forget to take them off before video calls. No one's noticed yet."</p>
+          <p style="margin:0;font-size:13px;font-weight:600;color:var(--muted);">Devon K. — Chicago, IL</p>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;">
+          <div style="display:flex;gap:3px;margin-bottom:14px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E2532F"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E2532F" stroke-width="1.5"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.3l7.1-.7z"></path></svg>
+          </div>
+          <p style="margin:0 0 18px;font-size:15px;line-height:1.65;">"Body patches saved me before a wedding. Back breakout gone in two nights."</p>
+          <p style="margin:0;font-size:13px;font-weight:600;color:var(--muted);">Priya S. — Denver, CO</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ingredients -->
+  <section id="ingredients" style="background:var(--sage);padding:96px 0;">
+    <div class="wrap ingr-grid" style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:64px;align-items:center;">
+      <div>
+        <h2 style="font-size:36px;font-weight:600;letter-spacing:-0.01em;margin-bottom:20px;">What's actually in it</h2>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div style="display:flex;gap:16px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:8px;flex-shrink:0;"></div>
+            <div>
+              <p style="margin:0 0 4px;font-weight:600;font-size:15px;">Medical-grade hydrocolloid</p>
+              <p style="margin:0;font-size:14px;color:var(--muted);line-height:1.6;">Absorbs fluid and gunk from the spot while creating a barrier against bacteria and picking.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:8px;flex-shrink:0;"></div>
+            <div>
+              <p style="margin:0 0 4px;font-weight:600;font-size:15px;">Salicylic acid (2%)</p>
+              <p style="margin:0;font-size:14px;color:var(--muted);line-height:1.6;">Exfoliates inside the pore to help clear it out faster.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:8px;flex-shrink:0;"></div>
+            <div>
+              <p style="margin:0 0 4px;font-weight:600;font-size:15px;">Centella asiatica extract</p>
+              <p style="margin:0;font-size:14px;color:var(--muted);line-height:1.6;">Calms redness and irritation around the spot.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:8px;flex-shrink:0;"></div>
+            <div>
+              <p style="margin:0 0 4px;font-weight:600;font-size:15px;">Tea tree oil</p>
+              <p style="margin:0;font-size:14px;color:var(--muted);line-height:1.6;">A gentle, natural antibacterial to keep new breakouts from forming.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="aspect-ratio:4/5;border-radius:24px;background:var(--card);display:flex;align-items:center;justify-content:center;">
+        <svg width="60%" viewBox="0 0 200 240">
+          <rect x="30" y="20" width="140" height="200" rx="20" fill="var(--sage)" stroke="var(--line)" stroke-width="1.5"></rect>
+          <circle cx="100" cy="90" r="26" fill="none" stroke="var(--accent)" stroke-width="2"></circle>
+          <circle cx="100" cy="90" r="10" fill="var(--accent)" opacity="0.5"></circle>
+          <line x1="60" y1="150" x2="140" y2="150" stroke="var(--line)" stroke-width="1.5"></line>
+          <line x1="60" y1="170" x2="120" y2="170" stroke="var(--line)" stroke-width="1.5"></line>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section style="padding:88px 0;">
+    <div class="wrap">
+      <div style="background:var(--ink);border-radius:28px;padding:64px 48px;text-align:center;">
+        <h2 style="color:var(--bg);font-size:32px;font-weight:600;letter-spacing:-0.01em;margin-bottom:12px;">Get 10% off your first order</h2>
+        <p style="margin:0 0 32px;color:#B7C8DA;font-size:15px;">Plus early access to new patch drops. No spam, unsubscribe anytime.</p>
+        <form id="newsletter-form" style="max-width:420px;margin:0 auto;display:flex;gap:10px;">
+          <label for="newsletter-email" class="sr-only">Email address</label>
+          <input id="newsletter-email" type="email" required class="newsletter-input" placeholder="you@example.com" style="flex-grow:1;padding:14px 18px;border-radius:100px;border:none;font-size:14px;font-family:inherit;"/>
+          <button type="submit" id="subscribe-btn" class="btn-primary" style="background:var(--accent);color:#fff;font-weight:600;font-size:14px;padding:14px 24px;border-radius:100px;white-space:nowrap;">Get My Code</button>
         </form>
-        <div class="form-success" id="formSuccess">
-          Opening WhatsApp — just hit send there to reach me. If nothing opened, <a href="#" id="waFallback">tap here</a>.
-        </div>
+        <p id="subscribe-confirm" style="display:none;margin:16px 0 0;color:#CFE1F4;font-size:13px;font-weight:600;">You're in — check your inbox for your code.</p>
       </div>
     </div>
   </section>
-</main>
 
-<footer class="wrap">
-  <span>Helmesseiten © 2026</span>
-  <span style="display:flex; gap:20px; flex-wrap:wrap;">
-    <a href="mailto:hello@helmesseiten.de">hello@helmesseiten.de</a>
-    <a href="tel:+4916093984993">+49 160 93984993</a>
-  </span>
-</footer>
+  <!-- Footer -->
+  <footer style="border-top:1px solid var(--line);padding:64px 0 40px;">
+    <div class="wrap">
+      <div class="footer-grid" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;">
+        <div>
+          <p style="font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin-bottom:12px;">Pimple Pommes</p>
+          <p style="margin:0;font-size:14px;color:var(--muted);line-height:1.6;max-width:260px;">Small patches, quietly doing the work while you get on with your day.</p>
+          <div style="display:flex;gap:16px;margin-top:20px;">
+            <a href="#" class="nav-link" style="font-size:13px;">Instagram</a>
+            <a href="#" class="nav-link" style="font-size:13px;">TikTok</a>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;color:var(--muted);">Shop</p>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <a href="#shop" class="nav-link" style="font-size:14px;">All patches</a>
+            <a href="#shop" class="nav-link" style="font-size:14px;">Bestsellers</a>
+            <a href="#shop" class="nav-link" style="font-size:14px;">Bundles</a>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;color:var(--muted);">Company</p>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <a href="#ingredients" class="nav-link" style="font-size:14px;">Ingredients</a>
+            <a href="#reviews" class="nav-link" style="font-size:14px;">Reviews</a>
+            <a href="#" class="nav-link" style="font-size:14px;">About us</a>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;color:var(--muted);">Help</p>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <a href="#" class="nav-link" style="font-size:14px;">Shipping &amp; returns</a>
+            <a href="#" class="nav-link" style="font-size:14px;">FAQ</a>
+            <a href="#" class="nav-link" style="font-size:14px;">Contact</a>
+          </div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <p style="margin:0;font-size:13px;color:var(--muted);">© 2026 Pimple Pommes. All rights reserved.</p>
+        <div style="display:flex;gap:20px;">
+          <a href="#" class="nav-link" style="font-size:13px;">Privacy</a>
+          <a href="#" class="nav-link" style="font-size:13px;">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div>
 
 <script>
-  const menuToggle = document.getElementById('menuToggle');
-  const navLinks = document.getElementById('navLinks');
-  menuToggle.addEventListener('click', () => {
-    const open = navLinks.classList.toggle('open');
-    menuToggle.setAttribute('aria-expanded', open);
+(function () {
+  var cartCount = 0;
+  var addedProducts = {};
+  var cartBadge = document.getElementById('cart-badge');
+  var addButtons = document.querySelectorAll('.btn-add[data-product]');
+
+  addButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('data-product');
+      if (addedProducts[id]) return;
+      addedProducts[id] = true;
+      cartCount++;
+      cartBadge.textContent = cartCount;
+      cartBadge.style.display = 'flex';
+      btn.textContent = 'Added ✓';
+      btn.classList.remove('btn-add');
+      btn.classList.add('btn-added');
+    });
   });
-  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-    navLinks.classList.remove('open');
-    menuToggle.setAttribute('aria-expanded', false);
-  }));
 
-  const form = document.getElementById('contactForm');
-  const success = document.getElementById('formSuccess');
-  const whatsappNumber = '4916093984993'; // +49 160 93984993, digits only, no leading 0 or +
+  var form = document.getElementById('newsletter-form');
+  var subscribeBtn = document.getElementById('subscribe-btn');
+  var confirmMsg = document.getElementById('subscribe-confirm');
 
-  function buildWhatsAppUrl(){
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const type = document.getElementById('type').value;
-    const budget = document.getElementById('budget').value;
-    const message = document.getElementById('message').value.trim();
-
-    const text =
-      `Hi, I'd like to get in touch about a website project.\n\n` +
-      `Name: ${name}\n` +
-      `Email: ${email}\n` +
-      `Project type: ${type}\n` +
-      `Budget: ${budget}\n\n` +
-      `${message}`;
-
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
-  }
-
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', function (e) {
     e.preventDefault();
-    const waUrl = buildWhatsAppUrl();
-    document.getElementById('waFallback').href = waUrl;
-    form.classList.add('hide');
-    success.classList.add('show');
-    window.open(waUrl, '_blank');
+    subscribeBtn.textContent = 'Subscribed ✓';
+    confirmMsg.style.display = 'block';
   });
+})();
 </script>
 
 </body>

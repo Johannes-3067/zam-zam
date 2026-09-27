@@ -1,185 +1,1072 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Weiter – Fokus ohne Ablenkung</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helmesseiten — Websites für kleine Unternehmen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F7F5F0;
-    --bg-alt:#EFEBE2;
-    --ink:#000000;
-    --muted:#000000;
-    --accent:#234C3F;
-    --accent-soft:#DCE6E0;
-    --line:#E2DED3;
+    --bg: #08050f;
+    --bg-alt: #0d0918;
+    --panel: #120c22;
+    --text: #f3f0ff;
+    --text-muted: #9086b8;
+    --accent: #00f6ff;
+    --accent2: #ff2ec4;
+    --accent-soft: rgba(0,246,255,0.12);
+    --accent2-soft: rgba(255,46,196,0.12);
+    --border: #2a2148;
+    --radius: 10px;
   }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Work Sans',sans-serif;-webkit-font-smoothing:antialiased}
-  h1,h2,h3{font-family:'Fraunces',serif;margin:0;letter-spacing:-0.01em}
-  a{color:inherit;text-decoration:none}
-  .btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 28px;border-radius:999px;font-weight:600;font-size:16px;transition:opacity .15s ease;white-space:nowrap;border:none;cursor:pointer;font-family:inherit}
-  .btn:hover{opacity:.85}
-  .btn-primary{background:var(--accent);color:#fff}
-  .btn-secondary{background:transparent;color:var(--ink);border:1px solid var(--line)}
-  .container{max-width:1120px;margin:0 auto;padding:0 32px}
-  .section{padding:120px 0}
-  .spotlight{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
-  .nav{position:sticky;top:0;z-index:10;background:rgba(247,245,240,0.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:76px}
-  .nav-links{display:flex;gap:36px;font-size:15px;color:var(--muted)}
-  .hero{padding:120px 0 0;text-align:center}
-  .hero-inner{max-width:760px;margin:0 auto}
-  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:24px}
-  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block}
-  h1{font-size:clamp(40px,6vw,72px);line-height:1.05;font-weight:600}
-  .lead{font-size:19px;line-height:1.6;color:var(--muted);max-width:520px;margin:24px auto 0}
-  .cta-row{display:flex;gap:16px;justify-content:center;margin-top:32px}
-  .preview{max-width:880px;margin:64px auto 0;border-radius:24px;background:#fff;border:1px solid var(--line);box-shadow:0 40px 80px -30px rgba(23,24,28,0.18);padding:40px;display:flex;flex-direction:column;gap:18px}
-  .preview-row{display:flex;align-items:center;gap:12px}
-  .preview-icon{width:22px;height:22px;border-radius:6px;flex-shrink:0}
-  .preview-bar{height:12px;background:var(--line);border-radius:6px}
-  .eyebrow-small{font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;margin-bottom:16px}
-  h2{font-size:clamp(28px,4vw,40px);line-height:1.15;font-weight:600}
-  .feature-text p{font-size:17px;line-height:1.7;color:var(--muted);max-width:440px;margin-top:20px}
-  .feature-visual{aspect-ratio:4/3;border-radius:24px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
-  .quote p{font-family:'Fraunces',serif;font-size:clamp(22px,3vw,30px);line-height:1.45;font-weight:400}
-  .quote-by{margin-top:28px;font-size:15px;color:var(--muted)}
-  .feat h3{font-size:18px;font-weight:600;margin:20px 0 10px}
-  .feat p{font-size:15px;color:var(--muted);line-height:1.6;margin:0}
-  footer{border-top:1px solid var(--line);padding:40px 0}
-  .footer-inner{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted);flex-wrap:wrap;gap:16px}
-  .footer-links{display:flex;gap:24px}
-  @media (max-width:860px){
-    .section{padding:64px 0}
-    .spotlight{grid-template-columns:1fr;gap:40px}
-    .spotlight .order-2{order:initial}
-    .grid-3{grid-template-columns:1fr;gap:40px}
-    .container{padding:0 24px}
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  .bg-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 900px 500px at 12% -5%, rgba(255,46,196,0.18), transparent 60%),
+      radial-gradient(ellipse 900px 600px at 90% 15%, rgba(0,246,255,0.15), transparent 60%),
+      rgba(8,5,15,0.3);
+  }
+
+  body{
+    margin: 0;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, .wordmark{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  a{ color: inherit; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .wrap{
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---- Nav ---- */
+  header{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(20,15,35,0.45);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 30px rgba(0,0,0,0.25);
+  }
+
+  nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .wordmark{
+    font-size: 2rem;
+    text-decoration: none;
+    color: var(--accent);
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 6px rgba(0,246,255,0.8), 0 0 22px rgba(0,246,255,0.5), 0 0 46px rgba(0,246,255,0.3);
+  }
+
+  .nav-links{
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .nav-links a{
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    transition: color 0.15s ease;
+  }
+  .nav-links a:hover{ color: var(--accent); text-shadow: 0 0 10px rgba(0,246,255,0.6); }
+
+  .btn{
+    display: inline-block;
+    background: var(--accent);
+    color: #071014;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 11px 22px;
+    border-radius: 999px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 0 14px rgba(0,246,255,0.55), 0 0 34px rgba(0,246,255,0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover{ box-shadow: 0 0 20px rgba(0,246,255,0.8), 0 0 50px rgba(0,246,255,0.4); transform: translateY(-1px); }
+
+  .btn-ghost{
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    color: var(--text);
+    border: 1px solid rgba(255,46,196,0.4);
+    padding: 10px 21px;
+    box-shadow: 0 0 10px rgba(255,46,196,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .btn-ghost:hover{ box-shadow: 0 0 18px rgba(255,46,196,0.6), 0 0 40px rgba(255,46,196,0.25), inset 0 1px 0 rgba(255,255,255,0.25); background: rgba(255,255,255,0.1); transform: none; }
+
+  .menu-toggle{
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+
+  /* ---- Hero ---- */
+  .hero{
+    padding: 90px 0 110px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .hero-copy{ opacity: 0; }
+  @media (prefers-reduced-motion: no-preference){
+    .hero-copy{
+      animation: rise 0.7s ease forwards;
+      animation-delay: 0.1s;
+    }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero-copy{ opacity: 1; }
+  }
+  @keyframes rise{
+    from{ opacity: 0; transform: translateY(14px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  .hero h1{
+    font-size: clamp(2.3rem, 4.6vw, 3.4rem);
+    line-height: 1.12;
+    max-width: 12.5ch;
+    text-shadow: 0 0 28px rgba(0,246,255,0.22), 0 0 60px rgba(255,46,196,0.14);
+  }
+
+  .hero p{
+    color: var(--text-muted);
+    font-size: 1.08rem;
+    max-width: 46ch;
+    margin: 22px 0 32px;
+  }
+
+  .hero-ctas{
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  /* mock browser window */
+  .mock-browser{
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 16px;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    transform: rotate(-2.5deg);
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7), 0 0 40px rgba(0,246,255,0.15), 0 0 70px rgba(255,46,196,0.1), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  .mock-browser::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 40%);
+    pointer-events: none;
+  }
+  .mock-bar{
+    display: flex;
+    gap: 6px;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    position: relative;
+  }
+  .mock-bar span{
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+  }
+  .mock-body{ padding: 26px 22px 30px; position: relative; }
+  .mock-line{
+    height: 11px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.14);
+    margin-bottom: 10px;
+  }
+  .mock-line.w-70{ width: 70%; background: var(--text-muted); opacity: 0.4; }
+  .mock-line.w-40{ width: 40%; margin-bottom: 22px; }
+  .mock-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .mock-block{
+    height: 58px;
+    border-radius: 10px;
+    background: rgba(0,246,255,0.1);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(0,246,255,0.4);
+    box-shadow: 0 0 14px rgba(0,246,255,0.2) inset, inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .mock-block:nth-child(2){ background: rgba(255,46,196,0.1); border-color: rgba(255,46,196,0.4); box-shadow: 0 0 14px rgba(255,46,196,0.2) inset, inset 0 1px 0 rgba(255,255,255,0.25); }
+
+  .hero-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 8px 18px 8px 14px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  .badge-dot{
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent);
+    flex-shrink: 0;
+  }
+
+  .headline-accent{
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .trust-strip{
+    padding: 8px 0 70px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .trust-label{
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .trust-items{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .trust-item{
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: 0.83rem;
+    color: var(--text-muted);
+  }
+
+  /* ---- Layout-type carousel ---- */
+  .layout-carousel{
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 6px 4px 30px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .layout-carousel::-webkit-scrollbar{ display: none; }
+
+  .layout-card{
+    flex: 0 0 78%;
+    max-width: 300px;
+    scroll-snap-align: center;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 18px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .layout-card h3{
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem;
+    margin: 0;
+  }
+  .layout-card p{
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+    flex: 1;
+  }
+  .layout-card.selected{
+    border-color: var(--accent);
+    box-shadow: 0 0 24px rgba(0,246,255,0.35), 0 20px 40px -20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  @media (min-width: 700px){
+    .layout-card{ flex-basis: 280px; }
+  }
+
+  .type-frame{
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 14px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+  }
+  .tf-grid2{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 1; }
+  .tf-rect{ background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; }
+  .tf-rect.accent{ background: var(--accent-soft); border-color: rgba(0,246,255,0.45); }
+  .tf-rect.accent2{ background: var(--accent2-soft); border-color: rgba(255,46,196,0.45); }
+  .tf-line{ height: 8px; border-radius: 4px; background: rgba(255,255,255,0.14); }
+  .tf-line.accent{ background: linear-gradient(90deg, var(--accent), var(--accent2)); opacity: 0.85; }
+  .tf-dot{ border-radius: 50%; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.2); display: inline-block; flex-shrink: 0; }
+  .tf-bar{ width: 14px; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, var(--accent), var(--accent2)); }
+
+  .btn-select{
+    width: 100%;
+    text-align: center;
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: none;
+  }
+  .btn-select:hover{ background: rgba(255,255,255,0.14); box-shadow: none; transform: none; }
+  .layout-card.selected .btn-select{
+    background: var(--accent);
+    color: #071014;
+    border-color: transparent;
+    box-shadow: 0 0 14px rgba(0,246,255,0.5);
+  }
+
+  .layout-nav{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: -12px;
+  }
+  .layout-arrow{
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .layout-arrow:hover{ border-color: var(--accent); }
+  .layout-dots{ display: flex; gap: 8px; }
+  .layout-dot{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: none; padding: 0; cursor: pointer;
+  }
+  .layout-dot.active{ background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+  /* ---- Scroll reveal ---- */
+  .reveal{
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .reveal{ opacity: 1; transform: none; transition: none; }
+  }
+
+  /* ---- Section shared ---- */
+  section{ padding: 80px 0; border-top: 1px solid var(--border); }
+  .section-head{ max-width: 52ch; margin-bottom: 44px; }
+  .section-head h2{ font-size: clamp(1.6rem, 3vw, 2.1rem); }
+  .section-head p{ color: var(--text-muted); margin-top: 14px; }
+
+  /* ---- Services ---- */
+  .service-row{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+    padding: 28px 0;
+    border-top: 1px solid var(--border);
+  }
+  .service-row:last-child{ border-bottom: 1px solid var(--border); }
+  .service-row h3{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    margin: 0;
+  }
+  .service-row p{
+    color: var(--text-muted);
+    margin: 0;
+    max-width: 50ch;
+  }
+
+  /* ---- Process ---- */
+  .process-list{
+    display: grid;
+    gap: 0;
+  }
+  .process-item{
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 20px;
+    padding: 26px 0;
+    border-top: 1px solid var(--border);
+  }
+  .process-item:last-child{ border-bottom: 1px solid var(--border); }
+  .process-num{
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--accent2);
+    font-size: 1rem;
+    font-weight: 600;
+    padding-top: 2px;
+    text-shadow: 0 0 10px rgba(255,46,196,0.7), 0 0 24px rgba(255,46,196,0.35);
+  }
+  .process-item h3{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 0 0 6px;
+  }
+  .process-item p{ color: var(--text-muted); margin: 0; max-width: 54ch; }
+
+  /* ---- Contact ---- */
+  .contact-grid{
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 56px;
+  }
+  .contact-info p{ color: var(--text-muted); max-width: 34ch; }
+  .contact-info a{
+    display: inline-block;
+    margin-top: 8px;
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+  }
+  .contact-info a:hover{ border-color: var(--accent); color: var(--accent); text-shadow: 0 0 10px rgba(0,246,255,0.6); }
+
+  .glass-card{
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 20px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .glass-card::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 35%);
+    pointer-events: none;
+  }
+
+  form{ display: grid; gap: 18px; position: relative; }
+  .field-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  label{
+    display: block;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 7px;
+  }
+  input, select, textarea{
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.96rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+  input:focus, select:focus, textarea:focus{ border-color: var(--accent); box-shadow: 0 0 12px rgba(0,246,255,0.35); }
+  textarea{ resize: vertical; min-height: 110px; }
+
+  .form-success{
+    display: none;
+    background: rgba(0,246,255,0.08);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid rgba(0,246,255,0.4);
+    box-shadow: 0 0 20px rgba(0,246,255,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 18px 20px;
+    color: var(--text);
+    position: relative;
+  }
+  .form-success.show{ display: block; }
+  .form-success a{ color: var(--accent); text-decoration: underline; }
+  form.hide{ display: none; }
+
+  /* ---- Footer ---- */
+  footer{
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  footer a{ color: var(--text-muted); text-decoration: none; }
+  footer a:hover{ color: var(--accent); text-shadow: 0 0 10px rgba(0,246,255,0.6); }
+
+  /* ---- Mobile ---- */
+  @media (max-width: 780px){
+    .hero{ grid-template-columns: 1fr; padding: 56px 0 64px; }
+    .mock-browser{ transform: none; order: -1; }
+    .nav-links{
+      position: absolute;
+      top: 100%; left: 0; right: 0;
+      background: rgba(18,12,34,0.75);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 20px 28px 28px;
+      display: none;
+    }
+    .nav-links.open{ display: flex; }
+    .menu-toggle{ display: block; }
+    .service-row, .contact-grid{ grid-template-columns: 1fr; gap: 12px; }
+    .field-row{ grid-template-columns: 1fr; }
+    footer{ flex-direction: column; gap: 10px; align-items: flex-start; }
   }
 </style>
 </head>
 <body>
 
-  <div class="nav">
-    <div class="container nav-inner">
-      <div style="font-family:'Fraunces',serif;font-weight:600;font-size:22px">Weiter</div>
-      <nav class="nav-links">
-        <a href="#produkt">Produkt</a>
-        <a href="#funktionen">Funktionen</a>
-        <a href="#stimmen">Stimmen</a>
-      </nav>
-      <a href="#start" class="btn btn-primary" style="padding:10px 22px;font-size:14px">Jetzt starten</a>
+<div class="bg-overlay"></div>
+
+
+
+<header>
+  <nav>
+    <a href="#" class="wordmark">Helmesseiten</a>
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Menü umschalten">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="#services">Leistungen</a>
+      <a href="#layouts">Beispiele</a>
+      <a href="#process">Ablauf</a>
+      <a href="#contact" class="btn">Projekt starten</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero wrap" style="border-top:none;">
+    <div class="hero-copy">
+      <div class="hero-badge"><span class="badge-dot"></span>Moderne Websites für dein Business</div>
+      <h1>Websites, die kleine Unternehmen <span class="headline-accent">aussehen lassen, als hätten sie es schon geschafft.</span></h1>
+      <p>Ich gestalte und entwickle schnelle, individuelle Websites für Gründer, Studios und lokale Unternehmen — von der ersten Skizze bis zum Launch.</p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn">Projekt starten</a>
+        <a href="#process" class="btn btn-ghost">So läuft's ab</a>
+      </div>
+    </div>
+    <div class="mock-browser" aria-hidden="true">
+      <div class="mock-bar"><span></span><span></span><span></span></div>
+      <div class="mock-body">
+        <div class="mock-line w-70"></div>
+        <div class="mock-line w-40"></div>
+        <div class="mock-grid">
+          <div class="mock-block"></div>
+          <div class="mock-block"></div>
+          <div class="mock-block"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="trust-strip wrap reveal">
+    <span class="trust-label">Warum Helmesseiten</span>
+    <div class="trust-items">
+      <span class="trust-item">Schnelle Umsetzung</span>
+      <span class="trust-item">Faire Preise</span>
+      <span class="trust-item">Persönliche Betreuung</span>
+      <span class="trust-item">Mobile-first Design</span>
+      <span class="trust-item">Direkter Draht per WhatsApp</span>
     </div>
   </div>
 
-  <div class="hero">
-    <div class="container hero-inner">
-      <div class="eyebrow"><span class="dot"></span>Für Menschen mit zu vielen offenen Tabs</div>
-      <h1>Weniger Ablenkung.<br>Mehr Fortschritt.</h1>
-      <p class="lead">Weiter bündelt deine Aufgaben in einer ruhigen, klaren Oberfläche – ganz ohne Benachrichtigungs-Chaos.</p>
-      <div class="cta-row">
-        <a href="#start" class="btn btn-primary">Kostenlos testen</a>
-        <a href="#produkt" class="btn btn-secondary">Mehr erfahren →</a>
+  <section id="services" class="wrap">
+    <div class="section-head reveal">
+      <h2>Was ich mache</h2>
+      <p>Alles, was du brauchst, um deine Website live zu bringen und am Laufen zu halten.</p>
+    </div>
+    <div class="service-row reveal">
+      <h3>Website-Design</h3>
+      <p>Ein individuelles Design, abgestimmt auf dein Business, deine Inhalte und darauf, wie Kunden dich wirklich finden — kein aufgeblasenes Template.</p>
+    </div>
+    <div class="service-row reveal">
+      <h3>Entwicklung</h3>
+      <p>Handgecodete, mobile-first umgesetzte Seiten, die schnell laden und auf jedem Gerät und jeder Verbindung zuverlässig laufen.</p>
+    </div>
+    <div class="service-row reveal">
+      <h3>Support &amp; Updates</h3>
+      <p>Sobald deine Seite live ist, bin ich für Änderungen, Fixes und kleine Ergänzungen da, wenn sich dein Business weiterentwickelt.</p>
+    </div>
+  </section>
+
+  <section id="process" class="wrap">
+    <div class="section-head reveal">
+      <h2>So läuft ein Projekt ab</h2>
+      <p>Drei Phasen, von Anfang bis Ende. Die meisten Seiten dauern drei bis fünf Wochen.</p>
+    </div>
+    <div class="process-list">
+      <div class="process-item reveal">
+        <span class="process-num">01</span>
+        <div>
+          <h3>Kennenlernen</h3>
+          <p>Ein Gespräch über deine Ziele, deine Zielgruppe und die Inhalte, die du schon hast.</p>
+        </div>
+      </div>
+      <div class="process-item reveal">
+        <span class="process-num">02</span>
+        <div>
+          <h3>Design &amp; Umsetzung</h3>
+          <p>Du bekommst einen ersten Entwurf, wir feilen gemeinsam daran, dann setze ich es um und teste es auf echten Geräten.</p>
+        </div>
+      </div>
+      <div class="process-item reveal">
+        <span class="process-num">03</span>
+        <div>
+          <h3>Launch</h3>
+          <p>Deine Seite geht live, und ich zeige dir, wie du einfache Änderungen selbst vornehmen kannst.</p>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="container" style="padding-bottom:120px">
-      <div class="preview">
-        <div class="preview-row">
-          <div class="preview-icon" style="background:var(--accent-soft);display:flex;align-items:center;justify-content:center">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#234C3F" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+  <section id="layouts" class="wrap">
+    <div class="section-head reveal">
+      <h2>Welcher Website-Typ passt zu dir?</h2>
+      <p>Wisch durch die Beispiele und wähl aus, was am besten zu deinem Projekt passt.</p>
+    </div>
+
+    <div class="layout-carousel reveal" id="layoutCarousel">
+
+      <div class="layout-card" data-type="Portfolio / persönliche Seite">
+        <div class="type-frame tf-grid2">
+          <div class="tf-rect accent" style="height:70px;"></div>
+          <div class="tf-rect" style="height:70px;"></div>
+          <div class="tf-rect" style="height:70px;"></div>
+          <div class="tf-rect accent2" style="height:70px;"></div>
+        </div>
+        <h3>Portfolio / persönliche Seite</h3>
+        <p>Für Fotografen, Designer und Freelancer, um Arbeiten zu zeigen.</p>
+        <button class="btn btn-select" type="button">Das passt zu mir</button>
+      </div>
+
+      <div class="layout-card" data-type="Business / Dienstleistung">
+        <div class="type-frame">
+          <div class="tf-line" style="width:55%;height:12px;"></div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+            <div style="display:flex;align-items:center;gap:8px;"><span class="tf-dot" style="width:14px;height:14px;"></span><span class="tf-line" style="width:70%;"></span></div>
+            <div style="display:flex;align-items:center;gap:8px;"><span class="tf-dot" style="width:14px;height:14px;"></span><span class="tf-line" style="width:55%;"></span></div>
+            <div style="display:flex;align-items:center;gap:8px;"><span class="tf-dot" style="width:14px;height:14px;"></span><span class="tf-line" style="width:65%;"></span></div>
           </div>
-          <div class="preview-bar" style="width:45%"></div>
+          <div class="tf-rect accent" style="width:90px;height:24px;border-radius:999px;margin-top:auto;"></div>
         </div>
-        <div class="preview-row">
-          <div class="preview-icon" style="background:var(--bg-alt)"></div>
-          <div class="preview-bar" style="width:65%"></div>
+        <h3>Business / Dienstleistung</h3>
+        <p>Firmenseite mit Leistungen, Kontakt, Team (z. B. Handwerker, Beratung, Kanzlei).</p>
+        <button class="btn btn-select" type="button">Das passt zu mir</button>
+      </div>
+
+      <div class="layout-card" data-type="Online-Shop">
+        <div class="type-frame" style="flex-direction:row;gap:8px;">
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+            <div class="tf-rect" style="height:60px;"></div>
+            <div class="tf-line" style="width:85%;"></div>
+            <div class="tf-line accent" style="width:45%;height:9px;"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+            <div class="tf-rect" style="height:60px;"></div>
+            <div class="tf-line" style="width:85%;"></div>
+            <div class="tf-line accent" style="width:45%;height:9px;"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+            <div class="tf-rect" style="height:60px;"></div>
+            <div class="tf-line" style="width:85%;"></div>
+            <div class="tf-line accent" style="width:45%;height:9px;"></div>
+          </div>
         </div>
-        <div class="preview-row">
-          <div class="preview-icon" style="background:var(--bg-alt)"></div>
-          <div class="preview-bar" style="width:55%"></div>
+        <h3>Online-Shop</h3>
+        <p>Produkte, Warenkorb, Bezahlung (E-Commerce).</p>
+        <button class="btn btn-select" type="button">Das passt zu mir</button>
+      </div>
+
+      <div class="layout-card" data-type="Landingpage">
+        <div class="type-frame" style="align-items:center;justify-content:center;text-align:center;gap:14px;">
+          <div class="tf-line" style="width:70%;height:14px;"></div>
+          <div class="tf-line" style="width:50%;height:14px;"></div>
+          <div class="tf-rect accent" style="width:120px;height:30px;border-radius:999px;"></div>
+        </div>
+        <h3>Landingpage</h3>
+        <p>Eine einzelne Seite für ein Produkt, eine App oder eine Kampagne.</p>
+        <button class="btn btn-select" type="button">Das passt zu mir</button>
+      </div>
+
+      <div class="layout-card" data-type="Blog / Magazin">
+        <div class="type-frame" style="gap:14px;">
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div class="tf-rect" style="width:40px;height:40px;flex-shrink:0;"></div>
+            <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+              <div class="tf-line" style="width:85%;"></div>
+              <div class="tf-line" style="width:55%;height:6px;opacity:.6;"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div class="tf-rect" style="width:40px;height:40px;flex-shrink:0;"></div>
+            <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+              <div class="tf-line" style="width:75%;"></div>
+              <div class="tf-line" style="width:45%;height:6px;opacity:.6;"></div>
+            </div>
+          </div>
+        </div>
+        <h3>Blog / Magazin</h3>
+        <p>Artikel, Kategorien, Kommentare.</p>
+        <button class="btn btn-select" type="button">Das passt zu mir</button>
+      </div>
+
+      <div class="layout-card" data-type="Restaurant / Café">
+        <div class="type-frame">
+          <div style="display:flex;justify-content:space-between;"><span class="tf-line" style="width:60%;"></span><span class="tf-line accent" style="width:14%;"></span></div>
+          <div style="display:flex;justify-content:space-between;"><span class="tf-line" style="width:45%;"></span><span class="tf-line accent" style="width:14%;"></span></div>
+          <div style="display:flex;justify-content:space-between;"><span class="tf-line" style="width:65%;"></span><span class="tf-line accent" style="width:14%;"></span></div>
+          <div class="tf-rect accent2" style="width:110px;height:24px;border-radius:999px;align-self:center;margin-top:auto;"></div>
+        </div>
+        <h3>Restaurant / Café</h3>
+        <p>Speisekarte, Reservierung, Standort.</p>
+        <button class="btn btn-select" type="button">Das passt zu mir</button>
+      </div>
+
+      <div class="layout-card" data-type="Event / Hochzeit">
+        <div class="type-frame" style="align-items:center;">
+          <div class="tf-line" style="width:40%;height:20px;"></div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+            <div class="tf-rect" style="width:32px;height:32px;border-radius:8px;"></div>
+            <div class="tf-rect" style="width:32px;height:32px;border-radius:8px;"></div>
+            <div class="tf-rect" style="width:32px;height:32px;border-radius:8px;"></div>
+          </div>
+          <div class="tf-rect accent" style="width:100px;height:24px;border-radius:999px;margin-top:auto;"></div>
+        </div>
+        <h3>Event / Hochzeit</h3>
+        <p>Datum, Ablauf, RSVP.</p>
+        <button class="btn btn-select" type="button">Das passt zu mir</button>
+      </div>
+
+      <div class="layout-card" data-type="Verein / Community">
+        <div class="type-frame">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="tf-dot" style="width:22px;height:22px;"></span>
+            <span class="tf-dot" style="width:22px;height:22px;"></span>
+            <span class="tf-dot" style="width:22px;height:22px;"></span>
+            <span class="tf-dot" style="width:22px;height:22px;"></span>
+            <span class="tf-dot" style="width:22px;height:22px;"></span>
+            <span class="tf-dot" style="width:22px;height:22px;"></span>
+          </div>
+          <div class="tf-line" style="width:70%;margin-top:10px;"></div>
+          <div class="tf-line" style="width:50%;height:6px;opacity:.6;"></div>
+        </div>
+        <h3>Verein / Community</h3>
+        <p>Mitgliederbereich, Termine, News.</p>
+        <button class="btn btn-select" type="button">Das passt zu mir</button>
+      </div>
+
+      <div class="layout-card" data-type="SaaS / App-Website">
+        <div class="type-frame" style="flex-direction:row;gap:8px;">
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px;align-items:center;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px;">
+            <div class="tf-line" style="width:60%;"></div>
+            <div class="tf-line" style="width:40%;height:12px;"></div>
+            <div class="tf-rect" style="width:100%;height:14px;border-radius:999px;margin-top:auto;"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px;align-items:center;border:1px solid rgba(0,246,255,.45);border-radius:8px;padding:8px;">
+            <div class="tf-line" style="width:60%;"></div>
+            <div class="tf-line accent" style="width:40%;height:12px;"></div>
+            <div class="tf-rect accent" style="width:100%;height:14px;border-radius:999px;margin-top:auto;"></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px;align-items:center;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px;">
+            <div class="tf-line" style="width:60%;"></div>
+            <div class="tf-line" style="width:40%;height:12px;"></div>
+            <div class="tf-rect" style="width:100%;height:14px;border-radius:999px;margin-top:auto;"></div>
+          </div>
+        </div>
+        <h3>SaaS / App-Website</h3>
+        <p>Feature-Erklärung, Preise, Anmeldung.</p>
+        <button class="btn btn-select" type="button">Das passt zu mir</button>
+      </div>
+
+      <div class="layout-card" data-type="Web-App / Tool">
+        <div class="type-frame" style="flex-direction:row;gap:10px;">
+          <div class="tf-rect" style="width:22px;"></div>
+          <div style="flex:1;display:flex;align-items:flex-end;gap:6px;">
+            <div class="tf-bar" style="height:35%;"></div>
+            <div class="tf-bar" style="height:60%;"></div>
+            <div class="tf-bar" style="height:45%;"></div>
+            <div class="tf-bar" style="height:80%;"></div>
+            <div class="tf-bar" style="height:55%;"></div>
+          </div>
+        </div>
+        <h3>Web-App / Tool</h3>
+        <p>Interaktive Anwendung statt nur Infoseite (Rechner, Dashboard, kleines Tool).</p>
+        <button class="btn btn-select" type="button">Das passt zu mir</button>
+      </div>
+
+    </div>
+
+    <div class="layout-nav">
+      <button class="layout-arrow" id="layoutPrev" type="button" aria-label="Zurück">‹</button>
+      <div class="layout-dots" id="layoutDots"></div>
+      <button class="layout-arrow" id="layoutNext" type="button" aria-label="Weiter">›</button>
+    </div>
+  </section>
+
+  <section id="contact" class="wrap">
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <div class="section-head" style="margin-bottom: 20px;">
+          <h2>Lass uns was aufbauen</h2>
+          <p>Erzähl mir kurz von deinem Projekt, ich melde mich innerhalb von ein bis zwei Tagen.</p>
+        </div>
+        <a href="mailto:hello@helmesseiten.de">hello@helmesseiten.de</a>
+        <a href="tel:+4916093984993">+49 160 93984993</a>
+      </div>
+
+      <div class="glass-card reveal">
+        <form id="contactForm">
+          <div class="field-row">
+            <div>
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+              <label for="email">E-Mail</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div>
+              <label for="type">Projektart</label>
+              <select id="type" name="type">
+                <option>Neue Website</option>
+                <option>Redesign</option>
+                <option>Landingpage</option>
+                <option>Etwas anderes</option>
+              </select>
+            </div>
+            <div>
+              <label for="budget">Budget</label>
+              <select id="budget" name="budget">
+                <option>Unter 2.000 €</option>
+                <option>2.000 € – 5.000 €</option>
+                <option>5.000 € – 10.000 €</option>
+                <option>Noch unsicher</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="message">Nachricht</label>
+            <textarea id="message" name="message" placeholder="Woran arbeitest du gerade?" required></textarea>
+          </div>
+          <button type="submit" class="btn">Per WhatsApp senden</button>
+        </form>
+        <div class="form-success" id="formSuccess">
+          WhatsApp wird geöffnet — schick die Nachricht dort einfach ab. Falls sich nichts geöffnet hat, <a href="#" id="waFallback">hier tippen</a>.
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div id="produkt" class="section" style="background:var(--bg-alt)">
-    <div class="container spotlight">
-      <div class="feature-text">
-        <div class="eyebrow-small">Fokus</div>
-        <h2>Ein Ort für das, was heute zählt</h2>
-        <p>Statt zehn Apps und drei Notizzettel siehst du genau eine Liste: die Aufgaben, die heute wirklich dran sind. Alles andere wartet ruhig im Hintergrund.</p>
-      </div>
-      <div class="feature-visual" style="background:#fff">
-        <svg width="88" height="88" viewBox="0 0 24 24" fill="none" stroke="#234C3F" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M8 14h5"/></svg>
-      </div>
-    </div>
-  </div>
+</main>
 
-  <div id="funktionen" class="section">
-    <div class="container spotlight">
-      <div class="feature-text order-2" style="order:2">
-        <div class="eyebrow-small">Ruhe</div>
-        <h2>Benachrichtigungen, die dich respektieren</h2>
-        <p>Weiter meldet sich nur, wenn es wirklich wichtig ist. Du bestimmst, wann Fokuszeit beginnt – der Rest wartet.</p>
-      </div>
-      <div class="feature-visual" style="order:1;background:var(--bg-alt)">
-        <svg width="88" height="88" viewBox="0 0 24 24" fill="none" stroke="#234C3F" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
-      </div>
-    </div>
-  </div>
+<footer class="wrap">
+  <span>Helmesseiten © 2026</span>
+  <span style="display:flex; gap:20px; flex-wrap:wrap;">
+    <a href="mailto:hello@helmesseiten.de">hello@helmesseiten.de</a>
+    <a href="tel:+4916093984993">+49 160 93984993</a>
+  </span>
+</footer>
 
-  <div id="stimmen" class="section quote" style="background:var(--accent-soft);text-align:center">
-    <div class="container" style="max-width:760px">
-      <p>„Ich habe zum ersten Mal seit Jahren das Gefühl, dass mein Tag mir gehört – und nicht mein Kalender mir.“</p>
-      <div class="quote-by">Nutzerin von Weiter · Produktdesignerin</div>
-    </div>
-  </div>
+<script>
+  const layoutCarousel = document.getElementById('layoutCarousel');
+  if (layoutCarousel) {
+    const layoutCards = Array.from(layoutCarousel.querySelectorAll('.layout-card'));
+    const dotsWrap = document.getElementById('layoutDots');
 
-  <div class="section">
-    <div class="container">
-      <h2 style="text-align:center;margin-bottom:56px;font-size:clamp(26px,3.5vw,34px)">Alles, was du wirklich brauchst</h2>
-      <div class="grid-3">
-        <div class="feat" style="text-align:center">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#234C3F" stroke-width="1.5" style="margin:0 auto;display:block"><path d="M4 4h16v16H4z"/><path d="M4 10h16"/><path d="M10 10v10"/></svg>
-          <h3>Synchron überall</h3>
-          <p>Am Rechner begonnen, unterwegs weitergemacht – ohne Wartezeit.</p>
-        </div>
-        <div class="feat" style="text-align:center">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#234C3F" stroke-width="1.5" style="margin:0 auto;display:block"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4.5L6 21l1.5-7.5L2 9h7z"/></svg>
-          <h3>Priorität auf einen Blick</h3>
-          <p>Die drei wichtigsten Aufgaben stehen immer oben – automatisch sortiert.</p>
-        </div>
-        <div class="feat" style="text-align:center">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#234C3F" stroke-width="1.5" style="margin:0 auto;display:block"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <h3>Privat by Design</h3>
-          <p>Deine Aufgaben gehören dir. Verschlüsselt, ohne Werbe-Tracking.</p>
-        </div>
-      </div>
-    </div>
-  </div>
+    layoutCards.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'layout-dot';
+      dot.setAttribute('aria-label', `Zu Beispiel ${i + 1} springen`);
+      dot.addEventListener('click', () => {
+        layoutCards[i].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      });
+      dotsWrap.appendChild(dot);
+    });
+    const layoutDots = Array.from(dotsWrap.querySelectorAll('.layout-dot'));
 
-  <div id="start" class="section" style="background:var(--ink);color:#fff;text-align:center">
-    <div class="container" style="max-width:640px">
-      <h2 style="color:#fff;margin-bottom:20px">Bereit für einen ruhigeren Tag?</h2>
-      <p style="font-size:17px;color:#ffffff;margin-bottom:32px">14 Tage kostenlos testen. Keine Kreditkarte nötig.</p>
-      <a href="#produkt" class="btn btn-primary">Jetzt loslegen</a>
-    </div>
-  </div>
+    function updateActiveDot(){
+      const center = layoutCarousel.scrollLeft + layoutCarousel.clientWidth / 2;
+      let closest = 0, closestDist = Infinity;
+      layoutCards.forEach((card, i) => {
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+        const dist = Math.abs(cardCenter - center);
+        if (dist < closestDist) { closestDist = dist; closest = i; }
+      });
+      layoutDots.forEach((d, i) => d.classList.toggle('active', i === closest));
+    }
+    updateActiveDot();
+    layoutCarousel.addEventListener('scroll', () => requestAnimationFrame(updateActiveDot), { passive: true });
 
-  <footer>
-    <div class="container footer-inner">
-      <div>© 2026 Weiter</div>
-      <div class="footer-links">
-        <a href="#">Datenschutz</a>
-        <a href="#">Impressum</a>
-      </div>
-    </div>
-  </footer>
+    document.getElementById('layoutPrev').addEventListener('click', () => {
+      const w = layoutCards[0].offsetWidth + 20;
+      layoutCarousel.scrollBy({ left: -w, behavior: 'smooth' });
+    });
+    document.getElementById('layoutNext').addEventListener('click', () => {
+      const w = layoutCards[0].offsetWidth + 20;
+      layoutCarousel.scrollBy({ left: w, behavior: 'smooth' });
+    });
+
+    layoutCards.forEach(card => {
+      const selectBtn = card.querySelector('.btn-select');
+      selectBtn.addEventListener('click', () => {
+        layoutCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const type = card.dataset.type;
+        const messageEl = document.getElementById('message');
+        if (messageEl && !messageEl.value.trim()) {
+          messageEl.value = `Ich interessiere mich für eine Website vom Typ „${type}“.\n\n`;
+        }
+        const contactSection = document.getElementById('contact');
+        if (contactSection) contactSection.scrollIntoView({ behavior: 'smooth' });
+        if (messageEl) messageEl.focus();
+      });
+    });
+  }
+
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    revealEls.forEach(el => revealObserver.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('visible'));
+  }
+
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
+  menuToggle.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', open);
+  });
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', false);
+  }));
+
+  const form = document.getElementById('contactForm');
+  const success = document.getElementById('formSuccess');
+  const whatsappNumber = '4916093984993'; // +49 160 93984993, digits only, no leading 0 or +
+
+  function buildWhatsAppUrl(){
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const type = document.getElementById('type').value;
+    const budget = document.getElementById('budget').value;
+    const message = document.getElementById('message').value.trim();
+
+    const text =
+      `Hallo, ich würde gerne über ein Website-Projekt sprechen.\n\n` +
+      `Name: ${name}\n` +
+      `E-Mail: ${email}\n` +
+      `Projektart: ${type}\n` +
+      `Budget: ${budget}\n\n` +
+      `${message}`;
+
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const waUrl = buildWhatsAppUrl();
+    document.getElementById('waFallback').href = waUrl;
+    form.classList.add('hide');
+    success.classList.add('show');
+    window.open(waUrl, '_blank');
+  });
+</script>
 
 </body>
 </html>

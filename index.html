@@ -208,6 +208,66 @@ label.toggle input {
 #notice.on { opacity: 1; }
 #open-tab { display: none; margin-top: 6px; }
 #open-tab.on { display: block; }
+.mode-note { margin: -6px 0 12px; font-size: 11px; line-height: 1.5; color: #8f8d85; }
+#mode-tabs button:disabled { opacity: 0.6; cursor: default; }
+
+/* ---- Zombie defense ---- */
+#zhud {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  text-align: center;
+  text-shadow: 2px 2px 0 #000;
+  pointer-events: none;
+  z-index: 4;
+}
+#zhud.on { display: block; }
+#zwave { font-size: 22px; letter-spacing: 5px; color: #c9c6ba; }
+#zbase { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; font-size: 12px; letter-spacing: 2px; color: #8fae7a; }
+#zbase-bar { width: 200px; height: 10px; background: #1a1a1a; border: 2px solid #55554f; }
+#zbase-bar b { display: block; height: 100%; width: 100%; background: #5fd06a; transition: width 0.2s; }
+#zbase-bar b.low { background: #c8412e; }
+#zbase em { min-width: 40px; font-style: normal; color: #c9c6ba; text-align: left; }
+#zinfo { margin-top: 4px; font-size: 13px; letter-spacing: 3px; color: #d0a84a; }
+#zbanner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 30%;
+  text-align: center;
+  font-size: 44px;
+  letter-spacing: 8px;
+  color: #c8412e;
+  text-shadow: 3px 3px 0 #000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 4;
+}
+#zbanner.on { opacity: 1; }
+#zover {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(40, 0, 0, 0.6);
+  text-shadow: 2px 2px 0 #000;
+  pointer-events: none;
+  z-index: 6;
+}
+#zover.on { display: flex; }
+#zover h2 { margin: 0; font-size: 50px; letter-spacing: 6px; color: #c8412e; text-align: center; }
+#zover p { margin: 8px 0 0; letter-spacing: 3px; color: #c9c6ba; text-align: center; }
+body.touch #zhud { top: calc(46px + env(safe-area-inset-top, 0px)); }
+body.touch #zwave { font-size: 16px; }
+body.touch #zbase-bar { width: 120px; }
+body.touch #zbanner { font-size: 30px; }
+@media (max-width: 600px) { #zbanner { font-size: 30px; } #zover h2 { font-size: 34px; } }
+
 .frame-note { margin: 6px 0 0; font-size: 11px; line-height: 1.5; color: #a8957a; }
 
 .controls-touch { display: none; }
@@ -487,6 +547,12 @@ body.touch #ammo-count { font-size: 30px; }
         <h1>RETRO FPS</h1>
         <p class="sub">Prototype &middot; Milestone 7</p>
 
+        <div class="tabs" id="mode-tabs">
+          <button type="button" data-mode="soldiers">SOLDIERS</button>
+          <button type="button" data-mode="zombies">ZOMBIE DEFENSE</button>
+        </div>
+        <p class="mode-note" id="mode-note"></p>
+
         <button id="play" type="button" disabled>LOADING...</button>
         <button id="open-settings" class="secondary" type="button">SETTINGS</button>
         <button id="open-tab" class="secondary" type="button">OPEN IN NEW TAB (MOUSE LOCK)</button>
@@ -494,7 +560,7 @@ body.touch #ammo-count { font-size: 30px; }
         <p class="hint" id="menu-hint"></p>
 
         <div id="net">
-          <span>Multiplayer (1v1, over the internet)</span>
+          <span id="net-title">Multiplayer (over the internet)</span>
           <button id="net-host" type="button">HOST GAME</button>
           <div class="net-join">
             <input id="net-code" type="text" spellcheck="false" autocomplete="off" maxlength="8" placeholder="CODE" aria-label="Game code">
@@ -1038,7 +1104,8 @@ class Ui {
       this.deathEl.classList.toggle('on', health.dead);
       if (health.dead) {
         this.deathCause.textContent = health.cause === 'fall' ? 'YOU FELL TO YOUR DEATH'
-          : health.cause === 'enemy' ? 'KILLED BY AN ENEMY' : 'YOU WERE BLOWN UP';
+          : health.cause === 'enemy' ? 'KILLED BY AN ENEMY'
+          : health.cause === 'zombie' ? 'EATEN BY ZOMBIES' : 'YOU WERE BLOWN UP';
       }
     }
     if (health.dead && this.killedBy) this.deathCause.textContent = this.killedBy;
@@ -1690,12 +1757,13 @@ class CollisionWorld {
    * Fills `out` with dist, point (x, y, z) and face normal (nx, ny, nz).
    * Returns false when nothing is hit. A box the ray starts inside is skipped.
    */
-  raycast(ox, oy, oz, dx, dy, dz, maxDist, out) {
+  raycast(ox, oy, oz, dx, dy, dz, maxDist, out, filter) {
     const boxes = this.boxes;
     let best = maxDist;
     let found = false;
     for (let i = 0; i < boxes.length; i++) {
       const b = boxes[i];
+      if (filter && !filter(b)) continue;
       let tMin = -Infinity;
       let tMax = Infinity;
       let axis = -1;
@@ -3123,6 +3191,31 @@ class WeaponAudio {
     if (kill) this._click(t + 0.07, 1800, 0.45);
   }
 
+  /** Wave start / game over. */
+  horn() {
+    if (!this._ready()) return;
+    const t = this.ctx.currentTime;
+    this._tone(t, 0.9, 196, 185, 0.35, 'sawtooth');
+    this._tone(t, 0.9, 147, 140, 0.3, 'sawtooth');
+  }
+
+  /** A zombie moan; `vol` 0..1 by distance. */
+  groan(vol) {
+    if (!this._ready()) return;
+    const t = this.ctx.currentTime;
+    const f = 80 + Math.random() * 40;
+    this._tone(t, 0.8, f, f * 0.7, 0.35 * vol, 'sawtooth');
+    this._noise(t, 0.7, 'lowpass', 500, 200, 1, 0.25 * vol);
+  }
+
+  /** Something heavy hitting the base. */
+  thud(vol) {
+    if (!this._ready()) return;
+    const t = this.ctx.currentTime;
+    this._tone(t, 0.15, 120, 50, 0.6 * vol);
+    this._noise(t, 0.08, 'bandpass', 900, 500, 2, 0.4 * vol);
+  }
+
   /** Being hit: a short dull thump. */
   hurt() {
     if (!this._ready()) return;
@@ -3398,12 +3491,13 @@ function loadPeerJs() {
 }
 
 /**
- * 1v1 connection. Three ways in, one interface for the game:
- *  - host():      this browser hosts a peer-to-peer match and gets a short code
+ * Multiplayer connection. Three ways in, one interface for the game:
+ *  - host(mode):  this browser hosts a peer-to-peer match and gets a short code.
+ *                 mode 'pvp' = 1v1 (2 players), 'coop' = zombie defense (up to 3).
  *  - join(code):  connect to a friend's hosted match
- *  - connect(url): a WebSocket relay server (the original server version)
- * Messages are small JSON objects: { t: 'type', ... }. When hosting, this
- * browser also does the server's job (relaying, damage, score).
+ *  - connect(url): a WebSocket relay server (the original 1v1 server version)
+ * Messages are small JSON objects: { t: 'type', ... }; the host stamps each
+ * with `from` (player id) and does the server's job (relaying, damage, score).
  * status: 'offline' | 'connecting' | 'connected' | 'full' | 'error'
  */
 class Net {
@@ -3411,20 +3505,31 @@ class Net {
     this.ws = null;
     this.status = 'offline';
     this.mode = null; // 'ws' | 'host' | 'guest'
+    this.roomMode = 'pvp'; // 'pvp' | 'coop'
     this.code = ''; // match code (peer-to-peer)
     this.error = ''; // reason for the last 'error' status
-    this.id = 0; // 1 or 2 once welcomed
-    this.peer = false; // is the other player present?
-    this.score = [0, 0]; // kills for player 1 and player 2
+    this.id = 0; // my player id (1 = host) once welcomed
+    this.players = new Set(); // ids of the other players present
+    this.score = [0, 0]; // 1v1 kills for player 1 and player 2
     this.handlers = {};
     this.onStatus = null;
     this._peerObj = null;
-    this._conn = null;
+    this._conn = null; // guest: connection to the host
+    this._guests = new Map(); // host: id -> connection
     this._joinTimer = 0;
   }
 
   get online() {
     return this.status === 'connected';
+  }
+
+  /** Is anyone else here? */
+  get peer() {
+    return this.players.size > 0;
+  }
+
+  get maxPlayers() {
+    return this.roomMode === 'coop' ? 3 : 2;
   }
 
   on(type, fn) {
@@ -3433,9 +3538,10 @@ class Net {
 
   // --- Peer-to-peer --------------------------------------------------------
 
-  async host() {
+  async host(roomMode) {
     this.disconnect();
     this.mode = 'host';
+    this.roomMode = roomMode === 'coop' ? 'coop' : 'pvp';
     this._set('connecting');
     const Peer = await loadPeerJs();
     if (this.mode !== 'host') return; // cancelled meanwhile
@@ -3449,26 +3555,35 @@ class Net {
       peer.on('open', () => {
         if (this._peerObj !== peer) return;
         this.code = code;
-        this._receive({ t: 'welcome', id: 1, peer: false, s: this.score.slice() });
+        this._receive({ t: 'welcome', id: 1, players: [], mode: this.roomMode, s: this.score.slice() });
       });
       peer.on('connection', (conn) => {
-        if (this._conn) {
-          // Already have an opponent: turn the newcomer away.
-          conn.on('open', () => { conn.send({ t: 'full' }); setTimeout(() => conn.close(), 300); });
-          return;
-        }
-        this._conn = conn;
         conn.on('open', () => {
-          this.score = [0, 0];
-          conn.send({ t: 'welcome', id: 2, peer: true, s: this.score.slice() });
-          this._receive({ t: 'peer', present: true });
-          this._receive({ t: 'score', s: this.score.slice(), victim: 0, killer: 0, quiet: 1 });
+          if (this._peerObj !== peer) { conn.close(); return; }
+          let id = 0;
+          for (let n = 2; n <= this.maxPlayers; n++) if (!this._guests.has(n)) { id = n; break; }
+          if (!id) {
+            conn.send({ t: 'full' });
+            setTimeout(() => conn.close(), 300);
+            return;
+          }
+          conn._pid = id;
+          this._guests.set(id, conn);
+          if (this.roomMode === 'pvp') this.score = [0, 0];
+          const others = [1];
+          for (const g of this._guests.keys()) if (g !== id) others.push(g);
+          conn.send({ t: 'welcome', id, players: others, peer: true, mode: this.roomMode, s: this.score.slice() });
+          this._broadcast({ t: 'peer', present: true, id }, id);
+          this._receive({ t: 'peer', present: true, id });
+          if (this.roomMode === 'pvp') this._receive({ t: 'score', s: this.score.slice(), victim: 0, killer: 0, quiet: 1 });
         });
-        conn.on('data', (m) => this._serve(2, m));
+        conn.on('data', (m) => { if (conn._pid) this._serve(conn._pid, m); });
         const gone = () => {
-          if (this._conn !== conn) return;
-          this._conn = null;
-          this._receive({ t: 'peer', present: false });
+          const id = conn._pid;
+          if (!id || this._guests.get(id) !== conn) return;
+          this._guests.delete(id);
+          this._broadcast({ t: 'peer', present: false, id }, id);
+          this._receive({ t: 'peer', present: false, id });
         };
         conn.on('close', gone);
         conn.on('error', gone);
@@ -3519,42 +3634,62 @@ class Net {
     this._joinTimer = setTimeout(() => { if (this.mode === 'guest' && this.status === 'connecting') this._fail('timeout'); }, 15000);
   }
 
-  /**
-   * The host plays server: handle a message sent by player `from` (1 = me, 2 = guest).
-   */
+  /** The host plays server: handle a message sent by player `from` (1 = me). */
   _serve(from, m) {
     if (!m || typeof m.t !== 'string') return;
-    const toOther = (msg) => (from === 1 ? this._sendConn(msg) : this._receive(msg));
+    const msg = Object.assign({}, m, { from });
     switch (m.t) {
-      case 's': case 'shot': case 'grenade': case 'barrel':
-        toOther(m);
-        break;
-      case 'hit':
-        if (typeof m.dmg === 'number') toOther({ t: 'dmg', dmg: Math.min(250, Math.max(0, m.dmg)), head: m.head ? 1 : 0 });
-        break;
-      case 'died': {
-        const killer = m.self ? 0 : (from === 1 ? 2 : 1);
-        if (killer) this.score[killer - 1]++;
-        const msg = { t: 'score', s: this.score.slice(), victim: from, killer };
-        this._receive(msg);
-        this._sendConn(msg);
+      case 'hit': { // 1v1: my bullet hit player `to`
+        const to = m.to || (from === 1 ? 2 : 1);
+        if (to !== from && typeof m.dmg === 'number') this._deliver(to, { t: 'dmg', dmg: Math.min(250, Math.max(0, m.dmg)), head: m.head ? 1 : 0, from });
         break;
       }
-      default:
+      case 'died': {
+        if (this.roomMode === 'pvp') {
+          const killer = m.self ? 0 : (from === 1 ? 2 : 1);
+          if (killer) this.score[killer - 1]++;
+          const sc = { t: 'score', s: this.score.slice(), victim: from, killer };
+          this._receive(sc);
+          this._broadcast(sc, 0);
+        } else {
+          const ev = { t: 'pdied', id: from };
+          this._receive(ev);
+          this._broadcast(ev, 0);
+        }
         break;
+      }
+      case 'zhit': // a guest hit a zombie: only the host needs it
+        if (from !== 1) this._receive(msg);
+        break;
+      default:
+        if (m.to) {
+          if (m.to !== from) this._deliver(m.to, msg);
+        } else {
+          if (from !== 1) this._receive(msg);
+          this._broadcast(msg, from);
+        }
     }
   }
 
-  _sendConn(msg) {
-    const c = this._conn;
+  _deliver(to, msg) {
+    if (to === 1) this._receive(msg);
+    else this._sendTo(this._guests.get(to), msg);
+  }
+
+  _broadcast(msg, except) {
+    for (const [id, c] of this._guests) if (id !== except) this._sendTo(c, msg);
+  }
+
+  _sendTo(c, msg) {
     if (c && c.open) { try { c.send(msg); } catch (_) { /* ignore */ } }
   }
 
-  // --- WebSocket server (optional) ----------------------------------------
+  // --- WebSocket server (optional, 1v1) -------------------------------------
 
   connect(url) {
     this.disconnect();
     this.mode = 'ws';
+    this.roomMode = 'pvp';
     this._set('connecting');
     let ws;
     try {
@@ -3580,48 +3715,59 @@ class Net {
 
   // --- Shared --------------------------------------------------------------
 
-  disconnect() {
+  _closeAll() {
     clearTimeout(this._joinTimer);
     const ws = this.ws, conn = this._conn, peer = this._peerObj;
     this.ws = null;
     this._conn = null;
     this._peerObj = null;
-    this.mode = null;
-    this.code = '';
-    this.peer = false;
-    this.id = 0;
+    for (const c of this._guests.values()) { try { c.close(); } catch (_) { /* ignore */ } }
+    this._guests.clear();
     if (ws) { try { ws.close(); } catch (_) { /* ignore */ } }
     if (conn) { try { conn.close(); } catch (_) { /* ignore */ } }
     if (peer) { try { peer.destroy(); } catch (_) { /* ignore */ } }
+    this.players.clear();
+    this.id = 0;
+    const h = this.handlers.clear;
+    if (h) h();
+  }
+
+  disconnect() {
+    this._closeAll();
+    this.mode = null;
+    this.code = '';
     if (this.status !== 'offline') this._set('offline');
-    const h = this.handlers.peer;
-    if (h) h({ t: 'peer', present: false });
   }
 
   send(obj) {
     if (this.status !== 'connected') return;
     if (this.mode === 'host') this._serve(1, obj);
-    else if (this.mode === 'guest') this._sendConn(obj);
+    else if (this.mode === 'guest') this._sendTo(this._conn, obj);
     else if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify(obj));
   }
 
   /** A message for this player (from the server, the host, or the host's own logic). */
   _receive(m) {
     if (!m || typeof m.t !== 'string') return;
+    // The 1v1 WebSocket server does not say who sent what: it is the other player.
+    if (m.from === undefined && this.mode === 'ws') m.from = this.id === 1 ? 2 : 1;
     if (m.t === 'welcome') {
       clearTimeout(this._joinTimer);
       this.id = m.id;
-      this.peer = !!m.peer;
+      this.roomMode = m.mode === 'coop' ? 'coop' : 'pvp';
+      this.players = new Set(Array.isArray(m.players) ? m.players.filter((p) => p !== m.id) : (m.peer ? [m.id === 1 ? 2 : 1] : []));
       this.score = m.s || [0, 0];
       this._set('connected');
     } else if (m.t === 'full') {
       const mode = this.mode;
-      this.disconnect();
+      this._closeAll();
       this.mode = mode;
       this._set('full');
+      this.mode = null;
       return;
     } else if (m.t === 'peer') {
-      this.peer = !!m.present;
+      if (m.id === undefined) m.id = this.id === 1 ? 2 : 1;
+      if (m.present) this.players.add(m.id); else this.players.delete(m.id);
     } else if (m.t === 'score') {
       this.score = m.s;
       if (m.quiet) {
@@ -3637,7 +3783,7 @@ class Net {
   /** The connection dropped after it was established. */
   _lost() {
     const mode = this.mode;
-    this.disconnect();
+    this._closeAll();
     this.mode = mode;
     this.error = 'lost';
     this._set('error');
@@ -3647,14 +3793,7 @@ class Net {
   _fail(reason) {
     const mode = this.mode;
     const code = this.code;
-    clearTimeout(this._joinTimer);
-    const ws = this.ws, conn = this._conn, peer = this._peerObj;
-    this.ws = null; this._conn = null; this._peerObj = null;
-    if (ws) { try { ws.close(); } catch (_) { /* ignore */ } }
-    if (conn) { try { conn.close(); } catch (_) { /* ignore */ } }
-    if (peer) { try { peer.destroy(); } catch (_) { /* ignore */ } }
-    this.peer = false;
-    this.id = 0;
+    this._closeAll();
     this.error = reason;
     this.mode = mode;
     this.code = code;
@@ -3680,7 +3819,7 @@ const R_HEAD = 0.3; // top slice of the box counts as a headshot
  * tests a ray against the box that is currently displayed.
  */
 class RemotePlayer {
-  constructor(scene, effects) {
+  constructor(scene, effects, color) {
     this.effects = effects;
     this.present = false;
     this.dead = false;
@@ -3692,7 +3831,7 @@ class RemotePlayer {
     this.slot = 1;
     this.flash = 0;
 
-    const body = new THREE.MeshLambertMaterial({ color: 0x6b3a2a });
+    const body = new THREE.MeshLambertMaterial({ color: color || 0x6b3a2a });
     const dark = new THREE.MeshLambertMaterial({ color: 0x3a3a40 });
     const skin = new THREE.MeshLambertMaterial({ color: 0xc09070 });
     const metal = new THREE.MeshLambertMaterial({ color: 0x222226 });
@@ -4998,6 +5137,7 @@ const NAV_LINKS = [
 const SPAWN_NODES = ['corr3', 'corr5', 'ctrl', 'ctrlL', 'ctrlR', 'wh2', 'wh3', 'wh5', 'wh6', 'wh7', 'east2', 'pump1', 'pump3', 'pump4'];
 
 const rand = (a, b) => a + Math.random() * (b - a);
+const NOT_ENEMY = (b) => !b.enemy && !b.isBase;
 
 /**
  * Enemy soldiers: simple waypoint navigation, sight checks against the level,
@@ -5161,6 +5301,7 @@ class Enemies {
       strafe: 1, strafeT: 0, burst: 0, shotT: 0, stuckT: 0, jumpCd: 0,
     };
     e.box = { minX: 0, minY: 0, minZ: 0, maxX: 0, maxY: 0, maxZ: 0, enemy: e };
+    e.sys = this;
     return e;
   }
 
@@ -5258,6 +5399,14 @@ class Enemies {
     return !this.collision.raycast(ax, ay, az, dx / d, dy / d, dz / d, d, this._hit);
   }
 
+  /** Like _clear, but looks through soldiers and zombies: for finding the way, not for seeing. */
+  _clearNav(ax, ay, az, bx, by, bz) {
+    const dx = bx - ax, dy = by - ay, dz = bz - az;
+    const d = Math.hypot(dx, dy, dz);
+    if (d < 0.01) return true;
+    return !this.collision.raycast(ax, ay, az, dx / d, dy / d, dz / d, d, this._hit, NOT_ENEMY);
+  }
+
   /** Overlap test against the level and other enemies, ignoring this enemy's own box. Sets this._top. */
   _blocked(e, x, y, z) {
     const boxes = this.collision.boxes;
@@ -5290,7 +5439,7 @@ class Enemies {
       const n = this.nodes[i];
       const d = Math.hypot(n.x - x, n.z - z) + Math.abs(n.y - y) * 2;
       if (d >= bestD) continue;
-      if (needSight && !this._clear(x, y + 1.0, z, n.x, n.y + 1.0, n.z)) continue;
+      if (needSight && !this._clearNav(x, y + 1.0, z, n.x, n.y + 1.0, n.z)) continue;
       best = i;
       bestD = d;
     }
@@ -5443,17 +5592,27 @@ class Enemies {
   }
 
   /** Head for (gx, gz): straight if the way is clear, otherwise along the waypoints. */
-  _goalPoint(e, gx, gz, dt) {
+  _goalPoint(e, gx, gz, dt, gy = this.player.y) {
     e.pathT -= dt;
     if (e.pathT <= 0) {
       e.pathT = 0.5;
-      const gy = this.player.y;
-      if (this._clear(e.x, e.y + 1.0, e.z, gx, gy + 1.0, gz) && this._clear(e.x, e.y + 0.4, e.z, gx, gy + 0.4, gz)) {
+      if (this._clearNav(e.x, e.y + 1.0, e.z, gx, gy + 1.0, gz) && this._clearNav(e.x, e.y + 0.4, e.z, gx, gy + 0.4, gz)) {
         e.nextNode = -1;
       } else {
         const from = this._nearestNode(e.x, e.y, e.z, true);
         const to = this._nearestNode(gx, gy, gz, true);
-        e.nextNode = Math.hypot(this.nodes[from].x - e.x, this.nodes[from].z - e.z) > 0.8 ? from : this._route(from, to);
+        const next = this._route(from, to);
+        const n0 = this.nodes[from], n1 = this.nodes[next];
+        const dFrom = Math.hypot(n0.x - e.x, n0.z - e.z);
+        if (dFrom <= 0.8 || next === from) {
+          e.nextNode = dFrom <= 0.8 ? next : from;
+        } else {
+          // Already past the nearest waypoint on the way to the next one? Then
+          // head straight on instead of turning back (stops back-and-forth).
+          const ahead = Math.hypot(n1.x - e.x, n1.z - e.z) < Math.hypot(n1.x - n0.x, n1.z - n0.z) &&
+            this._clearNav(e.x, e.y + 1.0, e.z, n1.x, n1.y + 1.0, n1.z);
+          e.nextNode = ahead ? next : from;
+        }
       }
     }
     if (e.nextNode >= 0) {
@@ -5709,6 +5868,725 @@ class Enemies {
     p.sprite.position.set(x, y, z);
     p.sprite.visible = true;
     p.t = 0;
+  }
+}
+
+// ===== js/game/Zombies.js =====
+const Z_BASE_HP = 1500;
+const Z_BASE_REACH = 3.2; // zombies this close to the base centre attack it
+const Z_BASE_RING = 2.4; // they walk to the nearest point of this circle around the base
+const Z_BREAK = 15; // seconds between waves
+const Z_FIRST_BREAK = 8;
+const Z_OVER_TIME = 10; // seconds on the game-over screen before a new game
+const Z_SNAPSHOT = 0.08; // host -> guests, about 12 per second
+const Z_PHASES = ['break', 'fight', 'over'];
+/** Where players (re)spawn in zombie defense: around the base, facing it. */
+const BASE_SPAWNS = [
+  { x: 0, y: 0, z: 6, yaw: 0 }, { x: 6.5, y: 0, z: 1.5, yaw: Math.PI / 2 },
+  { x: -6.5, y: 0, z: -1.5, yaw: -Math.PI / 2 }, { x: 1.5, y: 0, z: -7, yaw: Math.PI },
+];
+const zr2 = (v) => Math.round(v * 100) / 100;
+
+/**
+ * Zombie defense: waves of zombies come from the edges of the map and go for
+ * the base in the middle of the hall, or for any player they notice on the
+ * way. Reuses the soldiers' navigation and movement.
+ *
+ * Multiplayer: the host runs the zombies and sends snapshots; guests show
+ * puppets and report their hits ('zhit'). Zombie bites on a guest are sent
+ * to that guest ('zdmg'). Wave events go to everyone ('zev').
+ */
+class Zombies extends Enemies {
+  constructor(opts) {
+    super(opts);
+    this.net = opts.net;
+    this.remotes = opts.remotes;
+    this.enabled = false;
+    this.active = false;
+    this.role = 'host';
+    this.wave = 0;
+    this.phase = 'break';
+    this.timer = 0;
+    this.baseHp = Z_BASE_HP;
+    this.toSpawn = 0;
+    this.left = 0;
+    this.spawnT = 0;
+    this.nextId = 1;
+    this.scores = {}; // kills by player id
+    this.byId = new Map();
+    this.onEvent = null; // (event) for the game: refill on a cleared wave, respawn on a new game
+    this._snapT = 0;
+    this._players = [];
+    this._baseFlash = 0;
+    this._hud = {};
+    this._buildBase();
+    this._buildHud();
+  }
+
+  get myId() {
+    return this.net.online ? this.net.id : 1;
+  }
+
+  // Soldier-only behaviour switched off.
+  _syncCount() {}
+  noise() {}
+
+  // --- Mode ----------------------------------------------------------------
+
+  setActive(on, role) {
+    if (on === this.active && role === this.role) return;
+    this._clearAll();
+    this.active = on;
+    this.role = role;
+    this.base.visible = on;
+    this.baseLight.intensity = on ? 18 : 0;
+    const boxes = this.collision.boxes;
+    const i = boxes.indexOf(this.baseBox);
+    if (on && i < 0) boxes.push(this.baseBox);
+    if (!on && i >= 0) boxes.splice(i, 1);
+    this._hud.root.classList.toggle('on', on);
+    this._hud.over.classList.remove('on');
+    if (on && role === 'host') this._reset();
+  }
+
+  _reset() {
+    this._clearAll();
+    this.wave = 0;
+    this.phase = 'break';
+    this.timer = Z_FIRST_BREAK;
+    this.baseHp = Z_BASE_HP;
+    this.toSpawn = 0;
+    this.scores = {};
+    this._event({ k: 'reset' });
+  }
+
+  _clearAll() {
+    for (const e of this.list) {
+      this._removeBox(e);
+      this.scene.remove(e.root);
+    }
+    this.list = [];
+    this.byId.clear();
+  }
+
+  // --- Base ----------------------------------------------------------------
+
+  _buildBase() {
+    const g = new THREE.Group();
+    g.position.set(0, 0.6, 0);
+    const metal = new THREE.MeshLambertMaterial({ color: 0x3c4248, flatShading: true });
+    const dark = new THREE.MeshLambertMaterial({ color: 0x1e2226 });
+    this.baseGlow = new THREE.MeshBasicMaterial({ color: 0x5fd06a, fog: false });
+    const add = (geo, mat, x, y, z) => {
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set(x, y, z);
+      g.add(m);
+      return m;
+    };
+    add(new THREE.BoxGeometry(1.2, 1.4, 1.2), metal, 0, 0.7, 0);
+    add(new THREE.BoxGeometry(1.26, 0.1, 1.26), this.baseGlow, 0, 0.45, 0);
+    add(new THREE.BoxGeometry(1.26, 0.1, 1.26), this.baseGlow, 0, 1.05, 0);
+    add(new THREE.BoxGeometry(0.9, 0.12, 0.9), dark, 0, 1.46, 0);
+    add(new THREE.BoxGeometry(0.08, 0.8, 0.08), dark, 0.3, 1.9, 0.3);
+    add(new THREE.BoxGeometry(0.16, 0.16, 0.16), this.baseGlow, 0.3, 2.34, 0.3);
+    g.visible = false;
+    this.scene.add(g);
+    this.base = g;
+    // One permanent light so the light count never changes.
+    this.baseLight = new THREE.PointLight(0x7aff8a, 0, 9, 2);
+    this.baseLight.position.set(0, 2.2, 0);
+    this.scene.add(this.baseLight);
+    this.baseBox = { minX: -0.6, minY: 0.6, minZ: -0.6, maxX: 0.6, maxY: 2.0, maxZ: 0.6, isBase: true };
+  }
+
+  _buildHud() {
+    const root = document.createElement('div');
+    root.id = 'zhud';
+    root.innerHTML = '<div id="zwave"></div><div id="zbase"><span>BASE</span><div id="zbase-bar"><b></b></div><em></em></div><div id="zinfo"></div>';
+    document.body.appendChild(root);
+    const banner = document.createElement('div');
+    banner.id = 'zbanner';
+    document.body.appendChild(banner);
+    const over = document.createElement('div');
+    over.id = 'zover';
+    over.innerHTML = '<h2>BASE DESTROYED</h2><p id="zover-waves"></p><p id="zover-kills"></p><p id="zover-timer"></p>';
+    document.body.appendChild(over);
+    this._hud = {
+      root, banner, over,
+      wave: root.querySelector('#zwave'), info: root.querySelector('#zinfo'),
+      bar: root.querySelector('#zbase-bar b'), num: root.querySelector('#zbase em'),
+      waves: over.querySelector('#zover-waves'), kills: over.querySelector('#zover-kills'), timer: over.querySelector('#zover-timer'),
+      last: {},
+    };
+    this._bannerT = 0;
+  }
+
+  _setText(el, key, text) {
+    if (this._hud.last[key] === text) return;
+    this._hud.last[key] = text;
+    el.textContent = text;
+  }
+
+  _updateHud(dt) {
+    const h = this._hud;
+    this._setText(h.wave, 'wave', this.wave > 0 ? 'WAVE ' + this.wave : 'GET READY');
+    let info = '';
+    if (this.phase === 'break') info = 'NEXT WAVE IN ' + Math.max(0, Math.ceil(this.timer));
+    else if (this.phase === 'fight') info = 'ZOMBIES LEFT ' + this.left;
+    this._setText(h.info, 'info', info);
+    const f = Math.max(0, this.baseHp / Z_BASE_HP);
+    const w = Math.round(f * 100) + '%';
+    if (h.last.bar !== w) {
+      h.last.bar = w;
+      h.bar.style.width = w;
+      h.bar.classList.toggle('low', f < 0.3);
+    }
+    this._setText(h.num, 'num', String(Math.ceil(this.baseHp)));
+    if (this.phase === 'over') this._setText(h.timer, 'otimer', 'New game in ' + Math.max(1, Math.ceil(this.timer)));
+    if (this._bannerT > 0) {
+      this._bannerT -= dt;
+      if (this._bannerT <= 0) h.banner.classList.remove('on');
+    }
+    // Base glow: green, red when hit, flickering when low.
+    this._baseFlash = Math.max(0, this._baseFlash - dt * 4);
+    const low = f < 0.3 && Math.sin(performance.now() / 90) > 0;
+    if (this._baseFlash > 0 || low) this.baseGlow.color.setRGB(1, 0.25, 0.2);
+    else this.baseGlow.color.setRGB(0.37, 0.82, 0.42);
+  }
+
+  _banner(text, time) {
+    const b = this._hud.banner;
+    b.textContent = text;
+    b.classList.add('on');
+    this._bannerT = time || 2.5;
+  }
+
+  // --- Events (host decides, everyone shows) --------------------------------
+
+  _event(ev) {
+    this.handleEvent(ev);
+    if (this.net.online) this.net.send(Object.assign({ t: 'zev' }, ev));
+  }
+
+  /** A wave event, from the host's own logic or from the network. */
+  handleEvent(ev) {
+    const me = this.myId;
+    if (ev.k === 'wave') {
+      this._banner('WAVE ' + ev.n);
+      this.audio.horn();
+    } else if (ev.k === 'clear') {
+      this._banner('WAVE ' + ev.n + ' CLEARED');
+      this.ui.feed('BASE REPAIRED +10%');
+    } else if (ev.k === 'kill') {
+      if (this.role === 'guest' && ev.by === me) {
+        this.ui.hitMarker(true);
+        this.audio.hitmarker(true);
+      }
+      if (ev.s) this.scores = ev.s;
+      this.ui.setKills(this.scores[me] || 0);
+      if (ev.by === me) this.ui.feed(ev.head ? 'HEADSHOT' : 'ZOMBIE DOWN');
+    } else if (ev.k === 'over') {
+      this.scores = ev.s || this.scores;
+      const h = this._hud;
+      h.waves.textContent = 'You held out for ' + ev.n + (ev.n === 1 ? ' wave' : ' waves');
+      const parts = [];
+      for (const id of Object.keys(this.scores).sort()) {
+        parts.push((Number(id) === me ? 'YOU' : 'P' + id) + ' ' + this.scores[id]);
+      }
+      h.kills.textContent = parts.length ? 'Kills: ' + parts.join('  \u00b7  ') : 'Kills: 0';
+      h.over.classList.add('on');
+      this.audio.horn();
+    } else if (ev.k === 'reset') {
+      this.scores = {};
+      this._hud.over.classList.remove('on');
+      this.ui.setKills(0);
+    }
+    if (this.onEvent) this.onEvent(ev);
+  }
+
+  // --- Host: waves ---------------------------------------------------------
+
+  _collectPlayers() {
+    const out = this._players;
+    out.length = 0;
+    const p = this.player;
+    if (!this.health.dead && (this.input.locked || this.net.online)) out.push({ id: this.myId, x: p.x, y: p.y, z: p.z });
+    for (const [id, r] of this.remotes) {
+      if (r.present && !r.dead) out.push({ id, x: r.x, y: r.y, z: r.z });
+    }
+    return out;
+  }
+
+  get playerCount() {
+    let n = 1;
+    for (const r of this.remotes.values()) if (r.present) n++;
+    return n;
+  }
+
+  _startWave() {
+    this.wave++;
+    this.phase = 'fight';
+    const n = this.playerCount;
+    this.toSpawn = Math.round((6 + 4 * this.wave) * (1 + 0.5 * (n - 1)));
+    this.spawnT = 0;
+    this._event({ k: 'wave', n: this.wave });
+  }
+
+  _spawnZombie() {
+    const n = this.playerCount;
+    const runner = this.wave >= 3 && Math.random() < Math.min(0.35, 0.05 * this.wave);
+    // A spawn point away from every player.
+    let node = null;
+    for (let tries = 0; tries < 12 && !node; tries++) {
+      const cand = this.nodes[this.spawnNodes[Math.floor(Math.random() * this.spawnNodes.length)]];
+      let ok = true;
+      for (const pl of this._players) if (Math.hypot(pl.x - cand.x, pl.z - cand.z) < 12) ok = false;
+      if (ok || tries === 11) node = cand;
+    }
+    const e = this._createZombie(runner);
+    e.x = node.x + rand(-0.8, 0.8);
+    e.z = node.z + rand(-0.8, 0.8);
+    e.y = node.y + 0.05;
+    if (this._blocked(e, e.x, e.y, e.z)) { e.x = node.x; e.z = node.z; }
+    if (this._blocked(e, e.x, e.y, e.z)) { this.scene.remove(e.root); return false; } // crowded: try later
+    e.id = this.nextId++;
+    e.hp = (60 + 15 * this.wave) * (1 + 0.25 * (n - 1)) * (runner ? 0.7 : 1);
+    e.speed = runner ? 4.6 : 1.9 + Math.min(1.3, this.wave * 0.1) + rand(-0.2, 0.2);
+    e.alive = true;
+    e.root.visible = true;
+    this._addBox(e);
+    this.list.push(e);
+    this.byId.set(e.id, e);
+    return true;
+  }
+
+  // --- Per frame -----------------------------------------------------------
+
+  update(dt) {
+    if (!this.active) return;
+    if (this.role === 'host') this._updateHost(dt);
+    else this._updateGuest(dt);
+    for (const p of this.puffs) {
+      if (p.t < 0) continue;
+      p.t += dt;
+      const k = p.t / 0.35;
+      if (k >= 1) { p.t = -1; p.sprite.visible = false; continue; }
+      p.sprite.scale.setScalar(0.15 + 0.4 * k);
+      p.sprite.material.opacity = 0.9 * (1 - k);
+    }
+    this._updateHud(dt);
+  }
+
+  _updateHost(dt) {
+    // Solo: everything waits while the menu is open.
+    if (!this.net.online && !this.input.locked) return;
+    this._collectPlayers();
+
+    if (this.phase === 'break') {
+      this.timer -= dt;
+      if (this.timer <= 0) this._startWave();
+    } else if (this.phase === 'fight') {
+      let alive = 0;
+      for (const e of this.list) if (e.alive) alive++;
+      const maxAlive = 10 + 4 * this.playerCount;
+      if (this.toSpawn > 0) {
+        this.spawnT -= dt;
+        if (this.spawnT <= 0 && alive < maxAlive) {
+          if (this._spawnZombie()) this.toSpawn--;
+          this.spawnT = Math.max(0.35, 1.3 - this.wave * 0.06);
+        }
+      } else if (alive === 0) {
+        this.phase = 'break';
+        this.timer = Z_BREAK;
+        this.baseHp = Math.min(Z_BASE_HP, this.baseHp + Z_BASE_HP * 0.1);
+        this._event({ k: 'clear', n: this.wave });
+      }
+      this.left = this.toSpawn + alive;
+    } else if (this.phase === 'over') {
+      this.timer -= dt;
+      if (this.timer <= 0) this._reset();
+    }
+
+    for (let i = this.list.length - 1; i >= 0; i--) {
+      const e = this.list[i];
+      if (!e.alive) { this._updateDead(e, dt); continue; }
+      if (this.phase !== 'over') this._thinkZombie(e, dt);
+      else e.speedNow = 0;
+      this._physics(e, dt);
+      this._animate(e, dt);
+    }
+    this._separate(dt);
+
+    if (this.baseHp <= 0 && this.phase !== 'over') {
+      this.baseHp = 0;
+      this.phase = 'over';
+      this.timer = Z_OVER_TIME;
+      for (const e of this.list) e.speedNow = 0;
+      this._event({ k: 'over', n: Math.max(0, this.wave - 1), s: this.scores });
+    }
+
+    if (this.net.online && this.net.peer) {
+      this._snapT -= dt;
+      if (this._snapT <= 0) {
+        this._snapT = Z_SNAPSHOT;
+        this.net.send(this._snapshot());
+      }
+    }
+  }
+
+  _thinkZombie(e, dt) {
+    // Pick a target: a player it can see nearby, otherwise the base.
+    e.retargetT -= dt;
+    if (e.retargetT <= 0) {
+      e.retargetT = 0.4;
+      let best = null, bd = Infinity;
+      for (const pl of this._players) {
+        const d = Math.hypot(pl.x - e.x, pl.z - e.z);
+        if (d >= bd || d > 11) continue;
+        if (d < 4 || this._clear(e.x, e.y + 1.5, e.z, pl.x, pl.y + 1.4, pl.z)) { best = pl; bd = d; }
+      }
+      e.target = best ? best.id : 0;
+    }
+    let target = null;
+    if (e.target) for (const pl of this._players) if (pl.id === e.target) target = pl;
+
+    let attack = null;
+    if (target) {
+      if (Math.hypot(target.x - e.x, target.z - e.z) < 1.25 && Math.abs(target.y - e.y) < 1.5) attack = 'player';
+    } else if (Math.hypot(e.x, e.z) < Z_BASE_REACH) {
+      attack = 'base';
+    }
+
+    let face = null;
+    if (attack) {
+      e.state = 'attack';
+      e.speedNow = 0;
+      face = attack === 'player' ? Math.atan2(-(target.x - e.x), -(target.z - e.z)) : Math.atan2(e.x, e.z);
+      e.atkT -= dt;
+      if (e.atkT <= 0) {
+        e.atkT = 1.1;
+        if (attack === 'player') this._bite(target.id, 18 * (1 + this.wave * 0.04), e.x, e.z);
+        else {
+          this.baseHp -= 9 * (1 + this.wave * 0.03);
+          this._baseFlash = 1;
+          this.audio.thud(this._volumeAt(e.x, e.z));
+        }
+      }
+    } else {
+      e.state = 'walk';
+      e.atkT = Math.min(e.atkT, 0.45);
+      // Go for the player, or for the near side of the base (never through it).
+      let gx = 0, gz = 0;
+      if (target) { gx = target.x; gz = target.z; } else {
+        const d = Math.hypot(e.x, e.z) || 1;
+        gx = (e.x / d) * Z_BASE_RING;
+        gz = (e.z / d) * Z_BASE_RING;
+      }
+      const goal = this._goalPoint(e, gx, gz, dt, target ? target.y : 0);
+      const mx = goal.x - e.x, mz = goal.z - e.z;
+      const ml = Math.hypot(mx, mz);
+      if (ml > 0.05) {
+        e.moveX = mx / ml;
+        e.moveZ = mz / ml;
+        e.speedNow = e.speed;
+        face = Math.atan2(-e.moveX, -e.moveZ);
+      } else e.speedNow = 0;
+    }
+    if (face !== null) {
+      let d = face - e.yaw;
+      d = Math.atan2(Math.sin(d), Math.cos(d));
+      e.yaw += d * Math.min(1, dt * 6);
+    }
+    e.groanT -= dt;
+    if (e.groanT <= 0) {
+      e.groanT = rand(4, 11);
+      const v = this._volumeAt(e.x, e.z);
+      if (v > 0.05) this.audio.groan(v);
+    }
+  }
+
+  _volumeAt(x, z) {
+    const p = this.player;
+    return Math.max(0, 0.9 / (1 + Math.hypot(p.x - x, p.z - z) * 0.18));
+  }
+
+  _bite(id, dmg, x, z) {
+    if (id === this.myId) this.hurtMe(dmg, x, z);
+    else this.net.send({ t: 'zdmg', to: id, dmg: Math.round(dmg), x: zr2(x), z: zr2(z) });
+  }
+
+  /** A zombie bit this player (locally or reported by the host). */
+  hurtMe(dmg, x, z) {
+    if (!this.input.locked && !this.net.online) return;
+    const applied = this.health.damage(dmg, 'zombie', 'zombie');
+    if (applied <= 0) return;
+    const p = this.player;
+    this.ui.damageDir(Math.atan2(x - p.x, z - p.z) - (p.yaw + Math.PI));
+    this.audio.hurt();
+  }
+
+  _snapshot() {
+    const z = [];
+    for (const e of this.list) {
+      z.push([e.id, zr2(e.x), zr2(e.y), zr2(e.z), zr2(e.yaw), e.alive ? (e.state === 'attack' ? 1 : 0) : 2, e.runner ? 1 : 0]);
+    }
+    return {
+      t: 'zs', w: this.wave, ph: Z_PHASES.indexOf(this.phase), tm: Math.ceil(this.timer),
+      bh: Math.round(this.baseHp), left: this.left, z,
+    };
+  }
+
+  // --- Guest: puppets from snapshots ---------------------------------------
+
+  applySnapshot(m) {
+    if (!this.active || this.role !== 'guest') return;
+    this.wave = m.w | 0;
+    this.phase = Z_PHASES[m.ph] || 'break';
+    this.timer = m.tm;
+    if (m.bh < this.baseHp - 0.5) this._baseFlash = 1;
+    this.baseHp = m.bh;
+    this.left = m.left | 0;
+    const seen = new Set();
+    for (const row of m.z || []) {
+      const [id, x, y, z, yaw, st, runner] = row;
+      seen.add(id);
+      let e = this.byId.get(id);
+      if (!e) {
+        if (st === 2) continue; // never saw it alive
+        e = this._createZombie(!!runner);
+        e.id = id;
+        e.x = e.tx = x; e.y = e.ty = y; e.z = e.tz = z; e.yaw = e.tyaw = yaw;
+        e.alive = true;
+        e.root.visible = true;
+        this._addBox(e);
+        this.list.push(e);
+        this.byId.set(id, e);
+      }
+      e.tx = x; e.ty = y; e.tz = z; e.tyaw = yaw;
+      e.state = st === 1 ? 'attack' : 'walk';
+      if (st === 2 && e.alive) {
+        e.alive = false;
+        e.deadT = 0;
+        this._removeBox(e);
+      }
+    }
+    for (let i = this.list.length - 1; i >= 0; i--) {
+      const e = this.list[i];
+      if (!seen.has(e.id)) this._removeZombie(e, i);
+    }
+  }
+
+  _updateGuest(dt) {
+    const k = Math.min(1, dt * 12);
+    for (let i = this.list.length - 1; i >= 0; i--) {
+      const e = this.list[i];
+      if (!e.alive) { this._updateDead(e, dt); continue; }
+      const ox = e.x, oz = e.z;
+      e.x += (e.tx - e.x) * k;
+      e.y += (e.ty - e.y) * k;
+      e.z += (e.tz - e.z) * k;
+      let d = e.tyaw - e.yaw;
+      d = Math.atan2(Math.sin(d), Math.cos(d));
+      e.yaw += d * k;
+      e.speedNow = dt > 0 ? Math.hypot(e.x - ox, e.z - oz) / dt : 0;
+      e.onGround = true;
+      this._syncBox(e);
+      this._animate(e, dt);
+    }
+  }
+
+  // --- Damage --------------------------------------------------------------
+
+  bulletHit(box, hit, damage, headMul) {
+    const e = box && box.enemy;
+    if (!e || !e.alive) return false;
+    const head = hit.y > e.y + 1.5;
+    const dmg = damage * (head ? headMul : 1);
+    this._puff(hit.x, hit.y, hit.z);
+    if (this.role === 'host') {
+      this._damage(e, dmg, head, this.myId);
+    } else {
+      this.net.send({ t: 'zhit', z: e.id, dmg: Math.round(dmg), head: head ? 1 : 0 });
+      this.ui.hitMarker(head);
+      this.audio.hitmarker(false);
+    }
+    return true;
+  }
+
+  /** Host: a guest hit a zombie. */
+  onNetHit(m) {
+    if (this.role !== 'host') return;
+    const e = this.byId.get(m.z);
+    if (e && e.alive && typeof m.dmg === 'number') this._damage(e, Math.min(300, Math.max(0, m.dmg)), !!m.head, m.from | 0);
+  }
+
+  _damage(e, amount, head, byId) {
+    if (!e.alive) return;
+    e.hp -= amount;
+    e.hurtT = 0.12;
+    if (byId && e.target === 0) { e.target = byId; e.retargetT = 1.5; } // turn on whoever shoots it
+    const killed = e.hp <= 0;
+    if (killed) this._kill(e, byId, head);
+    if (byId && byId === this.myId) {
+      this.ui.hitMarker(head || killed);
+      this.audio.hitmarker(killed);
+    }
+  }
+
+  _kill(e, byId, head) {
+    if (!e.alive) return;
+    e.alive = false;
+    e.deadT = 0;
+    this._removeBox(e);
+    for (const m of e.mats) m.emissive.setRGB(0, 0, 0);
+    if (byId) {
+      this.scores[byId] = (this.scores[byId] || 0) + 1;
+      this._event({ k: 'kill', by: byId, head: head ? 1 : 0, s: this.scores });
+    }
+  }
+
+  _explosion(x, y, z, radius, owner) {
+    if (!this.active || this.role !== 'host') return;
+    const r = radius * 0.8;
+    for (const e of this.list) {
+      if (!e.alive) continue;
+      const d = Math.hypot(e.x - x, e.y + 0.9 - y, e.z - z);
+      if (d < r) {
+        e.vy = Math.max(e.vy, 4 * (1 - d / r));
+        this._damage(e, 220 * (1 - d / r), false, owner === 'me' ? this.myId : 0);
+      }
+    }
+  }
+
+  _updateDead(e, dt) {
+    e.deadT += dt;
+    const fall = Math.min(1, e.deadT / 0.45);
+    e.root.rotation.x = (Math.PI / 2) * fall * fall;
+    e.root.position.set(e.x, e.deadT > 2.5 ? e.y - (e.deadT - 2.5) * 0.6 : e.y, e.z);
+    if (e.deadT > 4 && this.role === 'host') this._removeZombie(e, this.list.indexOf(e));
+  }
+
+  _removeZombie(e, index) {
+    this._removeBox(e);
+    this.scene.remove(e.root);
+    this.byId.delete(e.id);
+    if (index >= 0) this.list.splice(index, 1);
+  }
+
+  _animate(e, dt) {
+    super._animate(e, dt);
+    // Arms reach out; claw when attacking.
+    e.clawT = (e.clawT || 0) + dt;
+    const target = e.state === 'attack' ? Math.sin(e.clawT * 9) * 0.55 - 0.15 : Math.sin(e.clawT * 2.3 + e.id) * 0.08;
+    e.arms.rotation.x += (target - e.arms.rotation.x) * Math.min(1, dt * 14);
+    e.root.rotation.z = Math.sin(e.stride * 0.5) * 0.06; // shambling sway
+  }
+
+  /** Like the soldiers' test, but other zombies do not block: crowds would jam in doorways. */
+  _blocked(e, x, y, z) {
+    const boxes = this.collision.boxes;
+    const minX = x - EN_RADIUS, maxX = x + EN_RADIUS, minZ = z - EN_RADIUS, maxZ = z + EN_RADIUS;
+    const minY = y, maxY = y + EN_HEIGHT;
+    let hit = false;
+    let top = -Infinity;
+    for (let i = 0; i < boxes.length; i++) {
+      const b = boxes[i];
+      if (b === e.box || (b.enemy && b.enemy.sys === this)) continue;
+      if (maxX > b.minX && minX < b.maxX && maxY > b.minY && minY < b.maxY && maxZ > b.minZ && minZ < b.maxZ) {
+        hit = true;
+        if (b.maxY > top) top = b.maxY;
+      }
+    }
+    this._top = top;
+    const p = this.player;
+    if (Math.hypot(p.x - x, p.z - z) < EN_RADIUS + p.radius + 0.05 && maxY > p.y && minY < p.y + p.height) {
+      hit = true;
+      this._top = Infinity;
+    }
+    return hit;
+  }
+
+  /** Nudge overlapping zombies apart so a crowd spreads out instead of stacking. */
+  _separate(dt) {
+    const list = this.list;
+    const push = Math.min(1, dt * 6);
+    for (let i = 0; i < list.length; i++) {
+      const a = list[i];
+      if (!a.alive) continue;
+      for (let j = i + 1; j < list.length; j++) {
+        const b = list[j];
+        if (!b.alive || Math.abs(a.y - b.y) > 1) continue;
+        let dx = b.x - a.x, dz = b.z - a.z;
+        let d = Math.hypot(dx, dz);
+        const min = EN_RADIUS * 2;
+        if (d >= min) continue;
+        if (d < 1e-3) { dx = Math.random() - 0.5; dz = Math.random() - 0.5; d = Math.hypot(dx, dz); }
+        const k = ((min - d) / d) * 0.5 * push;
+        const ax = a.x - dx * k, az = a.z - dz * k, bx = b.x + dx * k, bz = b.z + dz * k;
+        if (!this._blocked(a, ax, a.y + 0.01, az)) { a.x = ax; a.z = az; this._syncBox(a); }
+        if (!this._blocked(b, bx, b.y + 0.01, bz)) { b.x = bx; b.z = bz; this._syncBox(b); }
+      }
+    }
+  }
+
+  // --- Model ---------------------------------------------------------------
+
+  _createZombie(runner) {
+    const mat = (color) => new THREE.MeshLambertMaterial({ color, emissive: 0x000000, flatShading: true });
+    const m = {
+      pants: mat(0x3b3a30), shirt: mat(runner ? 0x6e2f28 : 0x56604a), skin: mat(0x7d9a6a), hair: mat(0x2a2620),
+    };
+    const g = this.geo;
+    const root = new THREE.Group();
+    root.rotation.order = 'YXZ';
+    const add = (parent, geo, material, x, y, z) => {
+      const mesh = new THREE.Mesh(geo, material);
+      mesh.position.set(x, y, z);
+      parent.add(mesh);
+      return mesh;
+    };
+    const legs = [];
+    for (const side of [-1, 1]) {
+      const hip = new THREE.Group();
+      hip.position.set(0.13 * side, 0.9, 0);
+      add(hip, g.leg, m.pants, 0, -0.45, 0);
+      root.add(hip);
+      legs.push(hip);
+    }
+    const torso = add(root, g.torso, m.shirt, 0, 1.22, -0.04);
+    torso.rotation.x = 0.18; // hunched
+    const head = add(root, g.head, m.skin, 0, 1.66, -0.1);
+    head.rotation.z = 0.2;
+    add(root, g.visor, this.eyeMat, 0, 1.69, -0.24);
+    add(root, g.helmet, m.hair, 0, 1.82, -0.1).scale.set(0.85, 0.6, 0.85);
+    const arms = new THREE.Group();
+    arms.position.set(0, 1.45, -0.05);
+    for (const side of [-1, 1]) {
+      const a = add(arms, g.arm, m.skin, 0.24 * side, -0.02, -0.28);
+      a.rotation.x = -1.5;
+    }
+    root.add(arms);
+    root.visible = false;
+    this.scene.add(root);
+
+    const e = {
+      root, legs, arms, flash: null, mats: Object.values(m), runner,
+      id: 0, x: 0, y: 0, z: 0, vy: 0, yaw: 0, onGround: false,
+      tx: 0, ty: 0, tz: 0, tyaw: 0,
+      hp: 100, speed: 2, alive: false, state: 'walk', box: null,
+      deadT: 0, flashT: 0, hurtT: 0, stride: Math.random() * 6, speedNow: 0,
+      target: 0, retargetT: 0, atkT: 0.5, groanT: rand(1, 8),
+      goalNode: -1, pathT: 0, nextNode: -1, patrolNode: -1,
+      strafe: 1, strafeT: 0, stuckT: 0, jumpCd: 0, moveX: 0, moveZ: 0,
+      sys: this,
+    };
+    e.box = { minX: 0, minY: 0, minZ: 0, maxX: 0, maxY: 0, maxZ: 0, enemy: e };
+    return e;
+  }
+
+  _buildShared() {
+    super._buildShared();
+    this.eyeMat = new THREE.MeshBasicMaterial({ color: 0xff3a22, fog: false });
   }
 }
 
@@ -6025,6 +6903,8 @@ class TouchControls {
 // ===== js/main.js =====
 const SEND_INTERVAL = 0.05; // 20 state messages per second
 const r2 = (v) => Math.round(v * 100) / 100;
+const REMOTE_COLORS = { 1: 0x6b3a2a, 2: 0x2a4f6b, 3: 0x6b5f2a };
+const MODE_KEY = 'retrofps.mode';
 
 function boot() {
   const canvas = document.getElementById('game');
@@ -6043,22 +6923,54 @@ function boot() {
   let barrels = null; // created below; weapons only call them at runtime
   let ui = null;
   let enemies = null;
+  let zombies = null;
   const net = new Net();
-  const remote = new RemotePlayer(engine.scene);
+
+  // Other players, by id. Created on demand.
+  const remotes = new Map();
+  const remoteFor = (id) => {
+    let r = remotes.get(id);
+    if (!r) {
+      r = new RemotePlayer(engine.scene, null, REMOTE_COLORS[id]);
+      remotes.set(id, r);
+    }
+    return r;
+  };
+  // Shooting targets: every other player in a 1v1 (no friendly fire in co-op).
+  const targets = {
+    head: false,
+    lastId: 0,
+    get active() {
+      if (zombies && zombies.active) return false;
+      for (const r of remotes.values()) if (r.active) return true;
+      return false;
+    },
+    raycast(ox, oy, oz, dx, dy, dz, max) {
+      let best = -1;
+      for (const [id, r] of remotes) {
+        if (!r.active) continue;
+        const d = r.raycast(ox, oy, oz, dx, dy, dz, best < 0 ? max : best);
+        if (d >= 0 && (best < 0 || d < best)) { best = d; this.head = r.head; this.lastId = id; }
+      }
+      return best;
+    },
+  };
+
   const weapons = new WeaponManager({
     engine, input, player, collision: world.collision, settings,
     onHit: (box, chance) => barrels.hit(box, chance),
-    targets: remote,
+    targets,
     onShoot: (slot, impact) => {
       net.send({ t: 'shot', w: slot, i: impact ? impact.map(r2) : null });
       if (enemies) enemies.noise();
     },
     onTargetHit: (dmg, head) => {
-      net.send({ t: 'hit', dmg, head: head ? 1 : 0 });
+      net.send({ t: 'hit', to: targets.lastId, dmg, head: head ? 1 : 0 });
       ui.hitMarker(head);
       weapons.audio.pickup();
     },
-    onEnemyHit: (box, hit, damage, headMul) => enemies.bulletHit(box, hit, damage, headMul),
+    // Soldiers and zombies are both boxes in the collision world.
+    onEnemyHit: (box, hit, damage, headMul) => box.enemy.sys.bulletHit(box, hit, damage, headMul),
   });
   const explosions = new Explosions({
     scene: engine.scene, player, collision: world.collision, effects: weapons.effects, audio: weapons.audio,
@@ -6068,19 +6980,31 @@ function boot() {
 
   const health = new Health({ player, spots: world.pickupSpots });
   const pickups = new Pickups(engine.scene, health);
-  explosions.onPlayerBlast = (damage, owner) => health.damage(damage, 'explosion', owner);
+  explosions.onPlayerBlast = (damage, owner) => {
+    if (zombies.active && owner === 'other') return; // no friendly fire in co-op
+    health.damage(damage, 'explosion', owner);
+  };
   health.onPickup.push(() => weapons.audio.pickup());
   ui = new Ui(settings, input);
   ui.setSlotCount(weapons.weapons.length);
 
-  enemies = new Enemies({
-    scene: engine.scene, world, player, input, settings, explosions, audio: weapons.audio, health, ui,
-  });
+  const common = { scene: engine.scene, world, player, input, settings, explosions, audio: weapons.audio, health, ui };
+  enemies = new Enemies(common);
+  zombies = new Zombies(Object.assign({ net, remotes }, common));
   health.onRespawn.push(() => {
     weapons.refill();
     grenades.cooldown = 0;
     enemies.onPlayerRespawn();
   });
+  zombies.onEvent = (ev) => {
+    if (ev.k === 'clear') {
+      // Between waves: fresh ammo and a patch-up for everyone.
+      weapons.refill();
+      health.heal(50);
+    } else if (ev.k === 'reset') {
+      if (input.locked || net.online) health.respawn();
+    }
+  };
 
   const touch = new TouchControls(input, settings, player);
   weapons.audio.setVolume(settings.get('volume'));
@@ -6092,15 +7016,49 @@ function boot() {
     document.body.classList.toggle('free-mouse', input.freeMouse);
   };
 
+  // ---- game mode: soldiers (solo / 1v1 online) or zombie defense (solo / co-op) ----
+  let gameMode = (() => { try { return localStorage.getItem(MODE_KEY); } catch (_) { return null; } })() === 'zombies' ? 'zombies' : 'soldiers';
+  const modeTabs = Array.from(document.querySelectorAll('#mode-tabs button'));
+  const modeNote = document.getElementById('mode-note');
+  const applyMode = () => {
+    const online = net.online;
+    const coop = online ? net.roomMode === 'coop' : gameMode === 'zombies';
+    const shown = online ? (coop ? 'zombies' : 'soldiers') : gameMode;
+    for (const b of modeTabs) {
+      b.classList.toggle('on', b.dataset.mode === shown);
+      b.disabled = net.status === 'connected' || net.status === 'connecting';
+    }
+    modeNote.textContent = shown === 'zombies'
+      ? 'Defend the base in the middle of the map against waves of zombies. Solo, or co-op with up to 2 friends.'
+      : (online ? '1v1 against your friend.' : 'Fight enemy soldiers. Online: 1v1 against a friend.');
+    const wasZombies = zombies.active;
+    enemies.setEnabled(!online && gameMode === 'soldiers');
+    zombies.setActive(coop, online && net.id !== 1 ? 'guest' : 'host');
+    if (zombies.active !== wasZombies) health.respawn(); // to the base, or away from it
+    ui.setKills(coop ? (zombies.scores[zombies.myId] || 0) : online ? null : enemies.kills);
+    showNet();
+  };
+  for (const b of modeTabs) {
+    b.addEventListener('click', () => {
+      if (b.disabled || gameMode === b.dataset.mode) return;
+      gameMode = b.dataset.mode;
+      try { localStorage.setItem(MODE_KEY, gameMode); } catch (_) { /* ignore */ }
+      applyMode();
+    });
+  }
+
   // ---- respawn points ----
   health.chooseSpawn = () => {
     const pts = world.spawnPoints;
+    if (zombies.active) return BASE_SPAWNS[Math.floor(Math.random() * BASE_SPAWNS.length)];
     // Against a player: the spawn farthest from them.
-    if (net.online && remote.present) {
+    const others = Array.from(remotes.values()).filter((r) => r.present);
+    if (net.online && others.length) {
       let best = pts[0], bestD = -1;
       for (const q of pts) {
-        const d = Math.hypot(q.x - remote.x, q.z - remote.z);
-        if (d > bestD) { bestD = d; best = q; }
+        let near = Infinity;
+        for (const r of others) near = Math.min(near, Math.hypot(q.x - r.x, q.z - r.z));
+        if (near > bestD) { bestD = near; best = q; }
       }
       return best;
     }
@@ -6118,7 +7076,8 @@ function boot() {
     return pts[Math.floor(Math.random() * pts.length)];
   };
 
-  // ---- multiplayer (1v1) ----
+  // ---- multiplayer ----
+  const nameOf = (id) => (id === net.id ? 'YOU' : 'P' + id);
   health.onDeath.push(() => {
     ui.killedBy = health.lastOwner === 'other' ? 'KILLED BY YOUR OPPONENT' : '';
     net.send({ t: 'died', self: health.lastOwner === 'other' ? 0 : 1 });
@@ -6127,27 +7086,42 @@ function boot() {
   barrels.onIgnite = (i) => net.send({ t: 'barrel', i });
 
   net.on('welcome', (m) => {
-    player.spawn = world.spawnPoints[m.id === 1 ? 0 : 2];
-    player.respawn();
-    remote.setPresent(!!m.peer);
+    for (const r of remotes.values()) r.setPresent(false);
+    for (const id of net.players) remoteFor(id).setPresent(true);
+    if (net.roomMode === 'pvp') {
+      player.spawn = world.spawnPoints[m.id === 1 ? 0 : 2];
+      player.respawn();
+    }
     ui.setScore(0, 0);
+    applyMode();
+  });
+  net.on('clear', () => {
+    for (const r of remotes.values()) {
+      r.setPresent(false);
+      r.tx = r.ty = r.tz = 0;
+    }
   });
   net.on('peer', (m) => {
-    remote.setPresent(!!m.present);
-    if (!m.present) remote.tx = remote.ty = remote.tz = 0;
+    const r = remoteFor(m.id);
+    r.setPresent(!!m.present);
+    if (!m.present) r.tx = r.ty = r.tz = 0;
     showNet();
-    if (net.online) ui.feed(m.present ? 'OPPONENT JOINED' : 'OPPONENT LEFT');
+    if (net.online) {
+      if (net.roomMode === 'coop') ui.feed('P' + m.id + (m.present ? ' JOINED' : ' LEFT'));
+      else ui.feed(m.present ? 'OPPONENT JOINED' : 'OPPONENT LEFT');
+    }
   });
-  net.on('s', (m) => remote.setState(m));
+  net.on('s', (m) => { if (m.from) remoteFor(m.from).setState(m); });
   net.on('dmg', (m) => {
-    if (typeof m.dmg === 'number') health.damage(m.dmg, 'bullet', 'other');
+    if (typeof m.dmg === 'number' && !zombies.active) health.damage(m.dmg, 'bullet', 'other');
   });
   net.on('shot', (m) => {
-    remote.shotFx();
+    const r = remoteFor(m.from || 2);
+    r.shotFx();
     if (Array.isArray(m.i) && m.i.length === 6) weapons.effects.spawn(m.i[0], m.i[1], m.i[2], m.i[3], m.i[4], m.i[5]);
     const spec = WEAPON_SPECS[(m.w | 0) - 1];
     if (spec) {
-      const d = Math.hypot(remote.x - player.x, remote.z - player.z);
+      const d = Math.hypot(r.x - player.x, r.z - player.z);
       weapons.audio.shot(spec.sound, Math.max(0.12, 1 / (1 + d * 0.07)));
     }
   });
@@ -6159,49 +7133,60 @@ function boot() {
     if (m.victim === net.id) ui.feed(m.killer ? 'FRAGGED BY OPPONENT' : 'YOU DIED');
     else ui.feed(m.killer ? 'YOU FRAGGED OPPONENT' : 'OPPONENT DIED');
   });
+  net.on('pdied', (m) => { if (m.id !== net.id) ui.feed(nameOf(m.id) + ' WENT DOWN'); });
+  // Zombie defense traffic.
+  net.on('zs', (m) => zombies.applySnapshot(m));
+  net.on('zhit', (m) => zombies.onNetHit(m));
+  net.on('zdmg', (m) => { if (typeof m.dmg === 'number') zombies.hurtMe(Math.min(100, m.dmg), m.x, m.z); });
+  net.on('zev', (m) => { if (zombies.role === 'guest') zombies.handleEvent(m); });
+
   const netCode = document.getElementById('net-code');
   const netHost = document.getElementById('net-host');
   const netJoin = document.getElementById('net-join');
   const ERRORS = {
     lib: 'Could not load the multiplayer library. Check your internet connection.',
-    code: 'Enter the code your friend sees after pressing HOST GAME.',
+    code: 'Enter the code your friend sees after pressing HOST.',
     'peer-unavailable': 'No game with this code. Check the code and that your friend is still hosting.',
-    timeout: 'No answer from that game. Try again, or let the other player host.',
+    timeout: 'No answer from that game. Try again, or let someone else host.',
     network: 'Could not reach the matchmaking server. Check your internet connection.',
     'server-error': 'The matchmaking server is not responding. Try again in a minute.',
     'browser-incompatible': 'This browser does not support peer-to-peer connections.',
-    lost: 'Connection to the other player was lost.',
+    lost: 'Connection to the host was lost.',
   };
-  const showNet = () => {
+  function showNet() {
     const st = net.status;
     const p2p = net.mode === 'host' || net.mode === 'guest';
     const busy = st === 'connecting' || st === 'connected';
+    const coop = net.roomMode === 'coop';
+    const count = net.players.size + 1;
     let html = '';
-    if (net.mode === 'host' && st === 'connecting') html = 'Creating a game…';
+    if (net.mode === 'host' && st === 'connecting') html = 'Creating a game\u2026';
     else if (net.mode === 'host' && st === 'connected') {
-      html = net.peer ? 'Opponent joined. Code <b>' + net.code + '</b>'
-        : 'Your code: <b>' + net.code + '</b><br>Send it to your friend. They type it in and press JOIN.';
-    } else if (net.mode === 'guest' && st === 'connecting') html = 'Joining <b>' + net.code + '</b>…';
-    else if (net.mode === 'guest' && st === 'connected') html = 'Connected to <b>' + net.code + '</b>';
+      html = 'Your code: <b>' + net.code + '</b><br>';
+      if (coop) html += count + '/3 players. Friends type the code in and press JOIN.';
+      else html += net.peer ? 'Opponent joined.' : 'Send it to your friend. They type it in and press JOIN.';
+    } else if (net.mode === 'guest' && st === 'connecting') html = 'Joining <b>' + net.code + '</b>\u2026';
+    else if (net.mode === 'guest' && st === 'connected') {
+      html = 'Connected to <b>' + net.code + '</b>' + (coop ? ' \u00b7 zombie co-op, ' + count + '/3 players' : ' \u00b7 1v1');
+    } else if (st === 'full') html = 'That game is full.';
     else if (st === 'error' && ERRORS[net.error]) html = ERRORS[net.error];
     if (html) {
       ui.netStatus.innerHTML = html;
-      ui.netStatus.className = st === 'connected' ? 'ok' : st === 'error' ? 'bad' : '';
+      ui.netStatus.className = st === 'connected' ? 'ok' : st === 'error' || st === 'full' ? 'bad' : '';
     }
-    netHost.textContent = p2p && busy ? 'LEAVE GAME' : 'HOST GAME';
+    netHost.textContent = p2p && busy ? 'LEAVE GAME' : gameMode === 'zombies' ? 'HOST CO-OP (UP TO 3)' : 'HOST 1V1';
     netHost.disabled = busy && net.mode === 'ws';
     netJoin.disabled = busy;
     netCode.disabled = busy;
     ui.netConnect.disabled = busy && p2p;
     ui.netConnect.textContent = net.mode === 'ws' && busy ? 'DISCONNECT' : 'CONNECT';
-  };
+  }
   netHost.addEventListener('click', () => {
     if ((net.mode === 'host' || net.mode === 'guest') && (net.status === 'connected' || net.status === 'connecting')) {
       net.disconnect();
-      remote.setPresent(false);
       return;
     }
-    net.host();
+    net.host(gameMode === 'zombies' ? 'coop' : 'pvp');
   });
   const join = () => { if (!netJoin.disabled) net.join(netCode.value); };
   netJoin.addEventListener('click', join);
@@ -6213,12 +7198,8 @@ function boot() {
 
   net.onStatus = (st) => {
     ui.setNetStatus(st);
-    showNet();
-    // Enemies only in single player; the kill counter goes with them.
-    const online = st === 'connected';
-    enemies.setEnabled(!online);
-    ui.setKills(online ? null : enemies.kills);
-    if (!online) ui.setMatch(false, false);
+    if (st !== 'connected') ui.setMatch(false, false);
+    applyMode();
   };
 
   const saved = (() => { try { return localStorage.getItem('retrofps.url'); } catch (_) { return null; } })();
@@ -6228,7 +7209,6 @@ function boot() {
   ui.netConnect.addEventListener('click', () => {
     if (net.mode === 'ws' && (net.status === 'connected' || net.status === 'connecting')) {
       net.disconnect();
-      remote.setPresent(false);
       return;
     }
     const url = ui.netUrl.value.trim();
@@ -6236,7 +7216,7 @@ function boot() {
     net.connect(url);
   });
   ui.setNetStatus('offline');
-  showNet();
+  applyMode();
   let sendTimer = 0;
 
   engine.run((dt) => {
@@ -6252,12 +7232,13 @@ function boot() {
     explosions.update(dt);
     if (input.locked || health.dead) health.update(dt);
     pickups.update(dt);
-    remote.update(dt);
+    for (const r of remotes.values()) r.update(dt);
     enemies.update(dt);
+    zombies.update(dt);
     if (net.online) {
-      ui.setMatch(true, !net.peer);
+      ui.setMatch(net.roomMode === 'pvp', net.roomMode === 'pvp' && !net.peer);
       sendTimer -= dt;
-      if (sendTimer <= 0) {
+      if (sendTimer <= 0 && net.peer) {
         sendTimer = SEND_INTERVAL;
         net.send({
           t: 's', x: r2(player.x), y: r2(player.y), z: r2(player.z),

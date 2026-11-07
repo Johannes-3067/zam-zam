@@ -158,6 +158,36 @@ button:disabled {
   color: #d0a84a;
 }
 
+.secondary {
+  color: #c9c6ba;
+  background: #2a2a2c;
+}
+.secondary:hover { background: #38383a; }
+
+.tabs { display: flex; gap: 4px; margin: 14px 0 14px; }
+.tabs button {
+  flex: 1;
+  margin: 0;
+  padding: 7px 0;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #8f8d85;
+  background: #2a2a2c;
+}
+.tabs button.on { color: #1a1a1a; background: #a89c6a; }
+
+.row { display: flex; gap: 8px; margin-top: 6px; }
+.row button { flex: 1; }
+
+label.toggle { grid-template-columns: 1fr auto; align-items: center; }
+label.toggle input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: #a89c6a;
+}
+.setting-note { margin: -8px 0 14px; font-size: 11px; color: #66645e; }
+
 .controls-touch { display: none; }
 @media (pointer: coarse) {
   .controls-key { display: none; }
@@ -203,6 +233,7 @@ button:disabled {
 
 #tc-stick {
   position: fixed;
+  box-sizing: border-box;
   width: 112px;
   height: 112px;
   margin: 0;
@@ -216,6 +247,7 @@ button:disabled {
 #tc-stick.idle { opacity: 0.3; }
 #tc-stick i {
   position: absolute;
+  box-sizing: border-box;
   left: 50%;
   top: 50%;
   width: 48px;
@@ -226,6 +258,7 @@ button:disabled {
   transform: translate(-50%, -50%);
 }
 
+#touch.on { opacity: var(--bo, 0.8); }
 #tc-btns {
   position: fixed;
   right: calc(10px + env(safe-area-inset-right, 0px));
@@ -233,9 +266,27 @@ button:disabled {
   width: 280px;
   height: 230px;
   transform-origin: bottom right;
-  transform: scale(var(--k, 1));
+  transform: scale(calc(var(--k, 1) * var(--bs, 1)));
   pointer-events: none;
 }
+#tc-lock {
+  position: fixed;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px dashed rgba(225, 225, 215, 0.6);
+  background: rgba(20, 20, 22, 0.35);
+  color: rgba(225, 225, 215, 0.85);
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+#tc-lock.show { display: flex; }
+#tc-lock.armed, #tc-lock.locked { border-style: solid; border-color: #d0a84a; background: rgba(208, 168, 74, 0.5); color: #fff; }
+.tc-lfire { left: calc(22% + env(safe-area-inset-left, 0px)); top: 26%; width: 72px; height: 72px; }
 @media (max-height: 420px) { #tc-btns { --k: 0.85; } }
 @media (max-height: 340px) { #tc-btns { --k: 0.7; } }
 
@@ -332,50 +383,53 @@ body.touch #ammo-count { font-size: 30px; }
 
   <div id="menu">
     <div class="panel">
-      <h1>RETRO FPS</h1>
-      <p class="sub">Prototype &middot; Milestone 4</p>
+      <div id="view-main">
+        <h1>RETRO FPS</h1>
+        <p class="sub">Prototype &middot; Milestone 4</p>
 
-      <label>
-        <span>Look sensitivity</span>
-        <output></output>
-        <input type="range" data-setting="sensitivity" min="0.1" max="3" step="0.05">
-      </label>
-      <label>
-        <span>Field of view</span>
-        <output></output>
-        <input type="range" data-setting="fov" min="60" max="110" step="1">
-      </label>
-      <label>
-        <span>Render scale</span>
-        <output></output>
-        <input type="range" data-setting="renderScale" min="0.5" max="1" step="0.05">
-      </label>
+        <button id="play" type="button" disabled>LOADING...</button>
+        <button id="open-settings" class="secondary" type="button">SETTINGS</button>
+        <p class="hint" id="menu-hint"></p>
 
-      <button id="play" type="button" disabled>LOADING...</button>
-      <p class="hint" id="menu-hint"></p>
+        <ul class="controls controls-touch">
+          <li><b>Left</b> move (push past the ring to sprint)</li>
+          <li><b>Lock</b> drag further up onto LOCK and let go to keep sprinting</li>
+          <li><b>DUCK</b> crouch, or slide while sprinting</li>
+          <li><b>Right</b> drag to look</li>
+          <li><b>Buttons</b> fire, aim, jump, reload, grenade</li>
+          <li><b>Top right</b> tap a number to pick a weapon</li>
+          <li><b>II</b> menu / settings</li>
+        </ul>
 
-      <ul class="controls controls-touch">
-        <li><b>Left</b> move (push past the ring to sprint)</li>
-        <li><b>Right</b> drag to look</li>
-        <li><b>Buttons</b> fire, aim, jump, crouch, reload, grenade</li>
-        <li><b>Top right</b> tap a number to pick a weapon</li>
-        <li><b>II</b> menu / settings</li>
-      </ul>
+        <ul class="controls controls-key">
+          <li><b>WASD</b> move</li>
+          <li><b>Mouse</b> look</li>
+          <li><b>Shift</b> sprint</li>
+          <li><b>C</b> crouch (hold), slide while sprinting</li>
+          <li><b>Space</b> jump (also cancels a slide)</li>
+          <li><b>LMB</b> fire</li>
+          <li><b>RMB</b> aim down sights</li>
+          <li><b>R</b> reload</li>
+          <li><b>1-8</b> pick weapon (wheel cycles)</li>
+          <li><b>Q</b> previous weapon</li>
+          <li><b>E</b> throw grenade</li>
+          <li><b>Esc</b> menu / settings</li>
+        </ul>
+      </div>
 
-      <ul class="controls controls-key">
-        <li><b>WASD</b> move</li>
-        <li><b>Mouse</b> look</li>
-        <li><b>Shift</b> sprint</li>
-        <li><b>Space</b> jump</li>
-        <li><b>LMB</b> fire</li>
-        <li><b>RMB</b> aim down sights</li>
-        <li><b>R</b> reload</li>
-        <li><b>1-8</b> pick weapon (wheel cycles)</li>
-        <li><b>Q</b> previous weapon</li>
-        <li><b>C</b> crouch (hold)</li>
-        <li><b>E</b> throw grenade</li>
-        <li><b>Esc</b> menu / settings</li>
-      </ul>
+      <div id="view-settings" hidden>
+        <h1>SETTINGS</h1>
+        <div class="tabs" id="settings-tabs">
+          <button type="button" data-tab="general">GENERAL</button>
+          <button type="button" data-tab="controls">CONTROLS</button>
+          <button type="button" data-tab="touch">TOUCH</button>
+        </div>
+        <div id="settings-list"></div>
+        <div class="row">
+          <button id="reset-settings" class="secondary" type="button">RESET</button>
+          <button id="close-settings" type="button">BACK</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -415,17 +469,41 @@ const STORAGE_KEY = 'retro-fps.settings.v1';
 
 const LIMITS = {
   sensitivity: { min: 0.1, max: 3 },
+  adsSensitivity: { min: 0.3, max: 1.5 },
+  touchSensitivity: { min: 0.3, max: 3 },
   fov: { min: 60, max: 110 },
   renderScale: { min: 0.5, max: 1 },
+  volume: { min: 0, max: 1 },
+  showFps: { min: 0, max: 1 },
+  invertY: { min: 0, max: 1 },
+  autoSprint: { min: 0, max: 1 },
+  sprintLock: { min: 0, max: 1 },
+  holdAim: { min: 0, max: 1 },
+  fixedStick: { min: 0, max: 1 },
+  leftFire: { min: 0, max: 1 },
+  buttonSize: { min: 0.7, max: 1.4 },
+  buttonOpacity: { min: 0.2, max: 1 },
 };
 
 function createDefaults() {
   const coarse = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
   return {
     sensitivity: 1,
+    adsSensitivity: 1,
+    touchSensitivity: 1,
     fov: 80,
     // Touch devices start at a lower internal resolution.
     renderScale: coarse ? 0.75 : 1,
+    volume: 0.8,
+    showFps: 1,
+    invertY: 0,
+    autoSprint: 0,
+    sprintLock: 1,
+    holdAim: 0,
+    fixedStick: 0,
+    leftFire: 1,
+    buttonSize: 1,
+    buttonOpacity: 0.8,
   };
 }
 
@@ -453,6 +531,15 @@ class Settings {
     this.values[key] = next;
     this._save();
     for (const listener of this._listeners) listener(key, next);
+  }
+
+  /** Back to the defaults; every listener hears about every key. */
+  reset() {
+    this.values = createDefaults();
+    this._save();
+    for (const key of Object.keys(LIMITS)) {
+      for (const listener of this._listeners) listener(key, this.values[key]);
+    }
   }
 
   /** Subscribe to changes. Returns an unsubscribe function. */
@@ -579,11 +666,35 @@ class Engine {
 }
 
 // ===== js/engine/Ui.js =====
-const FORMAT = {
-  sensitivity: (v) => v.toFixed(2) + 'x',
-  fov: (v) => Math.round(v) + '°',
-  renderScale: (v) => Math.round(v * 100) + '%',
-};
+const pct = (v) => Math.round(v * 100) + '%';
+const mult = (v) => v.toFixed(2) + 'x';
+
+/** Everything shown in the settings screen. Toggles are stored as 0 / 1. */
+const SETTINGS_SCHEMA = [
+  { tab: 'general', key: 'fov', label: 'Field of view', step: 1, format: (v) => Math.round(v) + '°' },
+  { tab: 'general', key: 'renderScale', label: 'Render scale', step: 0.05, format: pct,
+    note: 'Lower is faster on weak devices.' },
+  { tab: 'general', key: 'volume', label: 'Volume', step: 0.05, format: pct },
+  { tab: 'general', key: 'showFps', label: 'Show FPS counter', toggle: true },
+
+  { tab: 'controls', key: 'sensitivity', label: 'Mouse sensitivity', step: 0.05, format: mult },
+  { tab: 'controls', key: 'adsSensitivity', label: 'Aim sensitivity', step: 0.05, format: mult,
+    note: 'Look speed while aiming down sights.' },
+  { tab: 'controls', key: 'invertY', label: 'Invert vertical look', toggle: true },
+  { tab: 'controls', key: 'autoSprint', label: 'Always sprint', toggle: true,
+    note: 'Sprint whenever you move fully forward.' },
+
+  { tab: 'touch', key: 'touchSensitivity', label: 'Touch look sensitivity', step: 0.05, format: mult },
+  { tab: 'touch', key: 'buttonSize', label: 'Button size', step: 0.05, format: pct },
+  { tab: 'touch', key: 'buttonOpacity', label: 'Button opacity', step: 0.05, format: pct },
+  { tab: 'touch', key: 'sprintLock', label: 'Sprint lock', toggle: true,
+    note: 'Drag the stick up onto LOCK and let go to keep sprinting.' },
+  { tab: 'touch', key: 'holdAim', label: 'Hold to aim', toggle: true,
+    note: 'Off: tap AIM to switch aiming on and off.' },
+  { tab: 'touch', key: 'fixedStick', label: 'Fixed joystick', toggle: true,
+    note: 'Off: the stick appears where your thumb lands.' },
+  { tab: 'touch', key: 'leftFire', label: 'Left fire button', toggle: true },
+];
 
 /** Menu, settings sliders, crosshair and FPS counter. Plain DOM, no framework. */
 class Ui {
@@ -612,7 +723,12 @@ class Ui {
     this._frames = 0;
     this._time = 0;
 
-    this._bindSliders();
+    this.viewMain = document.getElementById('view-main');
+    this.viewSettings = document.getElementById('view-settings');
+    this._tab = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches ? 'touch' : 'general';
+    this._buildSettings();
+    this._applyFpsVisibility();
+    settings.onChange((key) => { if (key === 'showFps') this._applyFpsVisibility(); });
     const playBtn = document.getElementById('play');
     let lastType = 'mouse';
     playBtn.addEventListener('pointerdown', (e) => { lastType = e.pointerType || 'mouse'; });
@@ -702,27 +818,83 @@ class Ui {
 
   _showMenu(visible) {
     this.menu.classList.toggle('hidden', !visible);
+    if (visible) this._showSettings(false);
     this.crosshair.style.display = visible ? 'none' : 'block';
   }
 
-  _bindSliders() {
-    const sliders = this.menu.querySelectorAll('input[data-setting]');
-    for (const slider of sliders) {
-      const key = slider.dataset.setting;
-      const output = slider.closest('label').querySelector('output');
-      const format = FORMAT[key];
+  _applyFpsVisibility() {
+    this.fpsLabel.style.display = this.settings.get('showFps') ? '' : 'none';
+  }
 
-      const refresh = () => {
-        const value = this.settings.get(key);
-        slider.value = String(value);
-        output.textContent = format(value);
-      };
+  _showSettings(open) {
+    this.viewMain.hidden = open;
+    this.viewSettings.hidden = !open;
+    if (open) this._renderTab();
+  }
 
-      slider.addEventListener('input', () => {
-        this.settings.set(key, Number(slider.value));
-        refresh();
+  _buildSettings() {
+    document.getElementById('open-settings').addEventListener('click', () => this._showSettings(true));
+    document.getElementById('close-settings').addEventListener('click', () => this._showSettings(false));
+    document.getElementById('reset-settings').addEventListener('click', () => {
+      this.settings.reset();
+      this._renderTab();
+    });
+    this._tabButtons = Array.from(document.querySelectorAll('#settings-tabs button'));
+    for (const btn of this._tabButtons) {
+      btn.addEventListener('click', () => {
+        this._tab = btn.dataset.tab;
+        this._renderTab();
       });
-      refresh();
+    }
+    this._list = document.getElementById('settings-list');
+  }
+
+  _renderTab() {
+    for (const btn of this._tabButtons) btn.classList.toggle('on', btn.dataset.tab === this._tab);
+    const list = this._list;
+    list.textContent = '';
+    for (const item of SETTINGS_SCHEMA) {
+      if (item.tab !== this._tab) continue;
+      const label = document.createElement('label');
+      const name = document.createElement('span');
+      name.textContent = item.label;
+      label.appendChild(name);
+
+      if (item.toggle) {
+        label.className = 'toggle';
+        const box = document.createElement('input');
+        box.type = 'checkbox';
+        box.checked = !!this.settings.get(item.key);
+        box.addEventListener('change', () => this.settings.set(item.key, box.checked ? 1 : 0));
+        label.appendChild(box);
+      } else {
+        const output = document.createElement('output');
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = String(LIMITS[item.key].min);
+        slider.max = String(LIMITS[item.key].max);
+        slider.step = String(item.step);
+        const refresh = () => {
+          const value = this.settings.get(item.key);
+          slider.value = String(value);
+          output.textContent = item.format(value);
+        };
+        slider.addEventListener('input', () => {
+          this.settings.set(item.key, Number(slider.value));
+          refresh();
+        });
+        refresh();
+        label.appendChild(output);
+        label.appendChild(slider);
+      }
+      list.appendChild(label);
+
+      if (item.note) {
+        const note = document.createElement('p');
+        note.className = 'setting-note';
+        note.textContent = item.note;
+        list.appendChild(note);
+      }
     }
   }
 }
@@ -776,6 +948,7 @@ class Input {
     this._grenadeQueued = false;
     this._slotQueued = 0;
     this._virtualCrouch = false;
+    this._crouchPressed = false; // crouch was pressed since the last read (starts a slide when sprinting)
     this._wheel = 0;
     this._firePressed = false; // a press happened since the last read (even a very short tap)
 
@@ -988,6 +1161,24 @@ class Input {
   pressSlot(n) { this._slotQueued = n; }
   setVirtualCrouch(active) { this._virtualCrouch = !!active; }
 
+  /** Touch crouch button: toggles crouch and counts as a press (for sliding). */
+  toggleCrouch() {
+    this._virtualCrouch = !this._virtualCrouch;
+    if (this._virtualCrouch) this._crouchPressed = true;
+  }
+
+  /** Called when a slide starts, so a toggled crouch does not stick afterwards. */
+  clearCrouchToggle() { this._virtualCrouch = false; }
+
+  get crouchToggled() { return this._virtualCrouch; }
+
+  /** True once per crouch press. */
+  consumeCrouchPress() {
+    const pressed = this._crouchPressed;
+    this._crouchPressed = false;
+    return pressed;
+  }
+
   /** True while crouch (C) is held. */
   get crouch() {
     return this._virtualCrouch || this._keys.has(CROUCH);
@@ -1036,6 +1227,7 @@ class Input {
     if (e.code === JUMP) this._jumpQueued = true;
     if (e.code === RELOAD) this._reloadQueued = true;
     if (e.code === GRENADE) this._grenadeQueued = true;
+    if (e.code === CROUCH) this._crouchPressed = true;
     if (SLOT_KEYS[e.code]) this._slotQueued = SLOT_KEYS[e.code];
   }
 
@@ -1075,6 +1267,7 @@ class Input {
       this._virtualMove.y = 0;
       this._virtualSprint = false;
       this._virtualCrouch = false;
+      this._crouchPressed = false;
     }
     if (this.onLockChange) this.onLockChange(playing);
   }
@@ -1229,6 +1422,14 @@ class Player {
     this.terminalVelocity = 45;
     this.stepHeight = 0.35; // ledges up to this height are walked over
     this.coyoteTime = 0.1; // jump grace period after leaving a ledge
+
+    // Slide (crouch while sprinting).
+    this.slideSpeed = 11.5;     // starting speed
+    this.slideFriction = 9;     // m/s lost per second on the ground
+    this.slideDuration = 0.85;  // max length in seconds
+    this.slideEndSpeed = 4.5;   // slide ends below this speed
+    this.slideCooldown = 0.4;
+    this.slideEye = 0.78;
     this.jumpBufferTime = 0.12; // early jump press is remembered this long
 
     // State.
@@ -1247,6 +1448,12 @@ class Player {
     this.roll = 0; // camera roll, used for explosion shake
     this.lookDx = 0; // last frame's raw mouse delta (pixels), for weapon sway
     this.lookDy = 0;
+    this.aimEase = 0;   // 0..1, set by the weapon; scales aim sensitivity
+    this.sliding = false;
+    this.fovBoost = 0;  // extra degrees while sprinting / sliding, read by the weapon
+    this.slideRoll = 0; // camera tilt during a slide
+    this._slideTime = 0;
+    this._slideCd = 0;
 
     this._coyote = 0;
     this._jumpBuffer = 0;
@@ -1264,6 +1471,7 @@ class Player {
     this.pitch = 0;
     this.onGround = false;
     this.crouching = false;
+    this.sliding = false;
     this.height = this.standHeight;
     this.eyeHeight = this.standEye;
     this._syncCamera();
@@ -1277,23 +1485,41 @@ class Player {
     input.consumeLook(this._look);
     this.lookDx = this._look.x;
     this.lookDy = this._look.y;
-    const k = LOOK_RADIANS_PER_PIXEL * this.settings.get('sensitivity') * this.lookScale;
+    const ads = 1 + (this.settings.get('adsSensitivity') - 1) * this.aimEase;
+    const k = LOOK_RADIANS_PER_PIXEL * this.settings.get('sensitivity') * this.lookScale * ads;
+    const invert = this.settings.get('invertY') ? -1 : 1;
     this.yaw -= this._look.x * k;
-    this.pitch -= this._look.y * k;
+    this.pitch -= this._look.y * k * invert;
     this.pitch = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, this.pitch));
     this.yaw %= Math.PI * 2;
 
     // Movement input.
     input.getMove(this._move);
     if (input.consumeJump()) this._jumpBuffer = this.jumpBufferTime;
+
+    // Crouch pressed while sprinting on the ground: slide.
+    this._slideCd = Math.max(0, this._slideCd - dt);
+    if (input.consumeCrouchPress() && this.sprinting && this.onGround && !this.sliding && this._slideCd <= 0) {
+      this._startSlide();
+      input.clearCrouchToggle();
+    }
+
     // Crouch is held; standing back up needs headroom.
-    if (input.crouch) this.crouching = true;
+    if (this.sliding || input.crouch) this.crouching = true;
     else if (this.crouching && this._canStand()) this.crouching = false;
     this.height = this.crouching ? this.crouchHeight : this.standHeight;
-    const eyeTarget = this.crouching ? this.crouchEye : this.standEye;
+    const eyeTarget = this.sliding ? this.slideEye : this.crouching ? this.crouchEye : this.standEye;
     this.eyeHeight += (eyeTarget - this.eyeHeight) * Math.min(1, dt * 14);
 
-    this.sprinting = this.canSprint && !this.crouching && input.sprint && this._move.y > 0.1;
+    const autoSprint = this.settings.get('autoSprint') && this._move.y > 0.85 && Math.abs(this._move.x) < 0.6;
+    this.sprinting = !this.sliding && this.canSprint && !this.crouching &&
+      (input.sprint || autoSprint) && this._move.y > 0.1;
+
+    // Camera feel: wider view while running, a tilt while sliding.
+    const fovTarget = this.sliding ? 9 : this.sprinting ? 5 : 0;
+    this.fovBoost += (fovTarget - this.fovBoost) * Math.min(1, dt * 8);
+    const rollTarget = this.sliding ? 0.06 : 0;
+    this.slideRoll += (rollTarget - this.slideRoll) * Math.min(1, dt * 10);
 
     const steps = Math.max(1, Math.ceil(dt / MAX_SUBSTEP));
     const h = dt / steps;
@@ -1314,6 +1540,20 @@ class Player {
       this.onGround = false;
       this._coyote = 0;
       this._jumpBuffer = 0;
+      // Jumping out of a slide keeps its speed.
+      if (this.sliding) this._endSlide();
+    }
+
+    if (this.sliding) {
+      this._slideTime -= h;
+      const sp = Math.hypot(this.vx, this.vz);
+      const next = this.onGround ? Math.max(0, sp - this.slideFriction * h) : sp;
+      if (sp > 0) {
+        this.vx *= next / sp;
+        this.vz *= next / sp;
+      }
+      // Hitting a wall (velocity zeroed by collision) also ends the slide.
+      if (this._slideTime <= 0 || next < this.slideEndSpeed) this._endSlide();
     }
 
     // Horizontal velocity: move toward the wished velocity.
@@ -1323,7 +1563,7 @@ class Player {
     if (len > 1) { mx /= len; mz /= len; }
     const hasWish = mx !== 0 || mz !== 0;
 
-    if (this.onGround || hasWish) {
+    if (!this.sliding && (this.onGround || hasWish)) {
       const speed = (this.sprinting ? this.sprintSpeed : this.walkSpeed) * this.speedScale *
         (this.crouching ? this.crouchSpeedScale : 1);
       const sin = Math.sin(this.yaw);
@@ -1440,6 +1680,28 @@ class Player {
     return true;
   }
 
+  _startSlide() {
+    let dx = this.vx;
+    let dz = this.vz;
+    let sp = Math.hypot(dx, dz);
+    if (sp < 0.5) {
+      dx = -Math.sin(this.yaw);
+      dz = -Math.cos(this.yaw);
+      sp = 1;
+    }
+    const speed = Math.max(this.slideSpeed, Math.hypot(this.vx, this.vz) * 1.15);
+    this.vx = (dx / sp) * speed;
+    this.vz = (dz / sp) * speed;
+    this.sliding = true;
+    this.sprinting = false;
+    this._slideTime = this.slideDuration;
+  }
+
+  _endSlide() {
+    this.sliding = false;
+    this._slideCd = this.slideCooldown;
+  }
+
   _canStand() {
     const r = this.radius;
     return !this.collision.intersects(
@@ -1457,7 +1719,7 @@ class Player {
 
   _syncCamera() {
     this.camera.position.set(this.x, this.y + this.eyeHeight, this.z);
-    this.camera.rotation.set(this.pitch, this.yaw, this.roll);
+    this.camera.rotation.set(this.pitch, this.yaw, this.roll + this.slideRoll);
   }
 }
 
@@ -2268,9 +2530,15 @@ class WeaponAudio {
     this.ctx = null;
     this.master = null;
     this.noise = null;
+    this.volume = 1;
     const unlock = () => this.unlock();
     document.addEventListener('pointerdown', unlock, { passive: true });
     document.addEventListener('keydown', unlock, { passive: true });
+  }
+
+  setVolume(v) {
+    this.volume = v;
+    if (this.master) this.master.gain.value = 0.45 * v;
   }
 
   unlock() {
@@ -2283,7 +2551,7 @@ class WeaponAudio {
         return;
       }
       this.master = this.ctx.createGain();
-      this.master.gain.value = 0.45;
+      this.master.gain.value = 0.45 * this.volume;
       this.master.connect(this.ctx.destination);
       const length = this.ctx.sampleRate;
       this.noise = this.ctx.createBuffer(1, length, this.ctx.sampleRate);
@@ -2739,12 +3007,13 @@ class Weapon {
 
     // Aim zoom, matching look speed, and slower movement while aiming.
     const baseFov = this.settings.get('fov');
-    const fov = baseFov * (1 - spec.zoom * aimE);
+    const fov = (baseFov + p.fovBoost * (1 - aimE)) * (1 - spec.zoom * aimE);
     if (Math.abs(this.camera.fov - fov) > 0.01) {
       this.camera.fov = fov;
       this.camera.updateProjectionMatrix();
     }
     p.lookScale = 1 - spec.zoom * aimE;
+    p.aimEase = aimE;
     p.speedScale = 1 - 0.3 * aimE;
 
     // Spread (radians): worse when moving, airborne or after sustained fire; better crouched.
@@ -3625,20 +3894,27 @@ class World {
 }
 
 // ===== js/input/TouchControls.js =====
-const TOUCH_LOOK_SCALE = 1.4;  // finger pixels -> look pixels
-const STICK_RADIUS = 56;       // px
+const TOUCH_LOOK_SCALE = 1.4;  // finger pixels -> look pixels at touch sensitivity 1
+const STICK_RADIUS = 56;       // px at button size 100%
 const STICK_DEADZONE = 0.15;
 
 /**
- * On-screen controls: floating move stick (left), drag-to-look (right) and
- * buttons. Drives the same Input hooks a keyboard and mouse would.
- * Pointer events, so it also works with a mouse when pointer lock is unavailable.
+ * On-screen controls in the style of mobile shooters: move stick with sprint
+ * lock (left), drag-to-look (right), fire / aim / jump / duck / reload / grenade
+ * buttons and an optional left fire button. Drives the same Input hooks as a
+ * keyboard and mouse. Pointer events, so a mouse works too when pointer lock
+ * is unavailable.
  */
 class TouchControls {
-  constructor(input) {
+  constructor(input, settings, player) {
     this.input = input;
+    this.settings = settings;
+    this.player = player;
     this._aim = false;
-    this._crouch = false;
+    this._fireCount = 0;
+    this._sprintLocked = false;
+    this._lockArmed = false;
+    this._radius = STICK_RADIUS;
 
     const root = document.createElement('div');
     root.id = 'touch';
@@ -3646,8 +3922,10 @@ class TouchControls {
       '<div class="tc-zone" id="tc-move"></div>',
       '<div class="tc-zone" id="tc-look"></div>',
       '<div id="tc-stick" class="idle"><i></i></div>',
+      '<div id="tc-lock">LOCK</div>',
       '<div id="tc-rotate">Rotate your device to landscape</div>',
       '<div id="tc-pause" role="button">II</div>',
+      '<div class="tc-btn tc-lfire" role="button">FIRE</div>',
       '<div id="tc-btns">',
       '<div class="tc-btn tc-fire" role="button">FIRE</div>',
       '<div class="tc-btn tc-aim" role="button">AIM</div>',
@@ -3662,33 +3940,52 @@ class TouchControls {
 
     this.stick = root.querySelector('#tc-stick');
     this.knob = this.stick.querySelector('i');
+    this.lockEl = root.querySelector('#tc-lock');
     this.aimEl = root.querySelector('.tc-aim');
-    this.crouchEl = root.querySelector('.tc-crouch');
+    this.duckEl = root.querySelector('.tc-crouch');
+    this.lfireEl = root.querySelector('.tc-lfire');
 
     this._bindMove(root.querySelector('#tc-move'));
     this._bindLook(root.querySelector('#tc-look'));
 
-    const look = (dx, dy) => input.addLook(dx * TOUCH_LOOK_SCALE, dy * TOUCH_LOOK_SCALE);
+    const look = (dx, dy) => this._look(dx, dy);
+    const fireDown = () => {
+      this._unlockSprint(); // shooting ends a locked sprint
+      this._fireCount++;
+      input.setFire(true);
+    };
+    const fireUp = () => {
+      this._fireCount = Math.max(0, this._fireCount - 1);
+      if (this._fireCount === 0) input.setFire(false);
+    };
     // Holding fire and sliding the same finger also turns the view.
-    this._button(root.querySelector('.tc-fire'), () => input.setFire(true), () => input.setFire(false), look);
+    this._button(root.querySelector('.tc-fire'), fireDown, fireUp, look);
+    this._button(this.lfireEl, fireDown, fireUp, look);
     this._button(root.querySelector('.tc-jump'), () => input.pressJump());
     this._button(root.querySelector('.tc-reload'), () => input.pressReload());
     this._button(root.querySelector('.tc-grenade'), () => input.pressGrenade());
+    this._button(this.duckEl, () => input.toggleCrouch());
     this._button(this.aimEl, () => {
-      this._aim = !this._aim;
+      this._unlockSprint();
+      if (settings.get('holdAim')) {
+        this._aim = true;
+      } else {
+        this._aim = !this._aim;
+      }
       input.setAim(this._aim);
-      this.aimEl.classList.toggle('on', this._aim);
-    });
-    this._button(this.crouchEl, () => {
-      this._crouch = !this._crouch;
-      input.setVirtualCrouch(this._crouch);
-      this.crouchEl.classList.toggle('on', this._crouch);
-    });
+    }, () => {
+      if (settings.get('holdAim')) {
+        this._aim = false;
+        input.setAim(false);
+      }
+    }, look);
     this._button(root.querySelector('#tc-pause'), () => input.pause());
 
     // iOS Safari ignores user-scalable=no; stop pinch-zoom gestures.
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     window.addEventListener('resize', () => { if (this.stick.classList.contains('idle')) this._idleStick(); });
+    settings.onChange(() => this._apply());
+    this._apply();
   }
 
   /** Call whenever the playing state changes. */
@@ -3697,57 +3994,156 @@ class TouchControls {
     this.root.classList.toggle('on', on);
     document.body.classList.toggle('touch', on);
     this._aim = false;
-    this._crouch = false;
-    this.aimEl.classList.remove('on');
-    this.crouchEl.classList.remove('on');
+    this._fireCount = 0;
+    this._sprintLocked = false;
+    this._lockArmed = false;
     this.input.setVirtualMove(0, 0);
     this.input.setVirtualSprint(false);
     if (on) this._idleStick();
   }
 
+  /** Per frame: keep button highlights in step with the game state. */
+  update() {
+    if (!this.input.overlay) return;
+    this.duckEl.classList.toggle('on', this.input.crouchToggled || this.player.sliding);
+    this.aimEl.classList.toggle('on', this.input.aimHeld);
+  }
+
+  _apply() {
+    const st = this.settings;
+    const bs = st.get('buttonSize');
+    this.root.style.setProperty('--bs', String(bs));
+    this.root.style.setProperty('--bo', String(st.get('buttonOpacity')));
+    this._radius = STICK_RADIUS * bs;
+    const ring = Math.round(112 * bs) + 'px';
+    const knob = Math.round(48 * bs) + 'px';
+    const lock = Math.round(56 * bs) + 'px';
+    const lfire = Math.round(72 * bs) + 'px';
+    this.stick.style.width = this.stick.style.height = ring;
+    this.knob.style.width = this.knob.style.height = knob;
+    this.lockEl.style.width = this.lockEl.style.height = lock;
+    this.lfireEl.style.width = this.lfireEl.style.height = lfire;
+    this.lfireEl.style.display = st.get('leftFire') ? '' : 'none';
+    if (!st.get('sprintLock')) this._unlockSprint();
+    if (!st.get('holdAim') && this._aim !== this.input.aimHeld) this._aim = this.input.aimHeld;
+    if (this.stick.classList.contains('idle')) this._idleStick();
+  }
+
+  _look(dx, dy) {
+    const k = TOUCH_LOOK_SCALE * this.settings.get('touchSensitivity') / this.settings.get('sensitivity');
+    this.input.addLook(dx * k, dy * k);
+  }
+
+  _home() {
+    const r = this._radius;
+    return { x: 30 + r * 1.15, y: window.innerHeight - 30 - r * 1.15 };
+  }
+
+  _lockPos(ox, oy) {
+    return { x: ox, y: oy - this._radius * 2.6 };
+  }
+
+  _setKnob(dx, dy) {
+    this.knob.style.transform =
+      'translate(calc(-50% + ' + dx.toFixed(1) + 'px), calc(-50% + ' + dy.toFixed(1) + 'px))';
+  }
+
+  _placeLock(x, y, show) {
+    this.lockEl.style.left = x + 'px';
+    this.lockEl.style.top = y + 'px';
+    this.lockEl.classList.toggle('show', show);
+  }
+
+  /** Stick at rest (or showing a locked sprint). */
   _idleStick() {
+    const h = this._home();
     this.stick.classList.add('idle');
-    this.stick.style.left = Math.round(Math.min(110, window.innerWidth * 0.2)) + 'px';
-    this.stick.style.top = Math.round(window.innerHeight - Math.min(110, window.innerHeight * 0.3)) + 'px';
-    this.knob.style.transform = 'translate(-50%, -50%)';
+    this.stick.style.left = h.x + 'px';
+    this.stick.style.top = h.y + 'px';
+    this._setKnob(0, this._sprintLocked ? -this._radius : 0);
+    const l = this._lockPos(h.x, h.y);
+    this.lockEl.classList.remove('armed');
+    this.lockEl.classList.toggle('locked', this._sprintLocked);
+    this.lockEl.textContent = this._sprintLocked ? 'RUN' : 'LOCK';
+    this._placeLock(l.x, l.y, this._sprintLocked);
+  }
+
+  _unlockSprint() {
+    if (!this._sprintLocked) return;
+    this._sprintLocked = false;
+    this.input.setVirtualMove(0, 0);
+    this.input.setVirtualSprint(false);
+    if (this.stick.classList.contains('idle')) this._idleStick();
   }
 
   _bindMove(zone) {
     const input = this.input;
     let id = null, ox = 0, oy = 0;
+
+    const moveTo = (x, y) => {
+      const r = this._radius;
+      const dx = x - ox;
+      const dy = y - oy;
+      const len = Math.hypot(dx, dy);
+      const clamped = Math.min(len, r);
+      const nx = len > 0 ? dx / len : 0;
+      const ny = len > 0 ? dy / len : 0;
+      this._setKnob(nx * clamped, ny * clamped);
+      const mag = Math.max(0, (clamped / r - STICK_DEADZONE) / (1 - STICK_DEADZONE));
+      input.setVirtualMove(nx * mag, -ny * mag);
+      // Pull the finger past the ring while pushing forward to sprint.
+      const sprinting = len > r * 1.2 && -ny > 0.5;
+      input.setVirtualSprint(sprinting);
+
+      if (this.settings.get('sprintLock')) {
+        const l = this._lockPos(ox, oy);
+        this._lockArmed = Math.hypot(x - l.x, y - l.y) < r * 0.75;
+        this.lockEl.classList.toggle('armed', this._lockArmed);
+        this.lockEl.textContent = 'LOCK';
+        this._placeLock(l.x, l.y, sprinting || this._lockArmed);
+      }
+    };
+
     const end = (e) => {
       if (e.pointerId !== id) return;
       id = null;
-      input.setVirtualMove(0, 0);
-      input.setVirtualSprint(false);
+      if (this._lockArmed && this.settings.get('sprintLock')) {
+        // Let go on the lock: keep sprinting forward hands-free.
+        this._sprintLocked = true;
+        input.setVirtualMove(0, 1);
+        input.setVirtualSprint(true);
+      } else {
+        input.setVirtualMove(0, 0);
+        input.setVirtualSprint(false);
+      }
+      this._lockArmed = false;
       this._idleStick();
     };
+
     zone.addEventListener('pointerdown', (e) => {
       if (id !== null) return;
       id = e.pointerId;
-      ox = e.clientX;
-      oy = e.clientY;
       try { zone.setPointerCapture(id); } catch (_) { /* ignore */ }
+      // Touching the stick again cancels a locked sprint.
+      this._sprintLocked = false;
+      this.lockEl.classList.remove('locked');
+      if (this.settings.get('fixedStick')) {
+        const h = this._home();
+        ox = h.x;
+        oy = h.y;
+      } else {
+        ox = e.clientX;
+        oy = e.clientY;
+      }
       this.stick.classList.remove('idle');
       this.stick.style.left = ox + 'px';
       this.stick.style.top = oy + 'px';
-      this.knob.style.transform = 'translate(-50%, -50%)';
+      moveTo(e.clientX, e.clientY);
       e.preventDefault();
     });
     zone.addEventListener('pointermove', (e) => {
       if (e.pointerId !== id) return;
-      let dx = e.clientX - ox;
-      let dy = e.clientY - oy;
-      const len = Math.hypot(dx, dy);
-      const clamped = Math.min(len, STICK_RADIUS);
-      const nx = len > 0 ? dx / len : 0;
-      const ny = len > 0 ? dy / len : 0;
-      this.knob.style.transform =
-        'translate(calc(-50% + ' + (nx * clamped).toFixed(1) + 'px), calc(-50% + ' + (ny * clamped).toFixed(1) + 'px))';
-      const mag = Math.max(0, (clamped / STICK_RADIUS - STICK_DEADZONE) / (1 - STICK_DEADZONE));
-      input.setVirtualMove(nx * mag, -ny * mag);
-      // Pull the finger past the ring while pushing forward to sprint.
-      input.setVirtualSprint(len > STICK_RADIUS * 1.2 && -ny > 0.5);
+      moveTo(e.clientX, e.clientY);
     });
     zone.addEventListener('pointerup', end);
     zone.addEventListener('pointercancel', end);
@@ -3755,7 +4151,6 @@ class TouchControls {
   }
 
   _bindLook(zone) {
-    const input = this.input;
     let id = null, lx = 0, ly = 0;
     const end = (e) => { if (e.pointerId === id) id = null; };
     zone.addEventListener('pointerdown', (e) => {
@@ -3768,7 +4163,7 @@ class TouchControls {
     });
     zone.addEventListener('pointermove', (e) => {
       if (e.pointerId !== id) return;
-      input.addLook((e.clientX - lx) * TOUCH_LOOK_SCALE, (e.clientY - ly) * TOUCH_LOOK_SCALE);
+      this._look(e.clientX - lx, e.clientY - ly);
       lx = e.clientX;
       ly = e.clientY;
     });
@@ -3834,7 +4229,9 @@ function boot() {
   barrels = new Barrels({ world, explosions });
   const ui = new Ui(settings, input);
   ui.setSlotCount(weapons.weapons.length);
-  const touch = new TouchControls(input);
+  const touch = new TouchControls(input, settings, player);
+  weapons.audio.setVolume(settings.get('volume'));
+  settings.onChange((key, value) => { if (key === 'volume') weapons.audio.setVolume(value); });
   const baseLockChange = input.onLockChange;
   input.onLockChange = (playing) => {
     baseLockChange(playing);
@@ -3851,6 +4248,7 @@ function boot() {
     barrels.update(dt, player);
     explosions.update(dt);
     ui.updateHud(weapons.active, grenades);
+    touch.update();
   });
 }
 

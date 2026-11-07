@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Retro FPS - Milestone 7</title>
+  <title>Retro FPS - Milestone 8</title>
   <style>
 html, body {
   margin: 0;
@@ -514,6 +514,32 @@ body.touch #ammo-count { font-size: 30px; }
 #scope::before, #scope::after { content: ''; position: absolute; background: #000; }
 #scope::before { left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; }
 #scope::after { top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; }
+
+/* ---- Loadout ---- */
+#lo-slots { display: flex; gap: 4px; margin-bottom: 8px; }
+.lo-slot {
+  flex: 1; min-width: 0; min-height: 50px; margin: 0; padding: 5px 2px;
+  font-size: 9px; letter-spacing: 0; line-height: 1.25; font-weight: normal;
+  color: #66645e; background: #151515; border: 2px solid #44443f;
+  white-space: normal; word-break: break-word; overflow: hidden;
+}
+.lo-slot b { display: block; margin-bottom: 2px; font-size: 13px; color: #d0a84a; }
+.lo-slot.filled { color: #c9c6ba; }
+.lo-slot.edit { border-color: #d0a84a; }
+.lo-slot:hover { background: #222224; }
+#lo-count { min-height: 16px; margin: 0 0 6px; font-size: 12px; color: #d0a84a; }
+#lo-list { max-height: 300px; margin-bottom: 8px; overflow-y: auto; touch-action: pan-y; }
+.lo-cat { margin: 10px 0 4px; font-size: 11px; letter-spacing: 3px; color: #77756e; }
+.lo-item {
+  display: grid; grid-template-columns: 1fr auto; gap: 6px; text-align: left;
+  margin: 0 0 3px; padding: 6px 8px; font-size: 13px; letter-spacing: 1px; font-weight: normal;
+  color: #b9b7ae; background: #26262a; border: 2px solid #3a3a3e;
+}
+.lo-item:hover { background: #38383c; }
+.lo-item.on { color: #fff; background: #34322a; border-color: #a89c6a; }
+.lo-item .st { display: block; margin-top: 2px; font-size: 10px; letter-spacing: 0; color: #77756e; }
+.lo-item i { align-self: center; min-width: 14px; font-style: normal; font-size: 16px; color: #d0a84a; text-align: center; }
+#view-loadout .row button { font-size: 12px; letter-spacing: 1px; }
   </style>
 </head>
 <body>
@@ -545,7 +571,7 @@ body.touch #ammo-count { font-size: 30px; }
     <div class="panel">
       <div id="view-main">
         <h1>RETRO FPS</h1>
-        <p class="sub">Prototype &middot; Milestone 7</p>
+        <p class="sub">Prototype &middot; Milestone 8</p>
 
         <div class="tabs" id="mode-tabs">
           <button type="button" data-mode="soldiers">SOLDIERS</button>
@@ -554,6 +580,7 @@ body.touch #ammo-count { font-size: 30px; }
         <p class="mode-note" id="mode-note"></p>
 
         <button id="play" type="button" disabled>LOADING...</button>
+        <button id="open-loadout" class="secondary" type="button">LOADOUT (5 WEAPONS)</button>
         <button id="open-settings" class="secondary" type="button">SETTINGS</button>
         <button id="open-tab" class="secondary" type="button">OPEN IN NEW TAB (MOUSE LOCK)</button>
         <p class="frame-note" id="frame-note" hidden></p>
@@ -594,11 +621,24 @@ body.touch #ammo-count { font-size: 30px; }
           <li><b>LMB</b> fire</li>
           <li><b>RMB / Z</b> aim down sights (hold)</li>
           <li><b>R</b> reload</li>
-          <li><b>1-8</b> pick weapon (wheel cycles)</li>
+          <li><b>1-5</b> pick weapon from your loadout (wheel cycles)</li>
           <li><b>Q</b> previous weapon</li>
           <li><b>E</b> throw grenade</li>
           <li><b>Esc</b> menu / settings</li>
         </ul>
+      </div>
+
+      <div id="view-loadout" hidden>
+        <h1>LOADOUT</h1>
+        <p class="sub">Pick 5 weapons &middot; keys 1-5 in game</p>
+        <div id="lo-slots"></div>
+        <p id="lo-count"></p>
+        <div id="lo-list"></div>
+        <div class="row">
+          <button id="lo-random" class="secondary" type="button">RANDOM</button>
+          <button id="lo-cancel" class="secondary" type="button">CANCEL</button>
+          <button id="lo-done" type="button">DONE</button>
+        </div>
       </div>
 
       <div id="view-settings" hidden>
@@ -939,8 +979,10 @@ class Ui {
 
     this.viewMain = document.getElementById('view-main');
     this.viewSettings = document.getElementById('view-settings');
+    this.viewLoadout = document.getElementById('view-loadout');
     this._tab = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches ? 'touch' : 'general';
     this._buildSettings();
+    this._buildLoadout();
     this._applyFpsVisibility();
     settings.onChange((key) => { if (key === 'showFps') this._applyFpsVisibility(); });
     const playBtn = document.getElementById('play');
@@ -1121,9 +1163,9 @@ class Ui {
       this.weaponName.textContent = weapon.name;
       this._ammo = -1; // force the ammo text to refresh
     }
-    if (weapon.slot !== this._slot) {
-      this._slot = weapon.slot;
-      this._slotEls.forEach((el, i) => el.classList.toggle('on', i + 1 === weapon.slot));
+    if (weapon.hudSlot !== this._slot) {
+      this._slot = weapon.hudSlot;
+      this._slotEls.forEach((el, i) => el.classList.toggle('on', i + 1 === weapon.hudSlot));
     }
     const scope = Math.round(weapon.scopeEase * 20) / 20;
     if (scope !== this._scopeOpacity) {
@@ -1170,7 +1212,130 @@ class Ui {
   _showSettings(open) {
     this.viewMain.hidden = open;
     this.viewSettings.hidden = !open;
+    this.viewLoadout.hidden = true;
     if (open) this._renderTab();
+  }
+
+  _showLoadout(open) {
+    this.viewMain.hidden = open;
+    this.viewSettings.hidden = true;
+    this.viewLoadout.hidden = !open;
+    if (open) this._renderLoadout();
+  }
+
+  /** Tooltips on the 1-5 strip. */
+  setSlotNames(names) {
+    this._slotEls.forEach((el, i) => { el.title = names[i] || ''; });
+  }
+
+  /** Show this loadout (roster indices) as the current one in the menu. */
+  setLoadout(ids) {
+    this._applied = ids.slice(0, 5);
+    this._lo = this._applied.slice();
+    while (this._lo.length < 5) this._lo.push(null);
+    this._loEdit = 0;
+    this._renderLoadout();
+  }
+
+  _buildLoadout() {
+    this.onLoadout = null;
+    this._applied = [];
+    this._lo = [null, null, null, null, null];
+    this._loEdit = 0;
+    this._loCount = document.getElementById('lo-count');
+    this._loDone = document.getElementById('lo-done');
+
+    const slotsEl = document.getElementById('lo-slots');
+    this._loSlotEls = [];
+    for (let i = 0; i < 5; i++) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'lo-slot';
+      b.addEventListener('click', () => { this._loEdit = i; this._renderLoadout(); });
+      slotsEl.appendChild(b);
+      this._loSlotEls.push(b);
+    }
+
+    const list = document.getElementById('lo-list');
+    this._loItems = [];
+    for (const cat of LOADOUT_CATS) {
+      const head = document.createElement('div');
+      head.className = 'lo-cat';
+      head.textContent = cat;
+      list.appendChild(head);
+      WEAPON_SPECS.forEach((spec, id) => {
+        if (spec.cat !== cat) return;
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'lo-item';
+        b.innerHTML = '<div>' + spec.name + '<span class="st">' + weaponStats(spec) + '</span></div><i></i>';
+        b.addEventListener('click', () => this._loPick(id));
+        list.appendChild(b);
+        this._loItems.push({ id, el: b, mark: b.querySelector('i') });
+      });
+    }
+
+    document.getElementById('open-loadout').addEventListener('click', () => this._showLoadout(true));
+    document.getElementById('lo-cancel').addEventListener('click', () => {
+      this._lo = this._applied.slice();
+      while (this._lo.length < 5) this._lo.push(null);
+      this._showLoadout(false);
+    });
+    document.getElementById('lo-random').addEventListener('click', () => {
+      const ids = WEAPON_SPECS.map((_, i) => i);
+      for (let i = ids.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = ids[i]; ids[i] = ids[j]; ids[j] = t;
+      }
+      this._lo = ids.slice(0, 5);
+      this._loEdit = 0;
+      this._renderLoadout();
+    });
+    this._loDone.addEventListener('click', () => {
+      if (this._lo.indexOf(null) >= 0) return;
+      this._applied = this._lo.slice();
+      if (this.onLoadout) this.onLoadout(this._applied.slice());
+      this._showLoadout(false);
+    });
+  }
+
+  /** Tap a weapon: put it in the highlighted slot (or the first free one); tap a picked weapon to remove it. */
+  _loPick(id) {
+    const lo = this._lo;
+    const at = lo.indexOf(id);
+    if (at >= 0) {
+      lo[at] = null;
+      this._loEdit = at;
+    } else {
+      let slot = lo[this._loEdit] === null ? this._loEdit : lo.indexOf(null);
+      if (slot < 0) slot = this._loEdit;
+      lo[slot] = id;
+      const free = lo.indexOf(null);
+      this._loEdit = free >= 0 ? free : slot;
+    }
+    this._renderLoadout();
+  }
+
+  _renderLoadout() {
+    const lo = this._lo;
+    let filled = 0;
+    for (let i = 0; i < 5; i++) {
+      const el = this._loSlotEls[i];
+      const id = lo[i];
+      if (id !== null) filled++;
+      el.innerHTML = '<b>' + (i + 1) + '</b>' + (id !== null ? WEAPON_SPECS[id].name : '\u2014');
+      el.classList.toggle('filled', id !== null);
+      el.classList.toggle('edit', i === this._loEdit);
+    }
+    for (const it of this._loItems) {
+      const at = lo.indexOf(it.id);
+      it.el.classList.toggle('on', at >= 0);
+      it.mark.textContent = at >= 0 ? String(at + 1) : '';
+    }
+    this._loCount.textContent = filled < 5
+      ? 'Pick ' + (5 - filled) + ' more (' + filled + '/5)'
+      : '5/5 \u00b7 tap a slot, then a weapon, to swap';
+    this._loDone.disabled = filled < 5;
   }
 
   _buildSettings() {
@@ -2917,7 +3082,8 @@ function createPistol(o) {
   const mag = new THREE.Group();
   const magRestY = -h / 2 - o.gripH + 0.012;
   mag.position.set(0, magRestY, 0.02);
-  box(steelMat, w * 0.9, 0.02, o.gripD * 0.95, 0, 0, 0, 0, mag);
+  const mh = o.magH || 0.02;
+  box(steelMat, w * 0.9, mh, o.gripD * 0.95, 0, -(mh - 0.02) / 2, 0, 0, mag);
   root.add(mag);
 
   const flash = createMuzzleFlash();
@@ -2937,6 +3103,219 @@ function createPistol(o) {
       slide.position.z = slideRestZ + (slideT > 0 ? 0.03 * Math.sin(Math.PI * (1 - slideT / 0.09)) : 0);
     },
   };
+}
+
+/** Iron sights topping out at sightY: rear ears at rearZ, front post at frontZ. */
+function addIronSights(box, mat, sightY, rearZ, frontZ) {
+  box(mat, 0.030, 0.020, 0.040, 0, sightY - 0.035, rearZ);
+  box(mat, 0.008, 0.025, 0.012, 0.0095, sightY - 0.0125, rearZ - 0.005);
+  box(mat, 0.008, 0.025, 0.012, -0.0095, sightY - 0.0125, rearZ - 0.005);
+  box(mat, 0.022, 0.034, 0.030, 0, sightY - 0.0355, frontZ);
+  box(mat, 0.004, 0.0185, 0.004, 0, sightY - 0.00925, frontZ);
+}
+
+/**
+ * Parametric rifle / SMG / LMG. Options: recv (receiver length), barrel, barrelR,
+ * brake, shroud + shroudLen, guard, wood, stock + stockType ('solid' | 'wire' | 'none'),
+ * mag ('straight' | 'curved' | 'drum' | 'belt'), magH, magZ, sightY, rearZ, bipod.
+ * Muzzle points down -Z; the sights top out at sightY.
+ */
+function createLongGun(o) {
+  const { woodMat, steelMat, magMat } = createWeaponMaterials();
+  const root = new THREE.Group();
+  const { box, tube } = gunBuilders(root);
+  const furn = o.wood ? woodMat : steelMat;
+  const recv = o.recv;
+  const zb = 0.04 - recv; // front of the receiver
+  const muzzleZ = zb - o.barrel;
+
+  box(steelMat, 0.042, 0.062, recv, 0, 0, 0.04 - recv / 2);
+  box(steelMat, 0.036, 0.014, recv * 0.85, 0, 0.038, 0.04 - recv * 0.5);
+  box(steelMat, 0.006, 0.010, 0.065, 0, -0.060, 0.0);
+
+  tube(steelMat, o.barrelR || 0.0105, o.barrel, 0, 0.012, zb - o.barrel / 2, 10);
+  if (o.brake) tube(steelMat, 0.0135, 0.05, 0, 0.012, muzzleZ + 0.025, 10);
+  if (o.shroud) tube(steelMat, o.shroud, o.shroudLen, 0, 0.004, zb - o.shroudLen / 2, 10);
+  if (o.guard) {
+    box(furn, 0.044, 0.040, o.guard, 0, -0.004, zb - o.guard / 2 + 0.02);
+    box(furn, 0.040, 0.022, o.guard, 0, 0.034, zb - o.guard / 2 + 0.02);
+  }
+
+  if (o.stockType === 'wire') {
+    box(steelMat, 0.012, 0.012, o.stock, 0.014, 0.012, 0.04 + o.stock / 2);
+    box(steelMat, 0.012, 0.012, o.stock, -0.014, 0.012, 0.04 + o.stock / 2);
+    box(steelMat, 0.030, 0.07, 0.01, 0, 0, 0.04 + o.stock);
+  } else if (o.stockType !== 'none') {
+    box(furn, 0.034, 0.07, o.stock, 0, -0.012, 0.03 + o.stock / 2, 0.08);
+    box(steelMat, 0.034, 0.09, 0.012, 0, -0.02, 0.035 + o.stock, 0.08);
+  }
+  box(furn, 0.034, 0.10, 0.045, 0, -0.09, 0.01, -0.30);
+
+  addIronSights(box, steelMat, o.sightY, o.rearZ || 0, muzzleZ + 0.06);
+
+  if (o.bipod) {
+    for (const s of [-1, 1]) box(steelMat, 0.008, 0.008, 0.16, s * 0.022, -0.016, zb - 0.22, 0.15);
+  }
+
+  const handleRestZ = 0.04 - recv * 0.5;
+  const handle = box(steelMat, 0.012, 0.014, 0.03, 0.026, 0.012, handleRestZ);
+
+  const mag = new THREE.Group();
+  const magRestY = -0.03;
+  mag.position.set(0, magRestY, o.magZ);
+  if (o.mag === 'curved') {
+    for (let i = 0; i < 5; i++) box(magMat, 0.036, 0.07, 0.05, 0, -(0.035 + i * 0.063), -(i * i * 0.0045), i * 0.12, mag);
+  } else if (o.mag === 'drum') {
+    const geo = new THREE.CylinderGeometry(0.06, 0.06, 0.075, 16, 1);
+    geo.rotateZ(Math.PI / 2);
+    const drum = new THREE.Mesh(geo, magMat);
+    drum.position.set(0, -0.085, 0);
+    mag.add(drum);
+    box(magMat, 0.03, 0.04, 0.05, 0, -0.025, 0, 0, mag);
+  } else if (o.mag === 'belt') {
+    box(magMat, 0.075, 0.10, 0.14, 0, -0.085, 0, 0, mag);
+    box(steelMat, 0.05, 0.02, 0.05, 0, -0.02, 0, 0, mag);
+  } else {
+    const mh = o.magH || 0.12;
+    box(magMat, 0.030, mh, 0.04, 0, -mh / 2 - 0.01, 0, 0, mag);
+  }
+  root.add(mag);
+
+  const flash = createMuzzleFlash();
+  flash.position.set(0, 0.012, muzzleZ - 0.03);
+  root.add(flash);
+
+  return {
+    root, flash,
+    applyReload(r) {
+      mag.position.y = magRestY + r.magY;
+      mag.visible = r.magVisible;
+      handle.position.z = handleRestZ + 0.055 * r.charge;
+    },
+  };
+}
+
+/**
+ * Scoped rifle (the scope axis is at y = 0.060, like RIFLE_SCOPE).
+ * Options: barrel, barrelR, fore, brake, bipod, thick, scopeLen, scopeR, wood,
+ * mag (detachable magazine), bolt (visible bolt cycle after each shot).
+ */
+function createSniper(o) {
+  const { woodMat, steelMat, magMat } = createWeaponMaterials();
+  const root = new THREE.Group();
+  const { box, tube } = gunBuilders(root);
+  const furn = o.wood ? woodMat : steelMat;
+  const zb = -0.15;
+  const muzzleZ = zb - o.barrel;
+
+  box(steelMat, o.thick || 0.036, 0.055, 0.20, 0, 0, -0.05);
+  tube(steelMat, o.barrelR, o.barrel, 0, 0.012, zb - o.barrel / 2, 12);
+  if (o.brake) tube(steelMat, o.barrelR * 1.7, 0.07, 0, 0.012, muzzleZ + 0.035, 12);
+  box(furn, 0.040, 0.075, 0.34, 0, -0.02, 0.24, 0.07);
+  box(furn, 0.040, 0.035, o.fore, 0, -0.012, zb - o.fore / 2 + 0.02);
+  box(steelMat, 0.040, 0.080, 0.012, 0, -0.02, 0.415, 0.07);
+  box(steelMat, 0.006, 0.010, 0.05, 0, -0.040, 0.0);
+  box(steelMat, 0.030, 0.020, 0.07, 0, -0.040, -0.04);
+
+  const sl = o.scopeLen || 0.24;
+  const sr = o.scopeR || 0.0185;
+  tube(steelMat, sr, sl, 0, 0.060, -0.06, 12);
+  tube(steelMat, sr * 1.4, 0.05, 0, 0.060, -0.06 - sl / 2 - 0.005, 12);
+  tube(steelMat, sr * 1.2, 0.04, 0, 0.060, -0.06 + sl / 2 + 0.005, 12);
+  box(steelMat, 0.012, 0.022, 0.02, 0, 0.040, -0.12);
+  box(steelMat, 0.012, 0.022, 0.02, 0, 0.040, 0.0);
+
+  if (o.bipod) {
+    for (const s of [-1, 1]) box(steelMat, 0.008, 0.008, 0.2, s * 0.03, -0.03, zb - o.fore * 0.7, 0.2);
+  }
+
+  const handle = box(steelMat, 0.006, 0.006, 0.04, 0.026, 0.004, 0.03);
+  box(steelMat, 0.014, 0.014, 0.014, 0.034, -0.004, 0.045);
+
+  const mag = new THREE.Group();
+  const magRestY = -0.03;
+  mag.position.set(0, magRestY, -0.06);
+  if (o.mag) box(magMat, 0.030, 0.10, 0.045, 0, -0.06, 0, 0, mag);
+  root.add(mag);
+
+  const flash = createMuzzleFlash();
+  flash.position.set(0, 0.012, muzzleZ - 0.03);
+  root.add(flash);
+
+  const dur = o.bolt ? 1.0 : 0.12;
+  let boltT = 0;
+  let boltReload = 0;
+  return {
+    root, flash,
+    applyReload(r) {
+      boltReload = r.charge;
+      mag.position.y = magRestY + r.magY;
+      mag.visible = r.magVisible;
+    },
+    onShot() { boltT = dur; },
+    update(dt) {
+      boltT = Math.max(0, boltT - dt);
+      const p = 1 - boltT / dur;
+      const cycle = boltT > 0 ? Math.sin(Math.PI * Math.min(1, Math.max(0, (p - 0.25) / 0.5))) : 0;
+      handle.position.z = 0.03 + 0.06 * Math.max(cycle, boltReload);
+    },
+  };
+}
+
+/** Semi-automatic shotgun: fixed forend, tube magazine. Sight line: SHOTGUN_SIGHT. */
+function createAutoShotgun() {
+  const { woodMat, steelMat } = createWeaponMaterials();
+  const root = new THREE.Group();
+  const { box, tube } = gunBuilders(root);
+
+  box(steelMat, 0.042, 0.066, 0.20, 0, 0, -0.05);
+  box(steelMat, 0.012, 0.030, 0.07, 0.024, 0.006, -0.03);
+  tube(steelMat, 0.0115, 0.50, 0, 0.017, -0.35, 12);
+  tube(steelMat, 0.0120, 0.34, 0, -0.012, -0.27, 10);
+  box(woodMat, 0.046, 0.044, 0.20, 0, -0.012, -0.27);
+  box(steelMat, 0.008, 0.021, 0.46, 0, 0.039, -0.35);
+  box(steelMat, 0.006, 0.006, 0.006, 0, 0.0525, -0.58);
+  box(steelMat, 0.020, 0.008, 0.02, 0, 0.034, 0.03);
+  box(steelMat, 0.005, 0.014, 0.01, 0.007, 0.045, 0.03);
+  box(steelMat, 0.005, 0.014, 0.01, -0.007, 0.045, 0.03);
+  box(steelMat, 0.006, 0.010, 0.05, 0, -0.045, 0.0);
+  box(woodMat, 0.036, 0.07, 0.07, 0, -0.04, 0.07);
+  box(woodMat, 0.040, 0.07, 0.30, 0, -0.025, 0.24, 0.12);
+  box(steelMat, 0.040, 0.075, 0.012, 0, -0.03, 0.395, 0.12);
+
+  const flash = createMuzzleFlash();
+  flash.position.set(0, 0.017, -0.66);
+  root.add(flash);
+  return { root, flash, applyReload() {} };
+}
+
+/** Double-barrelled shotgun. Sight line: DOUBLE_SIGHT. */
+const DOUBLE_SIGHT = { y: 0.048, z: 0.03 };
+function createDoubleBarrel() {
+  const { woodMat, steelMat } = createWeaponMaterials();
+  const root = new THREE.Group();
+  const { box, tube } = gunBuilders(root);
+
+  box(steelMat, 0.046, 0.058, 0.12, 0, 0, -0.02);
+  tube(steelMat, 0.0115, 0.52, -0.013, 0.012, -0.34, 12);
+  tube(steelMat, 0.0115, 0.52, 0.013, 0.012, -0.34, 12);
+  box(steelMat, 0.008, 0.013, 0.52, 0, 0.030, -0.34);
+  box(steelMat, 0.006, 0.012, 0.006, 0, 0.042, -0.59);
+  box(steelMat, 0.026, 0.008, 0.02, 0, 0.033, 0.03);
+  box(steelMat, 0.005, 0.012, 0.01, 0.007, 0.042, 0.03);
+  box(steelMat, 0.005, 0.012, 0.01, -0.007, 0.042, 0.03);
+  box(woodMat, 0.050, 0.038, 0.22, 0, -0.012, -0.20);
+  box(steelMat, 0.008, 0.016, 0.014, 0.008, 0.036, 0.05, -0.3);
+  box(steelMat, 0.008, 0.016, 0.014, -0.008, 0.036, 0.05, -0.3);
+  box(steelMat, 0.006, 0.010, 0.05, 0, -0.045, 0.0);
+  box(woodMat, 0.036, 0.07, 0.07, 0, -0.04, 0.07);
+  box(woodMat, 0.040, 0.07, 0.30, 0, -0.025, 0.24, 0.12);
+  box(steelMat, 0.040, 0.075, 0.012, 0, -0.03, 0.395, 0.12);
+
+  const flash = createMuzzleFlash();
+  flash.position.set(0, 0.012, -0.64);
+  root.add(flash);
+  return { root, flash, applyReload() {} };
 }
 
 // ===== js/weapon/ImpactEffects.js =====
@@ -3077,6 +3456,9 @@ const SHOT_SOUNDS = {
   cannon: { dur: 0.4, f0: 4500, f1: 250, vol: 1.5, thump: 90, tf: 28, tv: 1.4, tail: 0.5, crack: 1.0 },
   shotgun: { dur: 0.35, f0: 3500, f1: 250, vol: 1.5, thump: 100, tf: 30, tv: 1.3, tail: 0.5, crack: 0.7 },
   rifle: { dur: 0.5, f0: 5500, f1: 300, vol: 1.6, thump: 120, tf: 30, tv: 1.2, tail: 0.8, crack: 1.2 },
+  lmg: { dur: 0.24, f0: 5500, f1: 400, vol: 1.1, thump: 120, tf: 38, tv: 1.0, tail: 0.3, crack: 0.8 },
+  dmr: { dur: 0.3, f0: 5500, f1: 400, vol: 1.2, thump: 130, tf: 40, tv: 1.0, tail: 0.5, crack: 1.0 },
+  amr: { dur: 0.6, f0: 4500, f1: 200, vol: 1.9, thump: 80, tf: 24, tv: 1.6, tail: 1.0, crack: 1.3 },
 };
 
 /**
@@ -3462,10 +3844,164 @@ Object.assign(M1911_SPEC, { damage: 26, falloff: { start: 20, end: 50, min: 0.6 
 Object.assign(CANNON_SPEC, { damage: 60, falloff: { start: 25, end: 60, min: 0.7 } });
 
 /** Slot order: 1 AK-47, 2 SMG, 3 shotgun, 4 hunting rifle, 5 revolver, 6-8 pistols. */
-const WEAPON_SPECS = [AK47_SPEC, SMG_SPEC, SHOTGUN_SPEC, RIFLE_SPEC, REVOLVER_SPEC, PISTOL_SPEC, M1911_SPEC, CANNON_SPEC];
+// ---- Roster expansion: ids 9-19. The loadout menu picks 5 of the 19. ----
+Object.assign(AK47_SPEC, { cat: 'ASSAULT' });
+Object.assign(SMG_SPEC, { cat: 'SMG' });
+Object.assign(SHOTGUN_SPEC, { cat: 'SHOTGUN' });
+Object.assign(RIFLE_SPEC, { cat: 'SNIPER' });
+Object.assign(REVOLVER_SPEC, { cat: 'PISTOL' });
+Object.assign(PISTOL_SPEC, { cat: 'PISTOL' });
+Object.assign(M1911_SPEC, { cat: 'PISTOL' });
+Object.assign(CANNON_SPEC, { cat: 'PISTOL' });
+
+const sightPose = (o) => ({ x: 0, y: -o.sightY, z: AIM_Z - (o.rearZ || 0), ry: 0 });
+const LONG_SPRINT = { x: 0.09, y: -0.25, z: -0.10, rx: -0.4, ry: 0.7, rz: 0.2 };
+const HIP_LONG = { x: 0.15, y: -0.18, z: -0.12, ry: 0.05 };
+const SCOPED_AIM = { x: 0, y: -RIFLE_SCOPE.y, z: -0.08 - RIFLE_SCOPE.z, ry: 0 };
+const SHOTGUN_AIM = { x: 0, y: -SHOTGUN_SIGHT.y, z: AIM_Z - SHOTGUN_SIGHT.z, ry: 0 };
+const DOUBLE_AIM = { x: 0, y: -DOUBLE_SIGHT.y, z: AIM_Z - DOUBLE_SIGHT.z, ry: 0 };
+
+const GUN_M4 = { recv: 0.26, barrel: 0.30, barrelR: 0.0095, guard: 0.22, brake: true, stock: 0.26, mag: 'straight', magH: 0.11, magZ: -0.14, sightY: 0.072 };
+const GUN_SAW = { recv: 0.30, barrel: 0.50, barrelR: 0.0115, brake: true, guard: 0.18, stock: 0.30, mag: 'belt', magZ: -0.13, sightY: 0.085, bipod: true };
+const GUN_HMG = { recv: 0.34, barrel: 0.56, barrelR: 0.0125, brake: true, guard: 0.22, wood: true, stock: 0.32, mag: 'belt', magZ: -0.14, sightY: 0.088, bipod: true };
+const GUN_RUSH = { recv: 0.20, barrel: 0.10, shroud: 0.019, shroudLen: 0.20, stock: 0.14, stockType: 'wire', mag: 'straight', magH: 0.15, magZ: -0.09, sightY: 0.060 };
+const GUN_DRUM = { recv: 0.24, barrel: 0.12, shroud: 0.02, shroudLen: 0.22, stock: 0.20, stockType: 'wire', mag: 'drum', magZ: -0.10, sightY: 0.064 };
+const SNIPER_DMR = { barrel: 0.46, barrelR: 0.0100, fore: 0.28, mag: true, brake: true, thick: 0.040, scopeLen: 0.22, bolt: false };
+const SNIPER_AMR = { barrel: 0.72, barrelR: 0.0135, fore: 0.34, brake: true, bipod: true, thick: 0.046, scopeLen: 0.30, scopeR: 0.022, bolt: true };
+const PISTOL_TAC = { len: 0.20, width: 0.028, height: 0.034, frameH: 0.024, gripH: 0.098, gripD: 0.040, wood: false };
+const MACHINE_PISTOL = { len: 0.17, width: 0.030, height: 0.036, frameH: 0.026, gripH: 0.09, gripD: 0.042, wood: false, magH: 0.10 };
+
+const M4_SPEC = {
+  name: 'M4 CARBINE', cat: 'ASSAULT', createModel: () => createLongGun(GUN_M4), sound: 'ak', auto: true, interval: 60 / 750,
+  magSize: 30, reloadTactical: 2.1, reloadEmpty: 2.7, aimTime: 0.18, zoom: 0.26, range: 120,
+  hip: HIP_LONG, aimPose: sightPose(GUN_M4), sprintPose: LONG_SPRINT,
+  spreadHip: [0.02, 0.016, 0.03, 0.018], spreadAds: [0.002, 0.003, 0.02, 0.005],
+  recoil: { pitch: 0.0036, pitchHeat: 0.004, yaw: 0.003, wave: 0.001, heatPerShot: 0.08 },
+  kick: { z: 0.016, rot: 0.035 }, flashScale: 0.9, flashTime: 0.04, barrelChance: 0.07,
+  reloadPose: ak47ReloadPose, damage: 22, falloff: { start: 28, end: 75, min: 0.6 },
+};
+
+const SAW_SPEC = {
+  name: 'LMG SAW', cat: 'LMG', createModel: () => createLongGun(GUN_SAW), sound: 'lmg', auto: true, interval: 60 / 800,
+  magSize: 100, reloadTactical: 5.0, reloadEmpty: 5.6, aimTime: 0.32, zoom: 0.22, range: 110, moveMul: 0.88,
+  hip: { x: 0.15, y: -0.20, z: -0.14, ry: 0.05 }, aimPose: sightPose(GUN_SAW), sprintPose: LONG_SPRINT,
+  spreadHip: [0.03, 0.02, 0.035, 0.03], spreadAds: [0.003, 0.004, 0.02, 0.01],
+  recoil: { pitch: 0.0042, pitchHeat: 0.006, yaw: 0.0045, wave: 0.0015, heatPerShot: 0.05 },
+  kick: { z: 0.02, rot: 0.05 }, flashScale: 1.1, flashTime: 0.04, barrelChance: 0.09,
+  reloadPose: ak47ReloadPose, damage: 19, falloff: { start: 30, end: 80, min: 0.6 },
+};
+
+const HMG_SPEC = {
+  name: 'LMG HEAVY', cat: 'LMG', createModel: () => createLongGun(GUN_HMG), sound: 'lmg', auto: true, interval: 60 / 560,
+  magSize: 75, reloadTactical: 5.6, reloadEmpty: 6.2, aimTime: 0.34, zoom: 0.22, range: 130, moveMul: 0.85,
+  hip: { x: 0.15, y: -0.20, z: -0.14, ry: 0.05 }, aimPose: sightPose(GUN_HMG), sprintPose: LONG_SPRINT,
+  spreadHip: [0.032, 0.02, 0.04, 0.03], spreadAds: [0.0035, 0.004, 0.02, 0.012],
+  recoil: { pitch: 0.007, pitchHeat: 0.008, yaw: 0.006, wave: 0.002, heatPerShot: 0.06 },
+  kick: { z: 0.03, rot: 0.07 }, flashScale: 1.3, flashTime: 0.045, barrelChance: 0.15,
+  reloadPose: ak47ReloadPose, damage: 30, falloff: { start: 35, end: 90, min: 0.65 },
+};
+
+const RUSH_SPEC = {
+  name: 'SMG RUSH', cat: 'SMG', createModel: () => createLongGun(GUN_RUSH), sound: 'smg', auto: true, interval: 60 / 1000,
+  magSize: 30, reloadTactical: 1.9, reloadEmpty: 2.4, aimTime: 0.14, zoom: 0.2, range: 80, moveMul: 1.05,
+  hip: { x: 0.14, y: -0.17, z: -0.12, ry: 0.05 }, aimPose: sightPose(GUN_RUSH), sprintPose: LONG_SPRINT,
+  spreadHip: [0.024, 0.016, 0.03, 0.015], spreadAds: [0.003, 0.003, 0.02, 0.005],
+  recoil: { pitch: 0.0026, pitchHeat: 0.003, yaw: 0.0028, wave: 0.001, heatPerShot: 0.06 },
+  kick: { z: 0.01, rot: 0.025 }, flashScale: 0.75, flashTime: 0.03, barrelChance: 0.05,
+  reloadPose: ak47ReloadPose, damage: 10, falloff: { start: 12, end: 35, min: 0.5 },
+};
+
+const DRUM_SPEC = {
+  name: 'SMG .45 DRUM', cat: 'SMG', createModel: () => createLongGun(GUN_DRUM), sound: 'smg', auto: true, interval: 60 / 750,
+  magSize: 50, reloadTactical: 3.0, reloadEmpty: 3.5, aimTime: 0.17, zoom: 0.22, range: 90,
+  hip: { x: 0.14, y: -0.18, z: -0.12, ry: 0.05 }, aimPose: sightPose(GUN_DRUM), sprintPose: LONG_SPRINT,
+  spreadHip: [0.024, 0.016, 0.03, 0.018], spreadAds: [0.003, 0.003, 0.02, 0.006],
+  recoil: { pitch: 0.0045, pitchHeat: 0.004, yaw: 0.004, wave: 0.001, heatPerShot: 0.07 },
+  kick: { z: 0.014, rot: 0.035 }, flashScale: 0.9, flashTime: 0.035, barrelChance: 0.08,
+  reloadPose: ak47ReloadPose, damage: 16, falloff: { start: 15, end: 42, min: 0.55 },
+};
+
+const DMR_SPEC = {
+  name: 'SNIPER DMR', cat: 'SNIPER', createModel: () => createSniper(SNIPER_DMR), sound: 'dmr', auto: false, interval: 0.32,
+  scope: true, magSize: 10, reloadTactical: 2.6, reloadEmpty: 3.1, aimTime: 0.26, zoom: 0.7, range: 220, moveMul: 0.95,
+  hip: { x: 0.14, y: -0.17, z: -0.10, ry: 0.04 }, aimPose: SCOPED_AIM, sprintPose: LONG_SPRINT,
+  spreadHip: [0.03, 0.02, 0.04, 0.02], spreadAds: [0.0008, 0.004, 0.03, 0.003],
+  recoil: { pitch: 0.022, pitchHeat: 0.006, yaw: 0.004, wave: 0, heatPerShot: 0.3 },
+  kick: { z: 0.05, rot: 0.14 }, flashScale: 1.2, flashTime: 0.05, barrelChance: 0.5,
+  reloadPose: ak47ReloadPose, damage: 52, headMul: 2,
+};
+
+const AMR_SPEC = {
+  name: 'SNIPER .50 AMR', cat: 'SNIPER', createModel: () => createSniper(SNIPER_AMR), sound: 'amr', auto: false, interval: 1.5,
+  scope: true, magSize: 5, reloadTactical: 3.8, reloadEmpty: 3.8, aimTime: 0.36, zoom: 0.85, range: 320, moveMul: 0.88,
+  hip: { x: 0.14, y: -0.17, z: -0.10, ry: 0.04 }, aimPose: SCOPED_AIM, sprintPose: LONG_SPRINT,
+  spreadHip: [0.035, 0.02, 0.045, 0.02], spreadAds: [0.0003, 0.005, 0.03, 0.002],
+  recoil: { pitch: 0.075, pitchHeat: 0, yaw: 0.008, wave: 0, heatPerShot: 0.6 },
+  kick: { z: 0.10, rot: 0.30 }, flashScale: 2.0, flashTime: 0.06, barrelChance: 1,
+  reloadPose: rifleReloadPose, damage: 150, headMul: 2,
+};
+
+const AUTO_SG_SPEC = {
+  name: 'SHOTGUN AUTO', cat: 'SHOTGUN', createModel: createAutoShotgun, sound: 'shotgun', auto: false, interval: 0.28,
+  pellets: 8, pelletSpread: 0.05, magSize: 8, shellTime: 0.4, reloadTactical: 0, reloadEmpty: 0,
+  aimTime: 0.2, zoom: 0.2, range: 55,
+  hip: { x: 0.15, y: -0.18, z: -0.10, ry: 0.05 }, aimPose: SHOTGUN_AIM, sprintPose: LONG_SPRINT,
+  spreadHip: [0.012, 0.012, 0.03, 0.012], spreadAds: [0.006, 0.004, 0.02, 0.005],
+  recoil: { pitch: 0.03, pitchHeat: 0.01, yaw: 0.008, wave: 0, heatPerShot: 0.25 },
+  kick: { z: 0.05, rot: 0.18 }, flashScale: 1.6, flashTime: 0.05, barrelChance: 0.1,
+  reloadPose: shotgunReloadPose, damage: 9, falloff: { start: 6, end: 24, min: 0.15 },
+};
+
+const DOUBLE_SG_SPEC = {
+  name: 'SHOTGUN DOUBLE', cat: 'SHOTGUN', createModel: createDoubleBarrel, sound: 'shotgun', auto: false, interval: 0.18,
+  pellets: 10, pelletSpread: 0.055, magSize: 2, shellTime: 0.7, reloadTactical: 0, reloadEmpty: 0,
+  aimTime: 0.18, zoom: 0.18, range: 50,
+  hip: { x: 0.15, y: -0.18, z: -0.10, ry: 0.05 }, aimPose: DOUBLE_AIM, sprintPose: LONG_SPRINT,
+  spreadHip: [0.01, 0.012, 0.03, 0.01], spreadAds: [0.005, 0.004, 0.02, 0.004],
+  recoil: { pitch: 0.06, pitchHeat: 0.01, yaw: 0.012, wave: 0, heatPerShot: 0.5 },
+  kick: { z: 0.09, rot: 0.32 }, flashScale: 2.0, flashTime: 0.06, barrelChance: 0.15,
+  reloadPose: shotgunReloadPose, damage: 12, falloff: { start: 5, end: 22, min: 0.12 },
+};
+
+const TAC_SPEC = {
+  ...pistolBase, name: 'PISTOL TAC .40', cat: 'PISTOL', createModel: () => createPistol(PISTOL_TAC), sound: 'pistol',
+  interval: 0.1, magSize: 12, reloadTactical: 1.7, reloadEmpty: 2.1, aimTime: 0.12, aimPose: pistolPose(PISTOL_TAC),
+  spreadHip: [0.014, 0.014, 0.03, 0.02], spreadAds: [0.0015, 0.002, 0.02, 0.004],
+  recoil: { pitch: 0.012, pitchHeat: 0.006, yaw: 0.004, wave: 0, heatPerShot: 0.2 },
+  kick: { z: 0.035, rot: 0.1 }, flashScale: 0.8, barrelChance: 0.12,
+  damage: 24, falloff: { start: 22, end: 55, min: 0.65 },
+};
+
+const MACHINE_PISTOL_SPEC = {
+  ...pistolBase, name: 'MACHINE PISTOL', cat: 'PISTOL', createModel: () => createPistol(MACHINE_PISTOL), sound: 'pistol',
+  auto: true, interval: 60 / 900, magSize: 20, reloadTactical: 1.9, reloadEmpty: 2.3, aimTime: 0.12,
+  aimPose: pistolPose(MACHINE_PISTOL),
+  spreadHip: [0.022, 0.016, 0.03, 0.025], spreadAds: [0.0035, 0.003, 0.02, 0.006],
+  recoil: { pitch: 0.006, pitchHeat: 0.005, yaw: 0.005, wave: 0.001, heatPerShot: 0.1 },
+  kick: { z: 0.02, rot: 0.05 }, flashScale: 0.65, barrelChance: 0.06,
+  damage: 11, falloff: { start: 12, end: 35, min: 0.5 },
+};
+
+const WEAPON_SPECS = [
+  AK47_SPEC, SMG_SPEC, SHOTGUN_SPEC, RIFLE_SPEC, REVOLVER_SPEC, PISTOL_SPEC, M1911_SPEC, CANNON_SPEC,
+  M4_SPEC, SAW_SPEC, HMG_SPEC, RUSH_SPEC, DRUM_SPEC, DMR_SPEC, AMR_SPEC, AUTO_SG_SPEC, DOUBLE_SG_SPEC,
+  TAC_SPEC, MACHINE_PISTOL_SPEC,
+];
+
+/** Categories in menu order, and the length of the gun shown in the other player's hands. */
+const LOADOUT_CATS = ['ASSAULT', 'LMG', 'SMG', 'SNIPER', 'SHOTGUN', 'PISTOL'];
+const REMOTE_LEN = { ASSAULT: 1, LMG: 1.25, SMG: 0.8, SNIPER: 1.5, SHOTGUN: 1.2, PISTOL: 0.5 };
+
+/** One line of stats for the loadout menu. */
+function weaponStats(spec) {
+  const pel = spec.pellets || 1;
+  const dmg = Math.round(spec.damage * pel);
+  const rpm = Math.round(60 / spec.interval);
+  return 'DMG ' + dmg + (pel > 1 ? ' (' + pel + 'x' + spec.damage + ')' : '') + ' \u00b7 ' + rpm + ' RPM \u00b7 MAG ' + spec.magSize;
+}
 
 // ===== js/net/Net.js =====
-const PEER_PREFIX = 'retrofps-m7-';
+const PEER_PREFIX = 'retrofps-m8-';
 const PEERJS_URLS = [
   'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js',
@@ -3909,8 +4445,8 @@ class RemotePlayer {
     this.pivot.rotation.x = this.pitch;
     this.flash = Math.max(0, this.flash - dt * 20);
     this.muzzle.intensity = this.flash * 2.5;
-    const g = this.slot;
-    this.gun.scale.set(1, 1, g === 4 ? 1.5 : g >= 5 ? 0.5 : g === 3 ? 1.2 : 1);
+    const sp = WEAPON_SPECS[this.slot - 1];
+    this.gun.scale.set(1, 1, (sp && REMOTE_LEN[sp.cat]) || 1);
   }
 
   /** The other player fired: muzzle light. */
@@ -4003,6 +4539,7 @@ class Weapon {
     this.scopeEase = 0; // scope overlay amount (scoped weapons only)
     this.shellClock = 0;
     this.slot = 0;
+    this.hudSlot = 0; // position in the loadout (1-5), 0 = not in it
     this.sprintBlend = 0;
     this.spread = 0;
     this.crosshairNdc = 0;
@@ -4119,7 +4656,7 @@ class Weapon {
     }
     p.lookScale = 1 - spec.zoom * aimE;
     p.aimEase = aimE;
-    p.speedScale = 1 - 0.3 * aimE;
+    p.speedScale = (1 - 0.3 * aimE) * (spec.moveMul || 1);
 
     // Spread (radians): worse when moving, airborne or after sustained fire; better crouched.
     const speed = Math.hypot(p.vx, p.vz) / p.sprintSpeed;
@@ -4351,8 +4888,34 @@ class WeaponManager {
     this.previous = 1;
     this.index = 0;
     this.target = 0;
+    this.loadout = [0, 1, 2, 3, 4]; // roster indices in slots 1-5
     this.state = 'idle'; // 'idle' | 'lowering' | 'raising'
     this.weapons[0].model.root.visible = true;
+    this.setLoadout(this.loadout);
+  }
+
+  /** Choose the 5 carried weapons (roster indices). Equips slot 1 at once with full ammo. */
+  setLoadout(ids) {
+    const seen = new Set();
+    const valid = [];
+    for (const i of ids) {
+      if (Number.isInteger(i) && i >= 0 && i < this.weapons.length && !seen.has(i)) { seen.add(i); valid.push(i); }
+    }
+    if (valid.length === 0) return;
+    this.loadout = valid.slice(0, 5);
+    for (const w of this.weapons) w.hudSlot = 0;
+    this.loadout.forEach((id, pos) => { this.weapons[id].hudSlot = pos + 1; });
+    const cur = this.active;
+    cur.cancelReload();
+    cur.model.root.visible = false;
+    this.index = this.loadout[0];
+    this.target = this.index;
+    this.previous = this.loadout.length > 1 ? this.loadout[1] : this.index;
+    this.state = 'idle';
+    const next = this.active;
+    next.raise = 1;
+    next.model.root.visible = true;
+    this.refill();
   }
 
   /** Full ammo for every weapon (on respawn). */
@@ -4382,12 +4945,12 @@ class WeaponManager {
     const slot = this.input.consumeSlot();
     const wheel = this.input.consumeWheel();
     if ((slot || wheel) && this.state === 'idle' && this.active.throwTimer <= 0) {
-      const n = this.weapons.length;
+      const n = this.loadout.length;
       let next = this.index;
       if (slot === -1) next = this.previous;
-      else if (slot) next = slot - 1;
-      else next = (this.index + wheel + n) % n;
-      if (next !== this.index && next >= 0 && next < n) {
+      else if (slot) next = slot <= n ? this.loadout[slot - 1] : this.index;
+      else next = this.loadout[(Math.max(0, this.loadout.indexOf(this.index)) + wheel + n) % n];
+      if (next !== this.index && next >= 0 && next < this.weapons.length) {
         this.previous = this.index;
         this.target = next;
         this.state = 'lowering';
@@ -6986,7 +7549,25 @@ function boot() {
   };
   health.onPickup.push(() => weapons.audio.pickup());
   ui = new Ui(settings, input);
-  ui.setSlotCount(weapons.weapons.length);
+  ui.setSlotCount(5);
+  const LOADOUT_KEY = 'retro-fps.loadout.v1';
+  const applyLoadout = (ids) => {
+    weapons.setLoadout(ids);
+    ui.setLoadout(weapons.loadout);
+    ui.setSlotNames(weapons.loadout.map((id) => WEAPON_SPECS[id].name));
+  };
+  ui.onLoadout = (ids) => {
+    applyLoadout(ids);
+    try { localStorage.setItem(LOADOUT_KEY, JSON.stringify(ids)); } catch (_) { /* ignore */ }
+  };
+  try {
+    const savedLoadout = JSON.parse(localStorage.getItem(LOADOUT_KEY));
+    const ok = Array.isArray(savedLoadout) && savedLoadout.length === 5 && new Set(savedLoadout).size === 5 &&
+      savedLoadout.every((i) => Number.isInteger(i) && i >= 0 && i < WEAPON_SPECS.length);
+    applyLoadout(ok ? savedLoadout : weapons.loadout);
+  } catch (_) {
+    applyLoadout(weapons.loadout);
+  }
 
   const common = { scene: engine.scene, world, player, input, settings, explosions, audio: weapons.audio, health, ui };
   enemies = new Enemies(common);

@@ -399,6 +399,7 @@ body.touch #ammo-count { font-size: 30px; }
           <li><b>Buttons</b> fire, aim, jump, reload, grenade</li>
           <li><b>Top right</b> tap a number to pick a weapon</li>
           <li><b>II</b> menu / settings</li>
+          <li><b>Keyboard</b> WASD, Space, C, R, E, Z (aim) also work</li>
         </ul>
 
         <ul class="controls controls-key">
@@ -408,7 +409,7 @@ body.touch #ammo-count { font-size: 30px; }
           <li><b>C</b> crouch (hold), slide while sprinting</li>
           <li><b>Space</b> jump (also cancels a slide)</li>
           <li><b>LMB</b> fire</li>
-          <li><b>RMB</b> aim down sights</li>
+          <li><b>RMB / Z</b> aim down sights (hold)</li>
           <li><b>R</b> reload</li>
           <li><b>1-8</b> pick weapon (wheel cycles)</li>
           <li><b>Q</b> previous weapon</li>
@@ -909,6 +910,7 @@ const JUMP = 'Space';
 const RELOAD = 'KeyR';
 const CROUCH = 'KeyC';
 const GRENADE = 'KeyE';
+const AIM_KEY = 'KeyZ'; // hold to aim down sights (alternative to right click)
 const SLOT_KEYS = {
   Digit1: 1, Digit2: 2, Digit3: 3, Digit4: 4, Digit5: 5, Digit6: 6, Digit7: 7, Digit8: 8,
   KeyQ: -1, // -1 = swap back to the previous weapon
@@ -943,7 +945,9 @@ class Input {
 
     /** Left / right mouse buttons. Independent, so both can be held at once. */
     this.fireHeld = false;
-    this.aimHeld = false;
+    // Aim sources: right mouse button, Z key, touch AIM button.
+    this._aimMouse = false;
+    this._aimTouch = false;
     this._reloadQueued = false;
     this._grenadeQueued = false;
     this._slotQueued = 0;
@@ -967,15 +971,21 @@ class Input {
     document.addEventListener('keydown', this._onKeyDown);
     document.addEventListener('keyup', this._onKeyUp);
     document.addEventListener('mousemove', this._onMouseMove);
+    // Right click aims in every mode. Pointer events, because the on-screen
+    // controls cancel the compatibility mouse events.
+    document.addEventListener('pointerdown', (e) => {
+      if (this.locked && e.pointerType === 'mouse' && e.button === 2) this._aimMouse = true;
+    }, true);
+    document.addEventListener('pointerup', (e) => {
+      if (e.pointerType === 'mouse' && e.button === 2) this._aimMouse = false;
+    }, true);
     document.addEventListener('mousedown', (e) => {
       if (this._mode !== 'lock') return;
       if (e.button === 0) { this.fireHeld = true; this._firePressed = true; }
-      else if (e.button === 2) this.aimHeld = true;
       e.preventDefault();
     });
     document.addEventListener('mouseup', (e) => {
-      if (e.button === 0) this.fireHeld = false;
-      else if (e.button === 2) this.aimHeld = false;
+      if (e.button === 0 && this._mode === 'lock') this.fireHeld = false;
     });
     document.addEventListener('wheel', (e) => {
       if (this._mode === 'lock' && e.deltaY !== 0) this._wheel = Math.sign(e.deltaY);
@@ -994,7 +1004,7 @@ class Input {
     window.addEventListener('blur', () => {
       this._keys.clear();
       this.fireHeld = false;
-      this.aimHeld = false;
+      this._aimMouse = false;
     });
     element.addEventListener('contextmenu', (e) => e.preventDefault());
   }
@@ -1155,7 +1165,13 @@ class Input {
     this._firePressed = false;
     return pressed;
   }
-  setAim(active) { this.aimHeld = !!active; }
+  /** Touch AIM button. */
+  setAim(active) { this._aimTouch = !!active; }
+
+  /** True while any aim input is held: right mouse button, Z or the touch AIM button. */
+  get aimHeld() {
+    return this._aimMouse || this._aimTouch || this._keys.has(AIM_KEY);
+  }
   pressReload() { this._reloadQueued = true; }
   pressGrenade() { this._grenadeQueued = true; }
   pressSlot(n) { this._slotQueued = n; }
@@ -1262,7 +1278,8 @@ class Input {
       this._firePressed = false;
       this._wheel = 0;
       this.fireHeld = false;
-      this.aimHeld = false;
+      this._aimMouse = false;
+      this._aimTouch = false;
       this._virtualMove.x = 0;
       this._virtualMove.y = 0;
       this._virtualSprint = false;
@@ -4025,7 +4042,7 @@ class TouchControls {
     this.lfireEl.style.width = this.lfireEl.style.height = lfire;
     this.lfireEl.style.display = st.get('leftFire') ? '' : 'none';
     if (!st.get('sprintLock')) this._unlockSprint();
-    if (!st.get('holdAim') && this._aim !== this.input.aimHeld) this._aim = this.input.aimHeld;
+    if (!st.get('holdAim')) this._aim = this.input._aimTouch;
     if (this.stick.classList.contains('idle')) this._idleStick();
   }
 
@@ -4182,6 +4199,7 @@ class TouchControls {
     };
     el.addEventListener('pointerdown', (e) => {
       if (id !== null) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
       id = e.pointerId;
       lx = e.clientX;
       ly = e.clientY;

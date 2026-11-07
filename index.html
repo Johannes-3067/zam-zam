@@ -31,6 +31,7 @@ html, body {
 
 #crosshair {
   --gap: 6px;
+  --dot: 3px;
   position: fixed;
   left: 50%;
   top: 50%;
@@ -41,14 +42,14 @@ html, body {
 
 #crosshair i {
   position: absolute;
-  background: rgba(225, 225, 215, 0.85);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  left: calc(var(--dot) / -2);
+  top: calc(var(--dot) / -2);
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: 50%;
+  background: rgba(240, 240, 230, 0.95);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.65);
 }
-
-#crosshair i:nth-child(1) { width: 2px; height: 6px; left: -1px; top: calc(-6px - var(--gap)); }
-#crosshair i:nth-child(2) { width: 2px; height: 6px; left: -1px; top: var(--gap); }
-#crosshair i:nth-child(3) { width: 6px; height: 2px; top: -1px; left: calc(-6px - var(--gap)); }
-#crosshair i:nth-child(4) { width: 6px; height: 2px; top: -1px; left: var(--gap); }
 
 #hud {
   position: fixed;
@@ -495,6 +496,13 @@ body.tc-editing .zonly { display: flex !important; }
 #touch.editing .tc-btn, #touch.editing #tc-pause, #touch.editing #tc-shop { outline: 2px dashed #d0a84a; outline-offset: 2px; cursor: move; }
 #touch.editing #tc-stick { opacity: 0.8; outline: 2px dashed #d0a84a; }
 #touch.editing .tc-lfire { display: flex !important; }
+.hud-custom {
+  position: fixed !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+}
+body.tc-editing #hud, body.tc-editing #health { outline: 2px dashed #d0a84a; outline-offset: 6px; z-index: 7; }
 #tc-editbar {
   display: none;
   position: fixed;
@@ -591,7 +599,7 @@ body.touch #ammo-count { font-size: 30px; }
 </head>
 <body>
 <canvas id="game"></canvas>
-  <div id="crosshair"><i></i><i></i><i></i><i></i></div>
+  <div id="crosshair"><i></i></div>
   <div id="fps">-- FPS</div>
 
   <div id="scope"></div>
@@ -630,6 +638,7 @@ body.touch #ammo-count { font-size: 30px; }
         <button id="play" type="button" disabled>LOADING...</button>
         <button id="play-full" class="secondary" type="button">FULLSCREEN + CAPTURE MOUSE</button>
         <button id="open-loadout" class="secondary" type="button">LOADOUT</button>
+        <button id="move-buttons" class="secondary" type="button">MOVE BUTTONS &amp; HUD</button>
         <button id="open-shop" class="secondary" type="button">SHOP (B)</button>
         <button id="open-settings" class="secondary" type="button">SETTINGS</button>
         <button id="open-tab" class="secondary" type="button">OPEN IN NEW TAB (MOUSE LOCK)</button>
@@ -775,6 +784,7 @@ const LIMITS = {
   leftFire: { min: 0, max: 1 },
   buttonSize: { min: 0.7, max: 1.4 },
   buttonOpacity: { min: 0.2, max: 1 },
+  crosshairSize: { min: 2, max: 10 },
   enemyCount: { min: 0, max: 12 },
   difficulty: { min: 0, max: 2 },
 };
@@ -798,6 +808,7 @@ function createDefaults() {
     leftFire: 1,
     buttonSize: 1,
     buttonOpacity: 0.8,
+    crosshairSize: 3,
     enemyCount: 6,
     difficulty: 1,
   };
@@ -979,6 +990,7 @@ const SETTINGS_SCHEMA = [
   { tab: 'controls', key: 'sensitivity', label: 'Mouse sensitivity', step: 0.05, format: mult },
   { tab: 'controls', key: 'adsSensitivity', label: 'Aim sensitivity', step: 0.05, format: mult,
     note: 'Look speed while aiming down sights.' },
+  { tab: 'controls', key: 'crosshairSize', label: 'Crosshair size', step: 1, format: (v) => Math.round(v) + ' px' },
   { tab: 'controls', key: 'invertY', label: 'Invert vertical look', toggle: true },
   { tab: 'controls', key: 'autoSprint', label: 'Always sprint', toggle: true,
     note: 'Sprint whenever you move fully forward.' },
@@ -1052,6 +1064,7 @@ class Ui {
     this._loSlot = 0;
     this._loClass = 0;
     document.getElementById('open-loadout').addEventListener('click', () => this._showView('loadout'));
+    document.getElementById('move-buttons').addEventListener('click', () => { if (this.onEditLayout) this.onEditLayout('main'); });
     document.getElementById('close-loadout').addEventListener('click', () => this._showView('main'));
     this.pendingView = null;
     document.getElementById('open-shop').addEventListener('click', () => this._showView('shop'));
@@ -1059,7 +1072,12 @@ class Ui {
     this._tab = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches ? 'touch' : 'general';
     this._buildSettings();
     this._applyFpsVisibility();
-    settings.onChange((key) => { if (key === 'showFps') this._applyFpsVisibility(); });
+    const applyCrosshair = () => this.crosshair.style.setProperty('--dot', Math.round(settings.get('crosshairSize')) + 'px');
+    applyCrosshair();
+    settings.onChange((key) => {
+      if (key === 'showFps') this._applyFpsVisibility();
+      if (key === 'crosshairSize') applyCrosshair();
+    });
     const playBtn = document.getElementById('play');
     let lastType = 'mouse';
     playBtn.addEventListener('pointerdown', (e) => { lastType = e.pointerType || 'mouse'; });
@@ -1277,11 +1295,6 @@ class Ui {
     if (weapon.reloading !== this._reloading) {
       this._reloading = weapon.reloading;
       this.reloadLabel.textContent = weapon.reloading ? 'RELOADING' : '';
-    }
-    const gap = Math.round(Math.min(90, Math.max(3, weapon.crosshairNdc * window.innerHeight * 0.5)));
-    if (gap !== this._gap) {
-      this._gap = gap;
-      this.crosshair.style.setProperty('--gap', gap + 'px');
     }
     const opacity = Math.round((1 - weapon.aimEase) * 20) / 20;
     if (opacity !== this._crossOpacity) {
@@ -1509,14 +1522,14 @@ class Ui {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'secondary';
-      btn.textContent = 'MOVE BUTTONS';
-      btn.addEventListener('click', () => this.onEditLayout());
-      list.appendChild(btn);
+      btn.textContent = 'MOVE BUTTONS & HUD';
+      btn.addEventListener('click', () => this.onEditLayout('settings'));
+      list.insertBefore(btn, list.firstChild);
       const note = document.createElement('p');
       note.className = 'setting-note';
       note.style.marginTop = '6px';
-      note.textContent = 'Drag each on-screen button and the joystick to where your thumbs like them.';
-      list.appendChild(note);
+      note.textContent = 'Drag every on-screen button, the joystick, the health bar and the ammo display to where you want them.';
+      list.insertBefore(note, btn.nextSibling);
     }
   }
 }
@@ -1763,7 +1776,10 @@ class Input {
 
   _start(mode) {
     clearTimeout(this._lockErrTimer);
-    if (mode === 'fallback' && this.onNoCapture) this.onNoCapture();
+    if (mode === 'fallback') {
+      if (this.onNoCapture) this.onNoCapture();
+      this._tryFullscreen(); // keeps the (hidden) cursor from leaving the screen
+    }
     const changed = this._mode !== mode;
     this._mode = mode;
     if (!this.locked) {
@@ -8001,7 +8017,7 @@ class TouchControls {
       '<div id="tc-rotate">Rotate your device to landscape</div>',
       '<div id="tc-pause" role="button">II</div>',
       '<div id="tc-shop" class="zonly" role="button">SHOP</div>',
-      '<div id="tc-editbar"><span>Drag the buttons and the joystick where you want them.</span>' +
+      '<div id="tc-editbar"><span>Drag the buttons, the joystick, the health bar and the ammo display where you want them.</span>' +
         '<button type="button" id="tc-reset">RESET</button><button type="button" id="tc-done">DONE</button></div>',
       '<div class="tc-btn tc-lfire" role="button">FIRE</div>',
       '<div id="tc-btns">',
@@ -8031,10 +8047,12 @@ class TouchControls {
       crouch: this.duckEl, reload: root.querySelector('.tc-reload'), grenade: root.querySelector('.tc-grenade'),
       mine: root.querySelector('.tc-mine'), lfire: this.lfireEl, pause: root.querySelector('#tc-pause'),
       shop: root.querySelector('#tc-shop'),
+      hud: document.getElementById('hud'),
+      health: document.getElementById('health'),
     };
     for (const [key, el] of Object.entries(this.movable)) {
       el.dataset.key = key;
-      el.dataset.home = el.parentNode === this.btns ? 'btns' : 'root';
+      el.dataset.home = key === 'hud' || key === 'health' ? 'body' : el.parentNode === this.btns ? 'btns' : 'root';
       const w = parseFloat(getComputedStyle(el).width);
       if (w && key !== 'pause' && key !== 'shop') el.dataset.base = String(w);
     }
@@ -8119,6 +8137,13 @@ class TouchControls {
     for (const [key, el] of Object.entries(this.movable)) {
       const pos = this.layout[key];
       const base = Number(el.dataset.base) || 0;
+      if (el.dataset.home === 'body') {
+        // HUD blocks stay where they are in the page; only their position changes.
+        el.classList.toggle('hud-custom', !!pos);
+        el.style.left = pos ? (pos.x * 100).toFixed(2) + '%' : '';
+        el.style.top = pos ? (pos.y * 100).toFixed(2) + '%' : '';
+        continue;
+      }
       if (pos) {
         if (el.parentNode !== this.root) this.root.appendChild(el); // out of the scaled cluster
         el.classList.add('custom');
@@ -8143,7 +8168,7 @@ class TouchControls {
     this.editing = true;
     this._onEditDone = onDone;
     this.root.classList.add('on', 'editing');
-    document.body.classList.add('tc-editing');
+    document.body.classList.add('tc-editing', 'touch'); // touch layout: the HUD clears the buttons
     this._applyLayout();
     this._idleStick();
   }
@@ -8168,18 +8193,25 @@ class TouchControls {
       this._applyLayout();
       this._idleStick();
     });
-    root.addEventListener('pointerdown', (e) => {
+    // Pick whatever is under the finger / cursor, by position: the HUD sits outside the controls.
+    window.addEventListener('pointerdown', (e) => {
       if (!this.editing || this._drag) return;
-      if (e.target.closest('#tc-editbar')) return;
-      let key = null;
-      const el = e.target.closest('[data-key]');
-      if (el) key = el.dataset.key;
-      else {
+      if (e.target.closest && e.target.closest('#tc-editbar')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      let key = null, bestArea = Infinity;
+      for (const [k, el] of Object.entries(this.movable)) {
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) continue;
+        const pad = 6;
+        if (e.clientX < r.left - pad || e.clientX > r.right + pad || e.clientY < r.top - pad || e.clientY > r.bottom + pad) continue;
+        const area = r.width * r.height;
+        if (area < bestArea) { bestArea = area; key = k; }
+      }
+      if (!key) {
         const h = this._home();
         if (Math.hypot(e.clientX - h.x, e.clientY - h.y) < this._radius * 1.2) key = 'stick';
       }
-      e.preventDefault();
-      e.stopPropagation();
       if (!key) return;
       this._drag = { id: e.pointerId, key };
       this._dragTo(e);
@@ -8566,11 +8598,11 @@ function boot() {
   };
 
   const touch = new TouchControls(input, settings, player);
-  ui.onEditLayout = () => {
+  ui.onEditLayout = (from) => {
     ui.menu.classList.add('hidden');
     touch.startEdit(() => {
       ui.menu.classList.remove('hidden');
-      ui._showView('settings');
+      ui._showView(from || 'settings');
     });
   };
   weapons.audio.setVolume(settings.get('volume'));

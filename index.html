@@ -188,6 +188,28 @@ label.toggle input {
 }
 .setting-note { margin: -8px 0 14px; font-size: 11px; color: #66645e; }
 
+#notice {
+  position: fixed;
+  left: 50%;
+  top: 22%;
+  z-index: 8;
+  max-width: min(520px, calc(100vw - 40px));
+  transform: translateX(-50%);
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #e6e2d2;
+  background: rgba(20, 20, 22, 0.92);
+  border: 2px solid #d0a84a;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+#notice.on { opacity: 1; }
+#open-tab { display: none; margin-top: 6px; }
+#open-tab.on { display: block; }
+.frame-note { margin: 6px 0 0; font-size: 11px; line-height: 1.5; color: #a8957a; }
+
 .controls-touch { display: none; }
 @media (pointer: coarse) {
   .controls-key { display: none; }
@@ -449,6 +471,7 @@ body.touch #ammo-count { font-size: 30px; }
   <div id="feed"></div>
   <div id="hitmarker"></div>
   <div id="waiting">WAITING FOR OPPONENT</div>
+  <div id="notice"></div>
 
   <div id="hud">
     <div id="slots"></div>
@@ -466,6 +489,8 @@ body.touch #ammo-count { font-size: 30px; }
 
         <button id="play" type="button" disabled>LOADING...</button>
         <button id="open-settings" class="secondary" type="button">SETTINGS</button>
+        <button id="open-tab" class="secondary" type="button">OPEN IN NEW TAB (MOUSE LOCK)</button>
+        <p class="frame-note" id="frame-note" hidden></p>
         <p class="hint" id="menu-hint"></p>
 
         <div id="net">
@@ -866,6 +891,37 @@ class Ui {
     const hintEl = document.getElementById('menu-hint');
     input.onHint = (text) => { hintEl.textContent = text || ''; };
 
+    // Inside another app's window (an embedded preview) browsers usually
+    // forbid mouse capture. Say so up front and offer to open a real tab.
+    const framed = (() => { try { return window.self !== window.top; } catch (_) { return true; } })();
+    const noticeEl = document.getElementById('notice');
+    const frameNote = document.getElementById('frame-note');
+    const openTab = document.getElementById('open-tab');
+    const canOpen = /^(https?|file):$/.test(location.protocol);
+    if (framed && !coarse) {
+      frameNote.hidden = false;
+      frameNote.textContent = 'This game is running inside another window (a preview), which may block mouse lock. ' +
+        (canOpen ? 'Open it in its own tab, or download the HTML file and open it in Chrome, Edge or Firefox.'
+          : 'Download the HTML file and open it directly in Chrome, Edge or Firefox.');
+      openTab.classList.toggle('on', canOpen);
+    }
+    openTab.addEventListener('click', () => {
+      let w = null;
+      try { w = window.open(location.href, '_blank'); } catch (_) { w = null; }
+      if (!w) hintEl.textContent = 'The new tab was blocked. Download the HTML file and open it directly in your browser.';
+    });
+    let noticeTimer = 0;
+    input.onNoCapture = () => {
+      const why = framed
+        ? 'Mouse lock is blocked because the game runs inside another window. Open it in its own tab (menu: Esc) or open the downloaded HTML file directly in your browser.'
+        : 'Your browser did not allow mouse lock. Click into the game to try again.';
+      noticeEl.textContent = why + ' Until then: move the mouse to look, and push it against the screen edge to keep turning.';
+      noticeEl.classList.add('on');
+      clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => noticeEl.classList.remove('on'), 7000);
+      hintEl.textContent = framed ? 'Mouse lock is blocked in this window. Use OPEN IN NEW TAB or open the file directly.' : '';
+    };
+
     input.onLockChange = (locked) => this._showMenu(!locked);
     this._showMenu(!input.locked);
   }
@@ -1182,6 +1238,8 @@ class Input {
     this._lastUnlock = -1e9;
     /** Called with a short message for the menu (or '' to clear it). */
     this.onHint = null;
+    /** Called when play starts without mouse capture because the browser refused it. */
+    this.onNoCapture = null;
     this._lockFails = 0;
     // Free-mouse mode (no pointer lock): where the cursor is, for edge turning.
     this._mouseX = -1;
@@ -1234,7 +1292,7 @@ class Input {
         return;
       }
       // Give a pending retry (without unadjustedMovement) a moment to succeed.
-      this._scheduleFallback(300);
+      this._scheduleFallback(700);
     });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && this.overlay) this.pause();
@@ -1282,11 +1340,17 @@ class Input {
       const result = el.requestPointerLock({ unadjustedMovement: true });
       if (result && typeof result.catch === 'function') {
         result.catch(() => {
-          try { el.requestPointerLock(); } catch (_) { this._scheduleFallback(0); }
+          try {
+            const again = el.requestPointerLock();
+            if (again && typeof again.catch === 'function') again.catch(() => this._scheduleFallback(0));
+          } catch (_) { this._scheduleFallback(0); }
         });
       }
     } catch (_) {
-      try { el.requestPointerLock(); } catch (__) { this._scheduleFallback(0); return; }
+      try {
+        const again = el.requestPointerLock();
+        if (again && typeof again.catch === 'function') again.catch(() => this._scheduleFallback(0));
+      } catch (__) { this._scheduleFallback(0); return; }
     }
     this._scheduleFallback(1500);
   }
@@ -1332,6 +1396,7 @@ class Input {
 
   _start(mode) {
     clearTimeout(this._lockErrTimer);
+    if (mode === 'fallback' && this.onNoCapture) this.onNoCapture();
     const changed = this._mode !== mode;
     this._mode = mode;
     if (!this.locked) {

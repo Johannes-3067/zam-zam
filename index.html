@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Retro FPS - Milestone 8</title>
+  <title>Retro FPS - Milestone 7</title>
   <style>
 html, body {
   margin: 0;
@@ -206,8 +206,30 @@ label.toggle input {
   transition: opacity 0.4s;
 }
 #notice.on { opacity: 1; }
-#open-tab { display: none; margin-top: 6px; }
-#open-tab.on { display: block; }
+#open-tab, #save-file { display: none; margin-top: 6px; }
+#open-tab.on, #save-file.on { display: block; }
+#play-full { margin-top: 6px; }
+.tabs.small button { font-size: 10px; letter-spacing: 0; padding: 7px 0; }
+#lo-slots button { line-height: 1.4; }
+#lo-slots button small { display: block; font-size: 10px; letter-spacing: 0; opacity: 0.8; }
+.lo-item { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #2e2e2c; }
+.lo-item b { font-size: 13px; color: #c9c6ba; }
+.lo-item small { font-size: 11px; color: #77756e; }
+.lo-item button { grid-column: 2; grid-row: 1 / 3; width: auto; min-width: 92px; margin: 0; padding: 8px 10px; font-size: 12px; letter-spacing: 1px; }
+#close-loadout { margin-top: 12px; }
+#open-shop, #gold, #mine-label { display: none; }
+body.zmode #open-shop { display: block; }
+body.zmode #gold { display: inline; margin-left: 10px; font-size: 13px; letter-spacing: 2px; color: #e2c35a; }
+body.zmode #mine-label { display: block; font-size: 12px; letter-spacing: 2px; color: #c98a5a; }
+#shop-gold { font-size: 16px; letter-spacing: 3px; color: #e2c35a; }
+.shop-head { margin: 12px 0 2px; font-size: 11px; letter-spacing: 2px; color: #77756e; }
+.shop-item { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #2e2e2c; }
+.shop-item b { font-size: 13px; color: #c9c6ba; }
+.shop-item small { font-size: 11px; line-height: 1.4; color: #77756e; }
+.shop-item em { font-style: normal; font-size: 11px; color: #a8957a; }
+.shop-item button { grid-column: 2; grid-row: 1 / 4; width: auto; min-width: 92px; margin: 0; padding: 8px 10px; font-size: 12px; letter-spacing: 1px; }
+#close-shop { margin-top: 12px; }
+@media (pointer: coarse) { #play-full { display: none; } }
 .mode-note { margin: -6px 0 12px; font-size: 11px; line-height: 1.5; color: #8f8d85; }
 #mode-tabs button:disabled { opacity: 0.6; cursor: default; }
 
@@ -330,6 +352,10 @@ body.free-mouse, body.free-mouse * { cursor: none; }
 #net-url { width: 100%; box-sizing: border-box; padding: 6px; margin-bottom: 6px; font: inherit; font-size: 12px; color: #c9c6ba; background: #151515; border: 1px solid #55554f; }
 #net-status { margin-top: 6px; font-size: 12px; color: #77756e; user-select: text; -webkit-user-select: text; }
 #net-status b { font-size: 22px; letter-spacing: 4px; color: #d0a84a; }
+.map-row small { font-size: 11px; letter-spacing: 2px; color: #77756e; }
+.map-row em { font-style: normal; color: #a8957a; letter-spacing: 0; }
+#map-tabs { margin: 6px 0 10px; }
+#map-tabs button { padding: 6px 0; }
 .net-join { display: flex; gap: 6px; margin-top: 6px; }
 .net-join input { flex: 1; min-width: 0; padding: 6px; font: inherit; font-size: 16px; letter-spacing: 3px; text-transform: uppercase;
   color: #c9c6ba; background: #151515; border: 1px solid #55554f; user-select: text; -webkit-user-select: text; }
@@ -462,6 +488,53 @@ body.touch #feed { top: 150px; }
 .tc-reload  { right: 106px; bottom: 112px; width: 58px;  height: 58px; }
 .tc-grenade { right: 176px; bottom: 104px; width: 58px;  height: 58px; }
 .tc-crouch  { right: 204px; bottom: 22px;  width: 58px;  height: 58px; }
+.tc-mine    { right: 196px; bottom: 170px; width: 52px;  height: 52px; }
+.zonly { display: none !important; }
+body.tc-editing .zonly { display: flex !important; }
+#touch .custom { position: fixed !important; right: auto !important; bottom: auto !important; transform: translate(-50%, -50%) !important; }
+#touch.editing .tc-btn, #touch.editing #tc-pause, #touch.editing #tc-shop { outline: 2px dashed #d0a84a; outline-offset: 2px; cursor: move; }
+#touch.editing #tc-stick { opacity: 0.8; outline: 2px dashed #d0a84a; }
+#touch.editing .tc-lfire { display: flex !important; }
+#tc-editbar {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  max-width: calc(100vw - 40px);
+  padding: 10px 12px;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 12px;
+  color: #e6e2d2;
+  text-align: center;
+  background: rgba(20, 20, 22, 0.9);
+  border: 2px solid #d0a84a;
+  pointer-events: auto;
+  z-index: 3;
+}
+#touch.editing #tc-editbar { display: flex; }
+#tc-editbar span { flex-basis: 100%; }
+#tc-editbar button { width: auto; margin: 0; padding: 8px 16px; }
+body.zmode .zonly { display: flex !important; }
+#tc-shop {
+  position: fixed;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  left: calc(50% + 34px);
+  height: 32px;
+  padding: 0 10px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(226, 195, 90, 0.7);
+  background: rgba(20, 20, 22, 0.45);
+  color: #e2c35a;
+  font-weight: bold;
+  letter-spacing: 2px;
+  font-size: 12px;
+  pointer-events: auto;
+}
 
 #tc-pause {
   position: fixed;
@@ -514,32 +587,6 @@ body.touch #ammo-count { font-size: 30px; }
 #scope::before, #scope::after { content: ''; position: absolute; background: #000; }
 #scope::before { left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; }
 #scope::after { top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; }
-
-/* ---- Loadout ---- */
-#lo-slots { display: flex; gap: 4px; margin-bottom: 8px; }
-.lo-slot {
-  flex: 1; min-width: 0; min-height: 50px; margin: 0; padding: 5px 2px;
-  font-size: 9px; letter-spacing: 0; line-height: 1.25; font-weight: normal;
-  color: #66645e; background: #151515; border: 2px solid #44443f;
-  white-space: normal; word-break: break-word; overflow: hidden;
-}
-.lo-slot b { display: block; margin-bottom: 2px; font-size: 13px; color: #d0a84a; }
-.lo-slot.filled { color: #c9c6ba; }
-.lo-slot.edit { border-color: #d0a84a; }
-.lo-slot:hover { background: #222224; }
-#lo-count { min-height: 16px; margin: 0 0 6px; font-size: 12px; color: #d0a84a; }
-#lo-list { max-height: 300px; margin-bottom: 8px; overflow-y: auto; touch-action: pan-y; }
-.lo-cat { margin: 10px 0 4px; font-size: 11px; letter-spacing: 3px; color: #77756e; }
-.lo-item {
-  display: grid; grid-template-columns: 1fr auto; gap: 6px; text-align: left;
-  margin: 0 0 3px; padding: 6px 8px; font-size: 13px; letter-spacing: 1px; font-weight: normal;
-  color: #b9b7ae; background: #26262a; border: 2px solid #3a3a3e;
-}
-.lo-item:hover { background: #38383c; }
-.lo-item.on { color: #fff; background: #34322a; border-color: #a89c6a; }
-.lo-item .st { display: block; margin-top: 2px; font-size: 10px; letter-spacing: 0; color: #77756e; }
-.lo-item i { align-self: center; min-width: 14px; font-style: normal; font-size: 16px; color: #d0a84a; text-align: center; }
-#view-loadout .row button { font-size: 12px; letter-spacing: 1px; }
   </style>
 </head>
 <body>
@@ -551,7 +598,7 @@ body.touch #ammo-count { font-size: 30px; }
   <div id="damage"></div>
   <div id="dmg-dir"><i></i></div>
   <div id="death"><h2>YOU DIED</h2><p id="death-cause"></p><p id="death-timer"></p></div>
-  <div id="health"><div id="health-bar-bg"><div id="health-bar"></div></div><b id="health-num">100</b><span id="kills"></span></div>
+  <div id="health"><div id="health-bar-bg"><div id="health-bar"></div></div><b id="health-num">100</b><span id="kills"></span><span id="gold"></span></div>
 
   <div id="score"><span id="score-me">0</span><i>:</i><span id="score-them">0</span></div>
   <div id="feed"></div>
@@ -565,13 +612,14 @@ body.touch #ammo-count { font-size: 30px; }
     <div id="ammo"><b id="ammo-count">30</b><span> / &infin;</span></div>
     <div id="reload-label"></div>
     <div id="grenade-label"></div>
+    <div id="mine-label"></div>
   </div>
 
   <div id="menu">
     <div class="panel">
       <div id="view-main">
         <h1>RETRO FPS</h1>
-        <p class="sub">Prototype &middot; Milestone 8</p>
+        <p class="sub">Prototype &middot; Milestone 7</p>
 
         <div class="tabs" id="mode-tabs">
           <button type="button" data-mode="soldiers">SOLDIERS</button>
@@ -580,14 +628,25 @@ body.touch #ammo-count { font-size: 30px; }
         <p class="mode-note" id="mode-note"></p>
 
         <button id="play" type="button" disabled>LOADING...</button>
-        <button id="open-loadout" class="secondary" type="button">LOADOUT (5 WEAPONS)</button>
+        <button id="play-full" class="secondary" type="button">FULLSCREEN + CAPTURE MOUSE</button>
+        <button id="open-loadout" class="secondary" type="button">LOADOUT</button>
+        <button id="open-shop" class="secondary" type="button">SHOP (B)</button>
         <button id="open-settings" class="secondary" type="button">SETTINGS</button>
         <button id="open-tab" class="secondary" type="button">OPEN IN NEW TAB (MOUSE LOCK)</button>
+        <button id="save-file" class="secondary" type="button">DOWNLOAD GAME FILE</button>
         <p class="frame-note" id="frame-note" hidden></p>
         <p class="hint" id="menu-hint"></p>
 
         <div id="net">
           <span id="net-title">Multiplayer (over the internet)</span>
+          <div class="map-row">
+            <small>MAP SIZE <em id="map-note"></em></small>
+            <div class="tabs" id="map-tabs">
+              <button type="button" data-map="small">SMALL</button>
+              <button type="button" data-map="middle">MEDIUM</button>
+              <button type="button" data-map="large">LARGE</button>
+            </div>
+          </div>
           <button id="net-host" type="button">HOST GAME</button>
           <div class="net-join">
             <input id="net-code" type="text" spellcheck="false" autocomplete="off" maxlength="8" placeholder="CODE" aria-label="Game code">
@@ -621,24 +680,29 @@ body.touch #ammo-count { font-size: 30px; }
           <li><b>LMB</b> fire</li>
           <li><b>RMB / Z</b> aim down sights (hold)</li>
           <li><b>R</b> reload</li>
-          <li><b>1-5</b> pick weapon from your loadout (wheel cycles)</li>
+          <li><b>1-9</b> pick weapon (9 = LMG, wheel cycles)</li>
           <li><b>Q</b> previous weapon</li>
           <li><b>E</b> throw grenade</li>
+          <li><b>B</b> shop (zombie defense)</li>
+          <li><b>G</b> place landmine (zombie defense)</li>
           <li><b>Esc</b> menu / settings</li>
         </ul>
       </div>
 
       <div id="view-loadout" hidden>
         <h1>LOADOUT</h1>
-        <p class="sub">Pick 5 weapons &middot; keys 1-5 in game</p>
-        <div id="lo-slots"></div>
-        <p id="lo-count"></p>
+        <p class="sub">Pick the weapons you carry. Keys 1, 2 and 3 switch between them.</p>
+        <div class="tabs" id="lo-slots"></div>
+        <div class="tabs" id="lo-classes"></div>
         <div id="lo-list"></div>
-        <div class="row">
-          <button id="lo-random" class="secondary" type="button">RANDOM</button>
-          <button id="lo-cancel" class="secondary" type="button">CANCEL</button>
-          <button id="lo-done" type="button">DONE</button>
-        </div>
+        <button id="close-loadout" type="button">BACK</button>
+      </div>
+
+      <div id="view-shop" hidden>
+        <h1>SHOP</h1>
+        <p class="sub" id="shop-gold"></p>
+        <div id="shop-list"></div>
+        <button id="close-shop" type="button">BACK</button>
       </div>
 
       <div id="view-settings" hidden>
@@ -662,6 +726,10 @@ body.touch #ammo-count { font-size: 30px; }
        https://unpkg.com/three@0.160.0/build/three.module.js as three.module.js
        next to this file; it is used automatically if the CDN is unreachable. -->
   <script type="module">
+// A clean copy of this page, taken before any script changed it. Lets the game
+// open itself in a real browser tab (mouse lock is blocked inside previews).
+const PAGE_SOURCE = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
 const THREE_URLS = [
   'https://unpkg.com/three@0.160.0/build/three.module.js',
   'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js',
@@ -979,10 +1047,17 @@ class Ui {
 
     this.viewMain = document.getElementById('view-main');
     this.viewSettings = document.getElementById('view-settings');
+    this.viewShop = document.getElementById('view-shop');
     this.viewLoadout = document.getElementById('view-loadout');
+    this._loSlot = 0;
+    this._loClass = 0;
+    document.getElementById('open-loadout').addEventListener('click', () => this._showView('loadout'));
+    document.getElementById('close-loadout').addEventListener('click', () => this._showView('main'));
+    this.pendingView = null;
+    document.getElementById('open-shop').addEventListener('click', () => this._showView('shop'));
+    document.getElementById('close-shop').addEventListener('click', () => this._showView('main'));
     this._tab = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches ? 'touch' : 'general';
     this._buildSettings();
-    this._buildLoadout();
     this._applyFpsVisibility();
     settings.onChange((key) => { if (key === 'showFps') this._applyFpsVisibility(); });
     const playBtn = document.getElementById('play');
@@ -1008,16 +1083,32 @@ class Ui {
     const canOpen = /^(https?|file):$/.test(location.protocol);
     if (framed && !coarse) {
       frameNote.hidden = false;
-      frameNote.textContent = 'This game is running inside another window (a preview), which may block mouse lock. ' +
-        (canOpen ? 'Open it in its own tab, or download the HTML file and open it in Chrome, Edge or Firefox.'
-          : 'Download the HTML file and open it directly in Chrome, Edge or Firefox.');
-      openTab.classList.toggle('on', canOpen);
+      frameNote.textContent = 'This game is running inside a preview window. Browsers do not allow mouse lock there. ' +
+        'Press OPEN IN NEW TAB, or download the HTML file and open it in Chrome, Edge or Firefox.';
+      openTab.classList.add('on');
+      document.getElementById('save-file').classList.add('on');
     }
+    document.getElementById('save-file').addEventListener('click', () => {
+      try {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([PAGE_SOURCE], { type: 'text/html' }));
+        a.download = 'retro-fps.html';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } catch (_) {
+        hintEl.textContent = 'Downloads are blocked in this window.';
+      }
+    });
     openTab.addEventListener('click', () => {
       let w = null;
-      try { w = window.open(location.href, '_blank'); } catch (_) { w = null; }
+      try {
+        if (canOpen) w = window.open(location.href, '_blank');
+        else w = window.open(URL.createObjectURL(new Blob([PAGE_SOURCE], { type: 'text/html' })), '_blank');
+      } catch (_) { w = null; }
       if (!w) hintEl.textContent = 'The new tab was blocked. Download the HTML file and open it directly in your browser.';
     });
+    document.getElementById('play-full').addEventListener('click', () => input.requestFullscreenPlay());
     let noticeTimer = 0;
     input.onNoCapture = () => {
       const why = framed
@@ -1163,9 +1254,9 @@ class Ui {
       this.weaponName.textContent = weapon.name;
       this._ammo = -1; // force the ammo text to refresh
     }
-    if (weapon.hudSlot !== this._slot) {
-      this._slot = weapon.hudSlot;
-      this._slotEls.forEach((el, i) => el.classList.toggle('on', i + 1 === weapon.hudSlot));
+    if (weapon.loadoutSlot !== this._slot) {
+      this._slot = weapon.loadoutSlot;
+      this._slotEls.forEach((el, i) => el.classList.toggle('on', i + 1 === weapon.loadoutSlot));
     }
     const scope = Math.round(weapon.scopeEase * 20) / 20;
     if (scope !== this._scopeOpacity) {
@@ -1201,7 +1292,10 @@ class Ui {
 
   _showMenu(visible) {
     this.menu.classList.toggle('hidden', !visible);
-    if (visible) this._showSettings(false);
+    if (visible) {
+      this._showView(this.pendingView || 'main');
+      this.pendingView = null;
+    }
     this.crosshair.style.display = visible ? 'none' : 'block';
   }
 
@@ -1210,132 +1304,141 @@ class Ui {
   }
 
   _showSettings(open) {
-    this.viewMain.hidden = open;
-    this.viewSettings.hidden = !open;
-    this.viewLoadout.hidden = true;
-    if (open) this._renderTab();
+    this._showView(open ? 'settings' : 'main');
   }
 
-  _showLoadout(open) {
-    this.viewMain.hidden = open;
-    this.viewSettings.hidden = true;
-    this.viewLoadout.hidden = !open;
-    if (open) this._renderLoadout();
+  /** Menu page: 'main', 'settings' or 'shop'. */
+  _showView(view) {
+    this.viewMain.hidden = view !== 'main';
+    this.viewSettings.hidden = view !== 'settings';
+    this.viewShop.hidden = view !== 'shop';
+    this.viewLoadout.hidden = view !== 'loadout';
+    if (view === 'loadout') this._renderLoadout();
+    if (view === 'settings') this._renderTab();
+    if (view === 'shop') this._renderShop();
   }
 
-  /** Tooltips on the 1-5 strip. */
-  setSlotNames(names) {
-    this._slotEls.forEach((el, i) => { el.title = names[i] || ''; });
-  }
-
-  /** Show this loadout (roster indices) as the current one in the menu. */
-  setLoadout(ids) {
-    this._applied = ids.slice(0, 5);
-    this._lo = this._applied.slice();
-    while (this._lo.length < 5) this._lo.push(null);
-    this._loEdit = 0;
-    this._renderLoadout();
-  }
-
-  _buildLoadout() {
-    this.onLoadout = null;
-    this._applied = [];
-    this._lo = [null, null, null, null, null];
-    this._loEdit = 0;
-    this._loCount = document.getElementById('lo-count');
-    this._loDone = document.getElementById('lo-done');
-
-    const slotsEl = document.getElementById('lo-slots');
-    this._loSlotEls = [];
-    for (let i = 0; i < 5; i++) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'lo-slot';
-      b.addEventListener('click', () => { this._loEdit = i; this._renderLoadout(); });
-      slotsEl.appendChild(b);
-      this._loSlotEls.push(b);
-    }
-
-    const list = document.getElementById('lo-list');
-    this._loItems = [];
-    for (const cat of LOADOUT_CATS) {
-      const head = document.createElement('div');
-      head.className = 'lo-cat';
-      head.textContent = cat;
-      list.appendChild(head);
-      WEAPON_SPECS.forEach((spec, id) => {
-        if (spec.cat !== cat) return;
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'lo-item';
-        b.innerHTML = '<div>' + spec.name + '<span class="st">' + weaponStats(spec) + '</span></div><i></i>';
-        b.addEventListener('click', () => this._loPick(id));
-        list.appendChild(b);
-        this._loItems.push({ id, el: b, mark: b.querySelector('i') });
-      });
-    }
-
-    document.getElementById('open-loadout').addEventListener('click', () => this._showLoadout(true));
-    document.getElementById('lo-cancel').addEventListener('click', () => {
-      this._lo = this._applied.slice();
-      while (this._lo.length < 5) this._lo.push(null);
-      this._showLoadout(false);
-    });
-    document.getElementById('lo-random').addEventListener('click', () => {
-      const ids = WEAPON_SPECS.map((_, i) => i);
-      for (let i = ids.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        const t = ids[i]; ids[i] = ids[j]; ids[j] = t;
-      }
-      this._lo = ids.slice(0, 5);
-      this._loEdit = 0;
-      this._renderLoadout();
-    });
-    this._loDone.addEventListener('click', () => {
-      if (this._lo.indexOf(null) >= 0) return;
-      this._applied = this._lo.slice();
-      if (this.onLoadout) this.onLoadout(this._applied.slice());
-      this._showLoadout(false);
-    });
-  }
-
-  /** Tap a weapon: put it in the highlighted slot (or the first free one); tap a picked weapon to remove it. */
-  _loPick(id) {
-    const lo = this._lo;
-    const at = lo.indexOf(id);
-    if (at >= 0) {
-      lo[at] = null;
-      this._loEdit = at;
-    } else {
-      let slot = lo[this._loEdit] === null ? this._loEdit : lo.indexOf(null);
-      if (slot < 0) slot = this._loEdit;
-      lo[slot] = id;
-      const free = lo.indexOf(null);
-      this._loEdit = free >= 0 ? free : slot;
-    }
-    this._renderLoadout();
+  /** Loadout data: { get(): ids, equip(slot, id) }. */
+  setLoadoutProvider(provider) {
+    this.loadoutApi = provider;
   }
 
   _renderLoadout() {
-    const lo = this._lo;
-    let filled = 0;
-    for (let i = 0; i < 5; i++) {
-      const el = this._loSlotEls[i];
-      const id = lo[i];
-      if (id !== null) filled++;
-      el.innerHTML = '<b>' + (i + 1) + '</b>' + (id !== null ? WEAPON_SPECS[id].name : '\u2014');
-      el.classList.toggle('filled', id !== null);
-      el.classList.toggle('edit', i === this._loEdit);
+    const api = this.loadoutApi;
+    if (!api) return;
+    const ids = api.get();
+    const slotBox = document.getElementById('lo-slots');
+    const classBox = document.getElementById('lo-classes');
+    const list = document.getElementById('lo-list');
+    slotBox.textContent = '';
+    classBox.textContent = '';
+    list.textContent = '';
+    LOADOUT_SLOTS.forEach((label, k) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.classList.toggle('on', k === this._loSlot);
+      const spec = WEAPON_SPECS[ids[k] - 1];
+      b.append(document.createTextNode(label));
+      const small = document.createElement('small');
+      small.textContent = spec ? spec.name : '';
+      b.appendChild(small);
+      b.addEventListener('click', () => {
+        this._loSlot = k;
+        this._loClass = 0;
+        this._renderLoadout();
+      });
+      slotBox.appendChild(b);
+    });
+    // Slots 1 and 2: the five weapon classes. Slot 3: sidearms.
+    const classes = this._loSlot === 2 ? [WEAPON_CLASSES[5]] : WEAPON_CLASSES.slice(0, 5);
+    if (this._loClass >= classes.length) this._loClass = 0;
+    if (this._loSlot < 2 && this._loClassTouched !== true) {
+      // Open on the class of the weapon that is equipped.
+      const cur = classes.findIndex((c) => c.ids.includes(ids[this._loSlot]));
+      if (cur >= 0) this._loClass = cur;
     }
-    for (const it of this._loItems) {
-      const at = lo.indexOf(it.id);
-      it.el.classList.toggle('on', at >= 0);
-      it.mark.textContent = at >= 0 ? String(at + 1) : '';
+    classBox.className = 'tabs small';
+    classes.forEach((c, k) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = c.short;
+      b.classList.toggle('on', k === this._loClass);
+      b.addEventListener('click', () => {
+        this._loClass = k;
+        this._loClassTouched = true;
+        this._renderLoadout();
+      });
+      classBox.appendChild(b);
+    });
+    const cls = classes[this._loClass];
+    for (const id of cls.ids) {
+      const spec = WEAPON_SPECS[id - 1];
+      const row = document.createElement('div');
+      row.className = 'lo-item';
+      const name = document.createElement('b');
+      name.textContent = spec.name;
+      const dmg = Math.round((spec.damage || 0) * (spec.pellets || 1));
+      const stats = document.createElement('small');
+      stats.textContent = 'DMG ' + dmg + (spec.pellets ? ' (x' + spec.pellets + ' pellets)' : '') +
+        '  \u00b7  ' + Math.round(60 / spec.interval) + ' RPM  \u00b7  MAG ' + spec.magSize + '  \u00b7  ' + spec.range + ' m';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      const equipped = ids[this._loSlot] === id;
+      btn.textContent = equipped ? 'EQUIPPED' : 'EQUIP';
+      btn.disabled = equipped;
+      btn.addEventListener('click', () => {
+        api.equip(this._loSlot, id);
+        this._renderLoadout();
+      });
+      row.append(name, btn, stats);
+      list.appendChild(row);
     }
-    this._loCount.textContent = filled < 5
-      ? 'Pick ' + (5 - filled) + ' more (' + filled + '/5)'
-      : '5/5 \u00b7 tap a slot, then a weapon, to swap';
-    this._loDone.disabled = filled < 5;
+  }
+
+  /** Shop data source: { items(), gold(), buy(id) }. */
+  setShop(provider) {
+    this.shop = provider;
+  }
+
+  /** Re-draw the shop if it is open (gold or prices changed). */
+  refreshShop() {
+    if (!this.viewShop.hidden && !this.menu.classList.contains('hidden')) this._renderShop();
+  }
+
+  _renderShop() {
+    if (!this.shop) return;
+    document.getElementById('shop-gold').textContent = 'GOLD ' + this.shop.gold();
+    const list = document.getElementById('shop-list');
+    list.textContent = '';
+    let lastTeam = null;
+    for (const it of this.shop.items()) {
+      if (it.team !== lastTeam) {
+        lastTeam = it.team;
+        const head = document.createElement('div');
+        head.className = 'shop-head';
+        head.textContent = it.team ? 'FOR THE TEAM' : 'FOR YOU';
+        list.appendChild(head);
+      }
+      const row = document.createElement('div');
+      row.className = 'shop-item';
+      const name = document.createElement('b');
+      name.textContent = it.name;
+      const desc = document.createElement('small');
+      desc.textContent = it.desc;
+      const lvl = document.createElement('em');
+      lvl.textContent = it.max > 1 ? 'Level ' + it.level + ' / ' + it.max : '';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = it.blocked || it.cost + ' GOLD';
+      btn.disabled = !it.can;
+      btn.addEventListener('click', () => {
+        this.shop.buy(it.id);
+        btn.disabled = true;
+        setTimeout(() => this.refreshShop(), 250); // guests wait for the host
+      });
+      row.append(name, btn, desc, lvl);
+      list.appendChild(row);
+    }
   }
 
   _buildSettings() {
@@ -1402,6 +1505,19 @@ class Ui {
         list.appendChild(note);
       }
     }
+    if (this._tab === 'touch' && this.onEditLayout) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'secondary';
+      btn.textContent = 'MOVE BUTTONS';
+      btn.addEventListener('click', () => this.onEditLayout());
+      list.appendChild(btn);
+      const note = document.createElement('p');
+      note.className = 'setting-note';
+      note.style.marginTop = '6px';
+      note.textContent = 'Drag each on-screen button and the joystick to where your thumbs like them.';
+      list.appendChild(note);
+    }
   }
 }
 
@@ -1416,8 +1532,10 @@ const RELOAD = 'KeyR';
 const CROUCH = 'KeyC';
 const GRENADE = 'KeyE';
 const AIM_KEY = 'KeyZ'; // hold to aim down sights (alternative to right click)
+const SHOP_KEY = 'KeyB';
+const MINE_KEY = 'KeyG';
 const SLOT_KEYS = {
-  Digit1: 1, Digit2: 2, Digit3: 3, Digit4: 4, Digit5: 5, Digit6: 6, Digit7: 7, Digit8: 8,
+  Digit1: 1, Digit2: 2, Digit3: 3, Digit4: 4, Digit5: 5, Digit6: 6, Digit7: 7, Digit8: 8, Digit9: 9,
   KeyQ: -1, // -1 = swap back to the previous weapon
 };
 
@@ -1585,6 +1703,23 @@ class Input {
       } catch (__) { this._scheduleFallback(0); return; }
     }
     this._scheduleFallback(1500);
+  }
+
+  /** Go fullscreen, then capture the mouse (one click does both). */
+  requestFullscreenPlay() {
+    const de = document.documentElement;
+    const go = () => this.requestLock('mouse');
+    if (document.fullscreenElement || !de.requestFullscreen || document.fullscreenEnabled === false) {
+      go();
+      return;
+    }
+    let p = null;
+    try { p = de.requestFullscreen({ navigationUI: 'hide' }); } catch (_) { p = null; }
+    try {
+      // Keeps Esc from leaving fullscreen while playing (Chrome / Edge; hold Esc to leave).
+      if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock(['Escape']).catch(() => {});
+    } catch (_) { /* optional */ }
+    if (p && p.then) p.then(go, go); else go();
   }
 
   /** Back to the menu. */
@@ -1779,6 +1914,23 @@ class Input {
 
   get crouchToggled() { return this._virtualCrouch; }
 
+  pressShop() { this._shopQueued = true; }
+  pressMine() { this._mineQueued = true; }
+
+  /** True once per shop key press. */
+  consumeShop() {
+    const q = this._shopQueued;
+    this._shopQueued = false;
+    return q;
+  }
+
+  /** True once per landmine key press. */
+  consumeMine() {
+    const q = this._mineQueued;
+    this._mineQueued = false;
+    return q && !this.blocked;
+  }
+
   /** True once per crouch press. */
   consumeCrouchPress() {
     const pressed = this._crouchPressed;
@@ -1823,6 +1975,12 @@ class Input {
 
   _onKeyDown(e) {
     if (!this.locked) return; // gameplay keys are ignored while the menu is open
+    if (e.code === 'F11' || (e.code === 'KeyF' && e.shiftKey)) {
+      e.preventDefault();
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+      return;
+    }
     // Without pointer lock the browser does not handle Esc for us.
     if (this._mode !== 'lock' && (e.code === 'Escape' || e.code === 'KeyP')) {
       this.pause();
@@ -1835,6 +1993,8 @@ class Input {
     if (e.code === RELOAD) this._reloadQueued = true;
     if (e.code === GRENADE) this._grenadeQueued = true;
     if (e.code === CROUCH) this._crouchPressed = true;
+    if (e.code === SHOP_KEY) this._shopQueued = true;
+    if (e.code === MINE_KEY) this._mineQueued = true;
     if (SLOT_KEYS[e.code]) this._slotQueued = SLOT_KEYS[e.code];
   }
 
@@ -1872,6 +2032,8 @@ class Input {
       this._virtualSprint = false;
       this._virtualCrouch = false;
       this._crouchPressed = false;
+      this._shopQueued = false;
+      this._mineQueued = false;
     }
     if (this.onLockChange) this.onLockChange(playing);
   }
@@ -2371,8 +2533,17 @@ class Health {
     /** Who caused the last damage: 'me' (own grenade, fall...) or 'other'. */
     this.lastOwner = 'me';
     /** Medkits: { x, y, z, active, timer }. */
-    this.pickups = spots.map((s) => ({ x: s.x, y: s.y, z: s.z, active: true, timer: 0 }));
+    this.pickups = spots.map((s) => ({ x: s.x, y: s.y, z: s.z, room: s.room, enabled: true, active: true, timer: 0 }));
     player.onLand = (speed) => this._fall(speed);
+  }
+
+  /** Medkits exist only in the rooms of the current map. */
+  setRooms(rooms) {
+    for (const k of this.pickups) {
+      k.enabled = !k.room || rooms.has(k.room);
+      k.active = true;
+      k.timer = 0;
+    }
   }
 
   /** Returns the damage actually applied. */
@@ -2430,6 +2601,7 @@ class Health {
 
     const p = this.player;
     for (const k of this.pickups) {
+      if (!k.enabled) continue;
       if (!k.active) {
         k.timer -= dt;
         if (k.timer <= 0) k.active = true;
@@ -2979,6 +3151,234 @@ function createSmg() {
   };
 }
 
+const LMG_SIGHT = { y: 0.062, z: 0.0 };
+
+/** Light machine gun: long barrel, carry handle, folded bipod, 100-round box magazine. */
+function createLmg() {
+  const { woodMat, steelMat, magMat } = createWeaponMaterials();
+  const root = new THREE.Group();
+  const { box, tube } = gunBuilders(root);
+
+  box(steelMat, 0.052, 0.072, 0.30, 0, 0, -0.08); // receiver
+  box(steelMat, 0.032, 0.012, 0.22, 0, 0.042, -0.08); // feed cover
+  box(steelMat, 0.005, 0.022, 0.012, 0.009, 0.052, 0.02); // rear sight
+  box(steelMat, 0.005, 0.022, 0.012, -0.009, 0.052, 0.02);
+  tube(steelMat, 0.025, 0.20, 0, 0.008, -0.31, 10); // barrel jacket
+  tube(steelMat, 0.015, 0.40, 0, 0.008, -0.45, 10); // barrel
+  tube(steelMat, 0.021, 0.05, 0, 0.008, -0.67, 8); // flash hider
+  box(steelMat, 0.006, 0.03, 0.006, 0, 0.040, -0.62); // front sight
+  box(steelMat, 0.010, 0.010, 0.17, 0.013, -0.032, -0.52); // folded bipod legs
+  box(steelMat, 0.010, 0.010, 0.17, -0.013, -0.032, -0.52);
+  box(steelMat, 0.016, 0.036, 0.10, 0, 0.068, -0.15); // carry handle
+  box(steelMat, 0.034, 0.10, 0.045, 0, -0.08, 0.05, -0.25); // grip
+  box(woodMat, 0.042, 0.072, 0.24, 0, -0.012, 0.20); // stock
+  const handle = box(steelMat, 0.008, 0.012, 0.03, 0.031, 0.01, -0.12);
+
+  const mag = new THREE.Group();
+  const magRestY = -0.036;
+  mag.position.set(0.006, magRestY, -0.12);
+  box(magMat, 0.072, 0.11, 0.12, 0, -0.055, 0, 0, mag); // box magazine
+  box(steelMat, 0.074, 0.012, 0.122, 0, -0.112, 0, 0, mag);
+  root.add(mag);
+
+  const flash = createMuzzleFlash();
+  flash.position.set(0, 0.008, -0.71);
+  root.add(flash);
+
+  return {
+    root, flash,
+    applyReload(r) {
+      mag.position.y = magRestY + r.magY * 1.2;
+      mag.visible = r.magVisible;
+      handle.position.z = -0.12 + 0.04 * r.charge;
+    },
+  };
+}
+
+const M4_SIGHT = { y: 0.056, z: 0.02 };
+const VECTOR_SIGHT = { y: 0.054, z: 0.0 };
+const RPK_SIGHT = { y: 0.060, z: 0.04 };
+const AUTO12_SIGHT = { y: 0.054, z: 0.02 };
+
+/** Magazine group helper: reload poses move it down and hide it. */
+function gunMag(root, x, y, z) {
+  const mag = new THREE.Group();
+  mag.position.set(x, y, z);
+  root.add(mag);
+  return { mag, restY: y };
+}
+
+/** M4A1 carbine: flat-top rail, straight magazine, short barrel, collapsible stock. */
+function createM4() {
+  const { steelMat, magMat } = createWeaponMaterials();
+  const root = new THREE.Group();
+  const { box, tube } = gunBuilders(root);
+  box(steelMat, 0.040, 0.058, 0.26, 0, 0, -0.08);
+  box(steelMat, 0.018, 0.008, 0.40, 0, 0.033, -0.16);
+  box(steelMat, 0.005, 0.022, 0.012, 0.009, 0.045, M4_SIGHT.z);
+  box(steelMat, 0.005, 0.022, 0.012, -0.009, 0.045, M4_SIGHT.z);
+  box(steelMat, 0.048, 0.050, 0.30, 0, -0.004, -0.37);
+  tube(steelMat, 0.0085, 0.16, 0, 0.004, -0.58, 10);
+  tube(steelMat, 0.012, 0.05, 0, 0.004, -0.68, 10);
+  box(steelMat, 0.006, 0.021, 0.006, 0, 0.0455, -0.52);
+  box(steelMat, 0.030, 0.095, 0.04, 0, -0.075, 0.03, -0.25);
+  box(steelMat, 0.036, 0.050, 0.20, 0, -0.012, 0.23);
+  box(steelMat, 0.040, 0.075, 0.012, 0, -0.012, 0.335);
+  const handle = box(steelMat, 0.020, 0.012, 0.035, 0, 0.043, 0.06);
+  const { mag, restY } = gunMag(root, 0, -0.03, -0.06);
+  box(magMat, 0.028, 0.13, 0.042, 0, -0.065, 0, 0, mag);
+  const flash = createMuzzleFlash();
+  flash.position.set(0, 0.004, -0.72);
+  root.add(flash);
+  return {
+    root, flash,
+    applyReload(r) {
+      mag.position.y = restY + r.magY;
+      mag.visible = r.magVisible;
+      handle.position.z = 0.06 + 0.04 * r.charge;
+    },
+  };
+}
+
+/** Compact submachine gun with a vertical foregrip and the magazine in the grip. */
+function createVector() {
+  const { steelMat, magMat } = createWeaponMaterials();
+  const root = new THREE.Group();
+  const { box, tube } = gunBuilders(root);
+  box(steelMat, 0.045, 0.065, 0.24, 0, 0, -0.08);
+  box(steelMat, 0.018, 0.006, 0.20, 0, 0.0355, -0.08);
+  box(steelMat, 0.005, 0.020, 0.012, 0.008, 0.044, VECTOR_SIGHT.z);
+  box(steelMat, 0.005, 0.020, 0.012, -0.008, 0.044, VECTOR_SIGHT.z);
+  box(steelMat, 0.036, 0.040, 0.14, 0, 0.004, -0.28);
+  tube(steelMat, 0.008, 0.07, 0, 0.004, -0.39, 8);
+  box(steelMat, 0.005, 0.020, 0.005, 0, 0.044, -0.40);
+  box(steelMat, 0.026, 0.080, 0.030, 0, -0.065, -0.27);
+  box(steelMat, 0.028, 0.085, 0.042, 0, -0.07, 0.08, -0.18);
+  box(steelMat, 0.010, 0.012, 0.18, 0.014, 0.012, 0.20);
+  box(steelMat, 0.010, 0.012, 0.18, -0.014, 0.012, 0.20);
+  box(steelMat, 0.036, 0.07, 0.01, 0, 0.004, 0.295);
+  const handle = box(steelMat, 0.008, 0.012, 0.03, 0.026, 0.02, -0.02);
+  const { mag, restY } = gunMag(root, 0, -0.10, 0.05);
+  box(magMat, 0.026, 0.13, 0.036, 0, -0.065, 0, 0, mag);
+  const flash = createMuzzleFlash();
+  flash.position.set(0, 0.004, -0.45);
+  root.add(flash);
+  return {
+    root, flash,
+    applyReload(r) {
+      mag.position.y = restY + r.magY * 0.8;
+      mag.visible = r.magVisible;
+      handle.position.z = -0.02 + 0.04 * r.charge;
+    },
+  };
+}
+
+/** RPK-style LMG: AK receiver, long barrel, wooden furniture and a round drum magazine. */
+function createRpk() {
+  const { woodMat, steelMat, magMat } = createWeaponMaterials();
+  const root = new THREE.Group();
+  const { box, tube } = gunBuilders(root);
+  box(steelMat, 0.048, 0.070, 0.28, 0, 0, -0.06);
+  box(steelMat, 0.005, 0.024, 0.012, 0.010, 0.048, RPK_SIGHT.z);
+  box(steelMat, 0.005, 0.024, 0.012, -0.010, 0.048, RPK_SIGHT.z);
+  box(woodMat, 0.050, 0.045, 0.30, 0, -0.005, -0.34);
+  tube(steelMat, 0.011, 0.50, 0, 0.012, -0.64, 10);
+  tube(steelMat, 0.016, 0.05, 0, 0.012, -0.92, 8);
+  box(steelMat, 0.006, 0.034, 0.006, 0, 0.043, -0.62);
+  box(steelMat, 0.010, 0.010, 0.18, 0.016, -0.03, -0.72);
+  box(steelMat, 0.010, 0.010, 0.18, -0.016, -0.03, -0.72);
+  box(woodMat, 0.034, 0.10, 0.045, 0, -0.08, 0.04, -0.22);
+  box(woodMat, 0.040, 0.075, 0.26, 0, -0.01, 0.23, 0.05);
+  box(steelMat, 0.040, 0.080, 0.012, 0, -0.015, 0.365);
+  const handle = box(steelMat, 0.008, 0.012, 0.03, 0.028, 0.012, -0.10);
+  const { mag, restY } = gunMag(root, 0, -0.04, -0.12);
+  box(magMat, 0.034, 0.05, 0.05, 0, -0.025, 0, 0, mag);
+  const drum = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.075, 18), magMat);
+  drum.rotation.z = Math.PI / 2;
+  drum.position.set(0, -0.09, 0);
+  mag.add(drum);
+  const flash = createMuzzleFlash();
+  flash.position.set(0, 0.012, -0.96);
+  root.add(flash);
+  return {
+    root, flash,
+    applyReload(r) {
+      mag.position.y = restY + r.magY * 1.1;
+      mag.visible = r.magVisible;
+      handle.position.z = -0.10 + 0.04 * r.charge;
+    },
+  };
+}
+
+/** Semi-automatic marksman rifle with a scope and a stick magazine. */
+function createDmr() {
+  const { woodMat, steelMat, magMat } = createWeaponMaterials();
+  const root = new THREE.Group();
+  const { box, tube } = gunBuilders(root);
+  box(steelMat, 0.036, 0.055, 0.26, 0, 0, -0.06);
+  tube(steelMat, 0.0095, 0.62, 0, 0.012, -0.55, 12);
+  tube(steelMat, 0.013, 0.07, 0, 0.012, -0.88, 10);
+  box(woodMat, 0.040, 0.040, 0.34, 0, -0.012, -0.38);
+  box(woodMat, 0.034, 0.090, 0.050, 0, -0.07, 0.07, -0.2);
+  box(woodMat, 0.034, 0.060, 0.26, 0, -0.01, 0.24);
+  box(woodMat, 0.034, 0.030, 0.10, 0, -0.06, 0.18);
+  box(steelMat, 0.040, 0.080, 0.012, 0, -0.02, 0.375);
+  tube(steelMat, 0.0185, 0.24, 0, 0.060, -0.06, 12);
+  tube(steelMat, 0.026, 0.05, 0, 0.060, -0.185, 12);
+  tube(steelMat, 0.022, 0.04, 0, 0.060, 0.045, 12);
+  box(steelMat, 0.012, 0.022, 0.02, 0, 0.040, -0.12);
+  box(steelMat, 0.012, 0.022, 0.02, 0, 0.040, 0.0);
+  const handle = box(steelMat, 0.008, 0.008, 0.04, 0.026, 0.008, 0.0);
+  const { mag, restY } = gunMag(root, 0, -0.03, -0.04);
+  box(magMat, 0.028, 0.10, 0.045, 0, -0.05, 0, 0, mag);
+  const flash = createMuzzleFlash();
+  flash.position.set(0, 0.012, -0.94);
+  root.add(flash);
+  return {
+    root, flash,
+    applyReload(r) {
+      mag.position.y = restY + r.magY * 0.9;
+      mag.visible = r.magVisible;
+      handle.position.z = 0.0 + 0.05 * r.charge;
+    },
+  };
+}
+
+/** Automatic 12-gauge with a drum magazine. */
+function createAuto12() {
+  const { woodMat, steelMat, magMat } = createWeaponMaterials();
+  const root = new THREE.Group();
+  const { box, tube } = gunBuilders(root);
+  box(steelMat, 0.044, 0.068, 0.22, 0, 0, -0.04);
+  box(steelMat, 0.005, 0.022, 0.012, 0.009, 0.043, AUTO12_SIGHT.z);
+  box(steelMat, 0.005, 0.022, 0.012, -0.009, 0.043, AUTO12_SIGHT.z);
+  tube(steelMat, 0.0135, 0.40, 0, 0.012, -0.34, 12);
+  tube(steelMat, 0.011, 0.26, 0, -0.016, -0.28, 10);
+  box(steelMat, 0.006, 0.021, 0.006, 0, 0.0435, -0.52);
+  box(woodMat, 0.050, 0.040, 0.18, 0, -0.012, -0.25);
+  box(steelMat, 0.030, 0.095, 0.04, 0, -0.075, 0.05, -0.25);
+  box(woodMat, 0.038, 0.065, 0.22, 0, -0.02, 0.24, 0.1);
+  box(steelMat, 0.040, 0.075, 0.012, 0, -0.025, 0.35);
+  const handle = box(steelMat, 0.008, 0.012, 0.03, 0.026, 0.016, -0.06);
+  const { mag, restY } = gunMag(root, 0, -0.05, -0.10);
+  box(magMat, 0.030, 0.04, 0.05, 0, -0.02, 0, 0, mag);
+  const drum = new THREE.Mesh(new THREE.CylinderGeometry(0.058, 0.058, 0.07, 16), magMat);
+  drum.rotation.z = Math.PI / 2;
+  drum.position.set(0, -0.075, 0);
+  mag.add(drum);
+  const flash = createMuzzleFlash();
+  flash.position.set(0, 0.012, -0.56);
+  root.add(flash);
+  return {
+    root, flash,
+    applyReload(r) {
+      mag.position.y = restY + r.magY;
+      mag.visible = r.magVisible;
+      handle.position.z = -0.06 + 0.04 * r.charge;
+    },
+  };
+}
+
 /** Pump-action shotgun with a sliding forearm. */
 function createShotgun() {
   const { woodMat, steelMat } = createWeaponMaterials();
@@ -3082,8 +3482,7 @@ function createPistol(o) {
   const mag = new THREE.Group();
   const magRestY = -h / 2 - o.gripH + 0.012;
   mag.position.set(0, magRestY, 0.02);
-  const mh = o.magH || 0.02;
-  box(steelMat, w * 0.9, mh, o.gripD * 0.95, 0, -(mh - 0.02) / 2, 0, 0, mag);
+  box(steelMat, w * 0.9, 0.02, o.gripD * 0.95, 0, 0, 0, 0, mag);
   root.add(mag);
 
   const flash = createMuzzleFlash();
@@ -3103,219 +3502,6 @@ function createPistol(o) {
       slide.position.z = slideRestZ + (slideT > 0 ? 0.03 * Math.sin(Math.PI * (1 - slideT / 0.09)) : 0);
     },
   };
-}
-
-/** Iron sights topping out at sightY: rear ears at rearZ, front post at frontZ. */
-function addIronSights(box, mat, sightY, rearZ, frontZ) {
-  box(mat, 0.030, 0.020, 0.040, 0, sightY - 0.035, rearZ);
-  box(mat, 0.008, 0.025, 0.012, 0.0095, sightY - 0.0125, rearZ - 0.005);
-  box(mat, 0.008, 0.025, 0.012, -0.0095, sightY - 0.0125, rearZ - 0.005);
-  box(mat, 0.022, 0.034, 0.030, 0, sightY - 0.0355, frontZ);
-  box(mat, 0.004, 0.0185, 0.004, 0, sightY - 0.00925, frontZ);
-}
-
-/**
- * Parametric rifle / SMG / LMG. Options: recv (receiver length), barrel, barrelR,
- * brake, shroud + shroudLen, guard, wood, stock + stockType ('solid' | 'wire' | 'none'),
- * mag ('straight' | 'curved' | 'drum' | 'belt'), magH, magZ, sightY, rearZ, bipod.
- * Muzzle points down -Z; the sights top out at sightY.
- */
-function createLongGun(o) {
-  const { woodMat, steelMat, magMat } = createWeaponMaterials();
-  const root = new THREE.Group();
-  const { box, tube } = gunBuilders(root);
-  const furn = o.wood ? woodMat : steelMat;
-  const recv = o.recv;
-  const zb = 0.04 - recv; // front of the receiver
-  const muzzleZ = zb - o.barrel;
-
-  box(steelMat, 0.042, 0.062, recv, 0, 0, 0.04 - recv / 2);
-  box(steelMat, 0.036, 0.014, recv * 0.85, 0, 0.038, 0.04 - recv * 0.5);
-  box(steelMat, 0.006, 0.010, 0.065, 0, -0.060, 0.0);
-
-  tube(steelMat, o.barrelR || 0.0105, o.barrel, 0, 0.012, zb - o.barrel / 2, 10);
-  if (o.brake) tube(steelMat, 0.0135, 0.05, 0, 0.012, muzzleZ + 0.025, 10);
-  if (o.shroud) tube(steelMat, o.shroud, o.shroudLen, 0, 0.004, zb - o.shroudLen / 2, 10);
-  if (o.guard) {
-    box(furn, 0.044, 0.040, o.guard, 0, -0.004, zb - o.guard / 2 + 0.02);
-    box(furn, 0.040, 0.022, o.guard, 0, 0.034, zb - o.guard / 2 + 0.02);
-  }
-
-  if (o.stockType === 'wire') {
-    box(steelMat, 0.012, 0.012, o.stock, 0.014, 0.012, 0.04 + o.stock / 2);
-    box(steelMat, 0.012, 0.012, o.stock, -0.014, 0.012, 0.04 + o.stock / 2);
-    box(steelMat, 0.030, 0.07, 0.01, 0, 0, 0.04 + o.stock);
-  } else if (o.stockType !== 'none') {
-    box(furn, 0.034, 0.07, o.stock, 0, -0.012, 0.03 + o.stock / 2, 0.08);
-    box(steelMat, 0.034, 0.09, 0.012, 0, -0.02, 0.035 + o.stock, 0.08);
-  }
-  box(furn, 0.034, 0.10, 0.045, 0, -0.09, 0.01, -0.30);
-
-  addIronSights(box, steelMat, o.sightY, o.rearZ || 0, muzzleZ + 0.06);
-
-  if (o.bipod) {
-    for (const s of [-1, 1]) box(steelMat, 0.008, 0.008, 0.16, s * 0.022, -0.016, zb - 0.22, 0.15);
-  }
-
-  const handleRestZ = 0.04 - recv * 0.5;
-  const handle = box(steelMat, 0.012, 0.014, 0.03, 0.026, 0.012, handleRestZ);
-
-  const mag = new THREE.Group();
-  const magRestY = -0.03;
-  mag.position.set(0, magRestY, o.magZ);
-  if (o.mag === 'curved') {
-    for (let i = 0; i < 5; i++) box(magMat, 0.036, 0.07, 0.05, 0, -(0.035 + i * 0.063), -(i * i * 0.0045), i * 0.12, mag);
-  } else if (o.mag === 'drum') {
-    const geo = new THREE.CylinderGeometry(0.06, 0.06, 0.075, 16, 1);
-    geo.rotateZ(Math.PI / 2);
-    const drum = new THREE.Mesh(geo, magMat);
-    drum.position.set(0, -0.085, 0);
-    mag.add(drum);
-    box(magMat, 0.03, 0.04, 0.05, 0, -0.025, 0, 0, mag);
-  } else if (o.mag === 'belt') {
-    box(magMat, 0.075, 0.10, 0.14, 0, -0.085, 0, 0, mag);
-    box(steelMat, 0.05, 0.02, 0.05, 0, -0.02, 0, 0, mag);
-  } else {
-    const mh = o.magH || 0.12;
-    box(magMat, 0.030, mh, 0.04, 0, -mh / 2 - 0.01, 0, 0, mag);
-  }
-  root.add(mag);
-
-  const flash = createMuzzleFlash();
-  flash.position.set(0, 0.012, muzzleZ - 0.03);
-  root.add(flash);
-
-  return {
-    root, flash,
-    applyReload(r) {
-      mag.position.y = magRestY + r.magY;
-      mag.visible = r.magVisible;
-      handle.position.z = handleRestZ + 0.055 * r.charge;
-    },
-  };
-}
-
-/**
- * Scoped rifle (the scope axis is at y = 0.060, like RIFLE_SCOPE).
- * Options: barrel, barrelR, fore, brake, bipod, thick, scopeLen, scopeR, wood,
- * mag (detachable magazine), bolt (visible bolt cycle after each shot).
- */
-function createSniper(o) {
-  const { woodMat, steelMat, magMat } = createWeaponMaterials();
-  const root = new THREE.Group();
-  const { box, tube } = gunBuilders(root);
-  const furn = o.wood ? woodMat : steelMat;
-  const zb = -0.15;
-  const muzzleZ = zb - o.barrel;
-
-  box(steelMat, o.thick || 0.036, 0.055, 0.20, 0, 0, -0.05);
-  tube(steelMat, o.barrelR, o.barrel, 0, 0.012, zb - o.barrel / 2, 12);
-  if (o.brake) tube(steelMat, o.barrelR * 1.7, 0.07, 0, 0.012, muzzleZ + 0.035, 12);
-  box(furn, 0.040, 0.075, 0.34, 0, -0.02, 0.24, 0.07);
-  box(furn, 0.040, 0.035, o.fore, 0, -0.012, zb - o.fore / 2 + 0.02);
-  box(steelMat, 0.040, 0.080, 0.012, 0, -0.02, 0.415, 0.07);
-  box(steelMat, 0.006, 0.010, 0.05, 0, -0.040, 0.0);
-  box(steelMat, 0.030, 0.020, 0.07, 0, -0.040, -0.04);
-
-  const sl = o.scopeLen || 0.24;
-  const sr = o.scopeR || 0.0185;
-  tube(steelMat, sr, sl, 0, 0.060, -0.06, 12);
-  tube(steelMat, sr * 1.4, 0.05, 0, 0.060, -0.06 - sl / 2 - 0.005, 12);
-  tube(steelMat, sr * 1.2, 0.04, 0, 0.060, -0.06 + sl / 2 + 0.005, 12);
-  box(steelMat, 0.012, 0.022, 0.02, 0, 0.040, -0.12);
-  box(steelMat, 0.012, 0.022, 0.02, 0, 0.040, 0.0);
-
-  if (o.bipod) {
-    for (const s of [-1, 1]) box(steelMat, 0.008, 0.008, 0.2, s * 0.03, -0.03, zb - o.fore * 0.7, 0.2);
-  }
-
-  const handle = box(steelMat, 0.006, 0.006, 0.04, 0.026, 0.004, 0.03);
-  box(steelMat, 0.014, 0.014, 0.014, 0.034, -0.004, 0.045);
-
-  const mag = new THREE.Group();
-  const magRestY = -0.03;
-  mag.position.set(0, magRestY, -0.06);
-  if (o.mag) box(magMat, 0.030, 0.10, 0.045, 0, -0.06, 0, 0, mag);
-  root.add(mag);
-
-  const flash = createMuzzleFlash();
-  flash.position.set(0, 0.012, muzzleZ - 0.03);
-  root.add(flash);
-
-  const dur = o.bolt ? 1.0 : 0.12;
-  let boltT = 0;
-  let boltReload = 0;
-  return {
-    root, flash,
-    applyReload(r) {
-      boltReload = r.charge;
-      mag.position.y = magRestY + r.magY;
-      mag.visible = r.magVisible;
-    },
-    onShot() { boltT = dur; },
-    update(dt) {
-      boltT = Math.max(0, boltT - dt);
-      const p = 1 - boltT / dur;
-      const cycle = boltT > 0 ? Math.sin(Math.PI * Math.min(1, Math.max(0, (p - 0.25) / 0.5))) : 0;
-      handle.position.z = 0.03 + 0.06 * Math.max(cycle, boltReload);
-    },
-  };
-}
-
-/** Semi-automatic shotgun: fixed forend, tube magazine. Sight line: SHOTGUN_SIGHT. */
-function createAutoShotgun() {
-  const { woodMat, steelMat } = createWeaponMaterials();
-  const root = new THREE.Group();
-  const { box, tube } = gunBuilders(root);
-
-  box(steelMat, 0.042, 0.066, 0.20, 0, 0, -0.05);
-  box(steelMat, 0.012, 0.030, 0.07, 0.024, 0.006, -0.03);
-  tube(steelMat, 0.0115, 0.50, 0, 0.017, -0.35, 12);
-  tube(steelMat, 0.0120, 0.34, 0, -0.012, -0.27, 10);
-  box(woodMat, 0.046, 0.044, 0.20, 0, -0.012, -0.27);
-  box(steelMat, 0.008, 0.021, 0.46, 0, 0.039, -0.35);
-  box(steelMat, 0.006, 0.006, 0.006, 0, 0.0525, -0.58);
-  box(steelMat, 0.020, 0.008, 0.02, 0, 0.034, 0.03);
-  box(steelMat, 0.005, 0.014, 0.01, 0.007, 0.045, 0.03);
-  box(steelMat, 0.005, 0.014, 0.01, -0.007, 0.045, 0.03);
-  box(steelMat, 0.006, 0.010, 0.05, 0, -0.045, 0.0);
-  box(woodMat, 0.036, 0.07, 0.07, 0, -0.04, 0.07);
-  box(woodMat, 0.040, 0.07, 0.30, 0, -0.025, 0.24, 0.12);
-  box(steelMat, 0.040, 0.075, 0.012, 0, -0.03, 0.395, 0.12);
-
-  const flash = createMuzzleFlash();
-  flash.position.set(0, 0.017, -0.66);
-  root.add(flash);
-  return { root, flash, applyReload() {} };
-}
-
-/** Double-barrelled shotgun. Sight line: DOUBLE_SIGHT. */
-const DOUBLE_SIGHT = { y: 0.048, z: 0.03 };
-function createDoubleBarrel() {
-  const { woodMat, steelMat } = createWeaponMaterials();
-  const root = new THREE.Group();
-  const { box, tube } = gunBuilders(root);
-
-  box(steelMat, 0.046, 0.058, 0.12, 0, 0, -0.02);
-  tube(steelMat, 0.0115, 0.52, -0.013, 0.012, -0.34, 12);
-  tube(steelMat, 0.0115, 0.52, 0.013, 0.012, -0.34, 12);
-  box(steelMat, 0.008, 0.013, 0.52, 0, 0.030, -0.34);
-  box(steelMat, 0.006, 0.012, 0.006, 0, 0.042, -0.59);
-  box(steelMat, 0.026, 0.008, 0.02, 0, 0.033, 0.03);
-  box(steelMat, 0.005, 0.012, 0.01, 0.007, 0.042, 0.03);
-  box(steelMat, 0.005, 0.012, 0.01, -0.007, 0.042, 0.03);
-  box(woodMat, 0.050, 0.038, 0.22, 0, -0.012, -0.20);
-  box(steelMat, 0.008, 0.016, 0.014, 0.008, 0.036, 0.05, -0.3);
-  box(steelMat, 0.008, 0.016, 0.014, -0.008, 0.036, 0.05, -0.3);
-  box(steelMat, 0.006, 0.010, 0.05, 0, -0.045, 0.0);
-  box(woodMat, 0.036, 0.07, 0.07, 0, -0.04, 0.07);
-  box(woodMat, 0.040, 0.07, 0.30, 0, -0.025, 0.24, 0.12);
-  box(steelMat, 0.040, 0.075, 0.012, 0, -0.03, 0.395, 0.12);
-
-  const flash = createMuzzleFlash();
-  flash.position.set(0, 0.012, -0.64);
-  root.add(flash);
-  return { root, flash, applyReload() {} };
 }
 
 // ===== js/weapon/ImpactEffects.js =====
@@ -3455,10 +3641,13 @@ const SHOT_SOUNDS = {
   revolver: { dur: 0.3, f0: 5000, f1: 350, vol: 1.2, thump: 110, tf: 32, tv: 1.1, tail: 0.35, crack: 0.9 },
   cannon: { dur: 0.4, f0: 4500, f1: 250, vol: 1.5, thump: 90, tf: 28, tv: 1.4, tail: 0.5, crack: 1.0 },
   shotgun: { dur: 0.35, f0: 3500, f1: 250, vol: 1.5, thump: 100, tf: 30, tv: 1.3, tail: 0.5, crack: 0.7 },
+  lmg: { dur: 0.2, f0: 5500, f1: 450, vol: 1.05, thump: 130, tf: 38, tv: 1.0, tail: 0.28, crack: 0.8 },
+  m4: { dur: 0.2, f0: 6500, f1: 550, vol: 0.95, thump: 160, tf: 45, tv: 0.8, tail: 0.22, crack: 0.85 },
+  vector: { dur: 0.12, f0: 7500, f1: 900, vol: 0.7, thump: 190, tf: 70, tv: 0.45, tail: 0.1, crack: 0.9 },
+  rpk: { dur: 0.24, f0: 5200, f1: 420, vol: 1.15, thump: 125, tf: 36, tv: 1.05, tail: 0.3, crack: 0.85 },
+  dmr: { dur: 0.35, f0: 5800, f1: 350, vol: 1.35, thump: 130, tf: 34, tv: 1.1, tail: 0.6, crack: 1.1 },
+  auto12: { dur: 0.3, f0: 3800, f1: 280, vol: 1.3, thump: 105, tf: 32, tv: 1.2, tail: 0.4, crack: 0.7 },
   rifle: { dur: 0.5, f0: 5500, f1: 300, vol: 1.6, thump: 120, tf: 30, tv: 1.2, tail: 0.8, crack: 1.2 },
-  lmg: { dur: 0.24, f0: 5500, f1: 400, vol: 1.1, thump: 120, tf: 38, tv: 1.0, tail: 0.3, crack: 0.8 },
-  dmr: { dur: 0.3, f0: 5500, f1: 400, vol: 1.2, thump: 130, tf: 40, tv: 1.0, tail: 0.5, crack: 1.0 },
-  amr: { dur: 0.6, f0: 4500, f1: 200, vol: 1.9, thump: 80, tf: 24, tv: 1.6, tail: 1.0, crack: 1.3 },
 };
 
 /**
@@ -3571,6 +3760,14 @@ class WeaponAudio {
     const t = this.ctx.currentTime;
     this._click(t, 3200, 0.35);
     if (kill) this._click(t + 0.07, 1800, 0.45);
+  }
+
+  /** A grenade bouncing off something. */
+  clink(vol) {
+    if (!this._ready()) return;
+    const t = this.ctx.currentTime;
+    this._tone(t, 0.05, 1400 + Math.random() * 400, 900, 0.18 * vol);
+    this._click(t, 3000, 0.2 * vol);
   }
 
   /** Wave start / game over. */
@@ -3833,6 +4030,74 @@ const CANNON_SPEC = {
   kick: { z: 0.07, rot: 0.26 }, flashScale: 1.5, barrelChance: 0.5,
 };
 
+const LMG_SPEC = {
+  name: 'LMG M249', createModel: createLmg, sound: 'lmg', auto: true, interval: 60 / 750,
+  magSize: 100, reloadTactical: 5.2, reloadEmpty: 5.8, aimTime: 0.32, zoom: 0.22, range: 110,
+  hip: { x: 0.16, y: -0.20, z: -0.14, ry: 0.05 },
+  aimPose: { x: 0, y: -LMG_SIGHT.y, z: AIM_Z - LMG_SIGHT.z, ry: 0 },
+  sprintPose: { x: 0.10, y: -0.27, z: -0.10, rx: -0.4, ry: 0.7, rz: 0.2 },
+  spreadHip: [0.03, 0.022, 0.035, 0.02], spreadAds: [0.005, 0.004, 0.025, 0.006],
+  recoil: { pitch: 0.0035, pitchHeat: 0.004, yaw: 0.005, wave: 0.0015, heatPerShot: 0.05 },
+  kick: { z: 0.016, rot: 0.03 }, flashScale: 1.1, flashTime: 0.04, barrelChance: 0.06,
+  reloadPose: ak47ReloadPose,
+};
+
+const M4_SPEC = {
+  name: 'M4A1', createModel: createM4, sound: 'm4', auto: true, interval: 60 / 700,
+  magSize: 30, reloadTactical: 2.3, reloadEmpty: 2.9, aimTime: 0.2, zoom: 0.27, range: 120,
+  hip: { x: 0.15, y: -0.18, z: -0.12, ry: 0.05 },
+  aimPose: { x: 0, y: -M4_SIGHT.y, z: AIM_Z - M4_SIGHT.z, ry: 0 },
+  sprintPose: { x: 0.09, y: -0.25, z: -0.10, rx: -0.4, ry: 0.7, rz: 0.2 },
+  spreadHip: [0.019, 0.017, 0.03, 0.018], spreadAds: [0.002, 0.003, 0.02, 0.005],
+  recoil: { pitch: 0.0042, pitchHeat: 0.004, yaw: 0.003, wave: 0.001, heatPerShot: 0.08 },
+  kick: { z: 0.016, rot: 0.035 }, flashScale: 0.95, flashTime: 0.04, barrelChance: 0.07,
+  reloadPose: ak47ReloadPose,
+};
+const VECTOR_SPEC = {
+  name: 'VECTOR .45', createModel: createVector, sound: 'vector', auto: true, interval: 60 / 1100,
+  magSize: 25, reloadTactical: 1.9, reloadEmpty: 2.4, aimTime: 0.14, zoom: 0.18, range: 80,
+  hip: { x: 0.14, y: -0.17, z: -0.12, ry: 0.05 },
+  aimPose: { x: 0, y: -VECTOR_SIGHT.y, z: AIM_Z - VECTOR_SIGHT.z, ry: 0 },
+  sprintPose: { x: 0.09, y: -0.25, z: -0.10, rx: -0.4, ry: 0.7, rz: 0.2 },
+  spreadHip: [0.026, 0.016, 0.03, 0.017], spreadAds: [0.004, 0.003, 0.02, 0.005],
+  recoil: { pitch: 0.0026, pitchHeat: 0.0028, yaw: 0.0035, wave: 0.0012, heatPerShot: 0.06 },
+  kick: { z: 0.010, rot: 0.025 }, flashScale: 0.75, flashTime: 0.03, barrelChance: 0.05,
+  reloadPose: ak47ReloadPose,
+};
+const RPK_SPEC = {
+  name: 'RPK DRUM', createModel: createRpk, sound: 'rpk', auto: true, interval: 60 / 600,
+  magSize: 60, reloadTactical: 4.2, reloadEmpty: 4.8, aimTime: 0.3, zoom: 0.24, range: 120,
+  hip: { x: 0.16, y: -0.20, z: -0.14, ry: 0.05 },
+  aimPose: { x: 0, y: -RPK_SIGHT.y, z: AIM_Z - RPK_SIGHT.z, ry: 0 },
+  sprintPose: { x: 0.10, y: -0.27, z: -0.10, rx: -0.4, ry: 0.7, rz: 0.2 },
+  spreadHip: [0.028, 0.02, 0.035, 0.019], spreadAds: [0.003, 0.0035, 0.025, 0.006],
+  recoil: { pitch: 0.0058, pitchHeat: 0.005, yaw: 0.005, wave: 0.0014, heatPerShot: 0.07 },
+  kick: { z: 0.022, rot: 0.04 }, flashScale: 1.1, flashTime: 0.04, barrelChance: 0.08,
+  reloadPose: ak47ReloadPose,
+};
+const DMR_SPEC = {
+  name: 'DMR SVD', createModel: createDmr, sound: 'dmr', auto: false, interval: 0.42, scope: true,
+  magSize: 10, reloadTactical: 2.8, reloadEmpty: 3.3, aimTime: 0.27, zoom: 0.68, range: 220,
+  hip: { x: 0.14, y: -0.17, z: -0.10, ry: 0.04 },
+  aimPose: { x: 0, y: -RIFLE_SCOPE.y, z: -0.08 - RIFLE_SCOPE.z, ry: 0 },
+  sprintPose: { x: 0.09, y: -0.25, z: -0.10, rx: -0.4, ry: 0.7, rz: 0.2 },
+  spreadHip: [0.03, 0.02, 0.04, 0.02], spreadAds: [0.0006, 0.004, 0.03, 0.003],
+  recoil: { pitch: 0.03, pitchHeat: 0.006, yaw: 0.005, wave: 0, heatPerShot: 0.3 },
+  kick: { z: 0.05, rot: 0.14 }, flashScale: 1.3, flashTime: 0.05, barrelChance: 0.5,
+  reloadPose: ak47ReloadPose,
+};
+const AUTO12_SPEC = {
+  name: 'AUTO-12 DRUM', createModel: createAuto12, sound: 'auto12', auto: true, interval: 0.3,
+  pellets: 8, pelletSpread: 0.05, magSize: 10, reloadTactical: 3.2, reloadEmpty: 3.8, aimTime: 0.22, zoom: 0.2, range: 55,
+  hip: { x: 0.15, y: -0.18, z: -0.11, ry: 0.05 },
+  aimPose: { x: 0, y: -AUTO12_SIGHT.y, z: AIM_Z - AUTO12_SIGHT.z, ry: 0 },
+  sprintPose: { x: 0.09, y: -0.25, z: -0.10, rx: -0.4, ry: 0.7, rz: 0.2 },
+  spreadHip: [0.012, 0.012, 0.03, 0.01], spreadAds: [0.006, 0.004, 0.02, 0.004],
+  recoil: { pitch: 0.03, pitchHeat: 0.008, yaw: 0.008, wave: 0, heatPerShot: 0.3 },
+  kick: { z: 0.06, rot: 0.2 }, flashScale: 1.6, flashTime: 0.05, barrelChance: 0.1,
+  reloadPose: ak47ReloadPose,
+};
+
 /** Damage per bullet (per pellet for the shotgun); falloff: full damage up to `start`, `min` fraction from `end`. */
 Object.assign(AK47_SPEC, { damage: 20, falloff: { start: 25, end: 70, min: 0.6 } });
 Object.assign(SMG_SPEC, { damage: 14, falloff: { start: 15, end: 40, min: 0.55 } });
@@ -3842,166 +4107,31 @@ Object.assign(REVOLVER_SPEC, { damage: 45, falloff: { start: 30, end: 80, min: 0
 Object.assign(PISTOL_SPEC, { damage: 18, falloff: { start: 20, end: 50, min: 0.6 } });
 Object.assign(M1911_SPEC, { damage: 26, falloff: { start: 20, end: 50, min: 0.6 } });
 Object.assign(CANNON_SPEC, { damage: 60, falloff: { start: 25, end: 60, min: 0.7 } });
+Object.assign(LMG_SPEC, { damage: 11, falloff: { start: 25, end: 70, min: 0.6 } }); // lots of bullets, little damage each
+Object.assign(M4_SPEC, { damage: 17, falloff: { start: 28, end: 75, min: 0.6 } });
+Object.assign(VECTOR_SPEC, { damage: 11, falloff: { start: 12, end: 35, min: 0.5 } });
+Object.assign(RPK_SPEC, { damage: 18, falloff: { start: 30, end: 80, min: 0.6 } });
+Object.assign(DMR_SPEC, { damage: 55, headMul: 2, falloff: { start: 60, end: 160, min: 0.8 } });
+Object.assign(AUTO12_SPEC, { damage: 8, falloff: { start: 5, end: 22, min: 0.15 } });
 
-/** Slot order: 1 AK-47, 2 SMG, 3 shotgun, 4 hunting rifle, 5 revolver, 6-8 pistols. */
-// ---- Roster expansion: ids 9-19. The loadout menu picks 5 of the 19. ----
-Object.assign(AK47_SPEC, { cat: 'ASSAULT' });
-Object.assign(SMG_SPEC, { cat: 'SMG' });
-Object.assign(SHOTGUN_SPEC, { cat: 'SHOTGUN' });
-Object.assign(RIFLE_SPEC, { cat: 'SNIPER' });
-Object.assign(REVOLVER_SPEC, { cat: 'PISTOL' });
-Object.assign(PISTOL_SPEC, { cat: 'PISTOL' });
-Object.assign(M1911_SPEC, { cat: 'PISTOL' });
-Object.assign(CANNON_SPEC, { cat: 'PISTOL' });
+/** Slot order: 1 AK-47, 2 SMG, 3 shotgun, 4 hunting rifle, 5 revolver, 6-8 pistols, 9 LMG. */
+const WEAPON_SPECS = [AK47_SPEC, SMG_SPEC, SHOTGUN_SPEC, RIFLE_SPEC, REVOLVER_SPEC, PISTOL_SPEC, M1911_SPEC, CANNON_SPEC, LMG_SPEC,
+  M4_SPEC, VECTOR_SPEC, RPK_SPEC, DMR_SPEC, AUTO12_SPEC];
 
-const sightPose = (o) => ({ x: 0, y: -o.sightY, z: AIM_Z - (o.rearZ || 0), ry: 0 });
-const LONG_SPRINT = { x: 0.09, y: -0.25, z: -0.10, rx: -0.4, ry: 0.7, rz: 0.2 };
-const HIP_LONG = { x: 0.15, y: -0.18, z: -0.12, ry: 0.05 };
-const SCOPED_AIM = { x: 0, y: -RIFLE_SCOPE.y, z: -0.08 - RIFLE_SCOPE.z, ry: 0 };
-const SHOTGUN_AIM = { x: 0, y: -SHOTGUN_SIGHT.y, z: AIM_Z - SHOTGUN_SIGHT.z, ry: 0 };
-const DOUBLE_AIM = { x: 0, y: -DOUBLE_SIGHT.y, z: AIM_Z - DOUBLE_SIGHT.z, ry: 0 };
-
-const GUN_M4 = { recv: 0.26, barrel: 0.30, barrelR: 0.0095, guard: 0.22, brake: true, stock: 0.26, mag: 'straight', magH: 0.11, magZ: -0.14, sightY: 0.072 };
-const GUN_SAW = { recv: 0.30, barrel: 0.50, barrelR: 0.0115, brake: true, guard: 0.18, stock: 0.30, mag: 'belt', magZ: -0.13, sightY: 0.085, bipod: true };
-const GUN_HMG = { recv: 0.34, barrel: 0.56, barrelR: 0.0125, brake: true, guard: 0.22, wood: true, stock: 0.32, mag: 'belt', magZ: -0.14, sightY: 0.088, bipod: true };
-const GUN_RUSH = { recv: 0.20, barrel: 0.10, shroud: 0.019, shroudLen: 0.20, stock: 0.14, stockType: 'wire', mag: 'straight', magH: 0.15, magZ: -0.09, sightY: 0.060 };
-const GUN_DRUM = { recv: 0.24, barrel: 0.12, shroud: 0.02, shroudLen: 0.22, stock: 0.20, stockType: 'wire', mag: 'drum', magZ: -0.10, sightY: 0.064 };
-const SNIPER_DMR = { barrel: 0.46, barrelR: 0.0100, fore: 0.28, mag: true, brake: true, thick: 0.040, scopeLen: 0.22, bolt: false };
-const SNIPER_AMR = { barrel: 0.72, barrelR: 0.0135, fore: 0.34, brake: true, bipod: true, thick: 0.046, scopeLen: 0.30, scopeR: 0.022, bolt: true };
-const PISTOL_TAC = { len: 0.20, width: 0.028, height: 0.034, frameH: 0.024, gripH: 0.098, gripD: 0.040, wood: false };
-const MACHINE_PISTOL = { len: 0.17, width: 0.030, height: 0.036, frameH: 0.026, gripH: 0.09, gripD: 0.042, wood: false, magH: 0.10 };
-
-const M4_SPEC = {
-  name: 'M4 CARBINE', cat: 'ASSAULT', createModel: () => createLongGun(GUN_M4), sound: 'ak', auto: true, interval: 60 / 750,
-  magSize: 30, reloadTactical: 2.1, reloadEmpty: 2.7, aimTime: 0.18, zoom: 0.26, range: 120,
-  hip: HIP_LONG, aimPose: sightPose(GUN_M4), sprintPose: LONG_SPRINT,
-  spreadHip: [0.02, 0.016, 0.03, 0.018], spreadAds: [0.002, 0.003, 0.02, 0.005],
-  recoil: { pitch: 0.0036, pitchHeat: 0.004, yaw: 0.003, wave: 0.001, heatPerShot: 0.08 },
-  kick: { z: 0.016, rot: 0.035 }, flashScale: 0.9, flashTime: 0.04, barrelChance: 0.07,
-  reloadPose: ak47ReloadPose, damage: 22, falloff: { start: 28, end: 75, min: 0.6 },
-};
-
-const SAW_SPEC = {
-  name: 'LMG SAW', cat: 'LMG', createModel: () => createLongGun(GUN_SAW), sound: 'lmg', auto: true, interval: 60 / 800,
-  magSize: 100, reloadTactical: 5.0, reloadEmpty: 5.6, aimTime: 0.32, zoom: 0.22, range: 110, moveMul: 0.88,
-  hip: { x: 0.15, y: -0.20, z: -0.14, ry: 0.05 }, aimPose: sightPose(GUN_SAW), sprintPose: LONG_SPRINT,
-  spreadHip: [0.03, 0.02, 0.035, 0.03], spreadAds: [0.003, 0.004, 0.02, 0.01],
-  recoil: { pitch: 0.0042, pitchHeat: 0.006, yaw: 0.0045, wave: 0.0015, heatPerShot: 0.05 },
-  kick: { z: 0.02, rot: 0.05 }, flashScale: 1.1, flashTime: 0.04, barrelChance: 0.09,
-  reloadPose: ak47ReloadPose, damage: 19, falloff: { start: 30, end: 80, min: 0.6 },
-};
-
-const HMG_SPEC = {
-  name: 'LMG HEAVY', cat: 'LMG', createModel: () => createLongGun(GUN_HMG), sound: 'lmg', auto: true, interval: 60 / 560,
-  magSize: 75, reloadTactical: 5.6, reloadEmpty: 6.2, aimTime: 0.34, zoom: 0.22, range: 130, moveMul: 0.85,
-  hip: { x: 0.15, y: -0.20, z: -0.14, ry: 0.05 }, aimPose: sightPose(GUN_HMG), sprintPose: LONG_SPRINT,
-  spreadHip: [0.032, 0.02, 0.04, 0.03], spreadAds: [0.0035, 0.004, 0.02, 0.012],
-  recoil: { pitch: 0.007, pitchHeat: 0.008, yaw: 0.006, wave: 0.002, heatPerShot: 0.06 },
-  kick: { z: 0.03, rot: 0.07 }, flashScale: 1.3, flashTime: 0.045, barrelChance: 0.15,
-  reloadPose: ak47ReloadPose, damage: 30, falloff: { start: 35, end: 90, min: 0.65 },
-};
-
-const RUSH_SPEC = {
-  name: 'SMG RUSH', cat: 'SMG', createModel: () => createLongGun(GUN_RUSH), sound: 'smg', auto: true, interval: 60 / 1000,
-  magSize: 30, reloadTactical: 1.9, reloadEmpty: 2.4, aimTime: 0.14, zoom: 0.2, range: 80, moveMul: 1.05,
-  hip: { x: 0.14, y: -0.17, z: -0.12, ry: 0.05 }, aimPose: sightPose(GUN_RUSH), sprintPose: LONG_SPRINT,
-  spreadHip: [0.024, 0.016, 0.03, 0.015], spreadAds: [0.003, 0.003, 0.02, 0.005],
-  recoil: { pitch: 0.0026, pitchHeat: 0.003, yaw: 0.0028, wave: 0.001, heatPerShot: 0.06 },
-  kick: { z: 0.01, rot: 0.025 }, flashScale: 0.75, flashTime: 0.03, barrelChance: 0.05,
-  reloadPose: ak47ReloadPose, damage: 10, falloff: { start: 12, end: 35, min: 0.5 },
-};
-
-const DRUM_SPEC = {
-  name: 'SMG .45 DRUM', cat: 'SMG', createModel: () => createLongGun(GUN_DRUM), sound: 'smg', auto: true, interval: 60 / 750,
-  magSize: 50, reloadTactical: 3.0, reloadEmpty: 3.5, aimTime: 0.17, zoom: 0.22, range: 90,
-  hip: { x: 0.14, y: -0.18, z: -0.12, ry: 0.05 }, aimPose: sightPose(GUN_DRUM), sprintPose: LONG_SPRINT,
-  spreadHip: [0.024, 0.016, 0.03, 0.018], spreadAds: [0.003, 0.003, 0.02, 0.006],
-  recoil: { pitch: 0.0045, pitchHeat: 0.004, yaw: 0.004, wave: 0.001, heatPerShot: 0.07 },
-  kick: { z: 0.014, rot: 0.035 }, flashScale: 0.9, flashTime: 0.035, barrelChance: 0.08,
-  reloadPose: ak47ReloadPose, damage: 16, falloff: { start: 15, end: 42, min: 0.55 },
-};
-
-const DMR_SPEC = {
-  name: 'SNIPER DMR', cat: 'SNIPER', createModel: () => createSniper(SNIPER_DMR), sound: 'dmr', auto: false, interval: 0.32,
-  scope: true, magSize: 10, reloadTactical: 2.6, reloadEmpty: 3.1, aimTime: 0.26, zoom: 0.7, range: 220, moveMul: 0.95,
-  hip: { x: 0.14, y: -0.17, z: -0.10, ry: 0.04 }, aimPose: SCOPED_AIM, sprintPose: LONG_SPRINT,
-  spreadHip: [0.03, 0.02, 0.04, 0.02], spreadAds: [0.0008, 0.004, 0.03, 0.003],
-  recoil: { pitch: 0.022, pitchHeat: 0.006, yaw: 0.004, wave: 0, heatPerShot: 0.3 },
-  kick: { z: 0.05, rot: 0.14 }, flashScale: 1.2, flashTime: 0.05, barrelChance: 0.5,
-  reloadPose: ak47ReloadPose, damage: 52, headMul: 2,
-};
-
-const AMR_SPEC = {
-  name: 'SNIPER .50 AMR', cat: 'SNIPER', createModel: () => createSniper(SNIPER_AMR), sound: 'amr', auto: false, interval: 1.5,
-  scope: true, magSize: 5, reloadTactical: 3.8, reloadEmpty: 3.8, aimTime: 0.36, zoom: 0.85, range: 320, moveMul: 0.88,
-  hip: { x: 0.14, y: -0.17, z: -0.10, ry: 0.04 }, aimPose: SCOPED_AIM, sprintPose: LONG_SPRINT,
-  spreadHip: [0.035, 0.02, 0.045, 0.02], spreadAds: [0.0003, 0.005, 0.03, 0.002],
-  recoil: { pitch: 0.075, pitchHeat: 0, yaw: 0.008, wave: 0, heatPerShot: 0.6 },
-  kick: { z: 0.10, rot: 0.30 }, flashScale: 2.0, flashTime: 0.06, barrelChance: 1,
-  reloadPose: rifleReloadPose, damage: 150, headMul: 2,
-};
-
-const AUTO_SG_SPEC = {
-  name: 'SHOTGUN AUTO', cat: 'SHOTGUN', createModel: createAutoShotgun, sound: 'shotgun', auto: false, interval: 0.28,
-  pellets: 8, pelletSpread: 0.05, magSize: 8, shellTime: 0.4, reloadTactical: 0, reloadEmpty: 0,
-  aimTime: 0.2, zoom: 0.2, range: 55,
-  hip: { x: 0.15, y: -0.18, z: -0.10, ry: 0.05 }, aimPose: SHOTGUN_AIM, sprintPose: LONG_SPRINT,
-  spreadHip: [0.012, 0.012, 0.03, 0.012], spreadAds: [0.006, 0.004, 0.02, 0.005],
-  recoil: { pitch: 0.03, pitchHeat: 0.01, yaw: 0.008, wave: 0, heatPerShot: 0.25 },
-  kick: { z: 0.05, rot: 0.18 }, flashScale: 1.6, flashTime: 0.05, barrelChance: 0.1,
-  reloadPose: shotgunReloadPose, damage: 9, falloff: { start: 6, end: 24, min: 0.15 },
-};
-
-const DOUBLE_SG_SPEC = {
-  name: 'SHOTGUN DOUBLE', cat: 'SHOTGUN', createModel: createDoubleBarrel, sound: 'shotgun', auto: false, interval: 0.18,
-  pellets: 10, pelletSpread: 0.055, magSize: 2, shellTime: 0.7, reloadTactical: 0, reloadEmpty: 0,
-  aimTime: 0.18, zoom: 0.18, range: 50,
-  hip: { x: 0.15, y: -0.18, z: -0.10, ry: 0.05 }, aimPose: DOUBLE_AIM, sprintPose: LONG_SPRINT,
-  spreadHip: [0.01, 0.012, 0.03, 0.01], spreadAds: [0.005, 0.004, 0.02, 0.004],
-  recoil: { pitch: 0.06, pitchHeat: 0.01, yaw: 0.012, wave: 0, heatPerShot: 0.5 },
-  kick: { z: 0.09, rot: 0.32 }, flashScale: 2.0, flashTime: 0.06, barrelChance: 0.15,
-  reloadPose: shotgunReloadPose, damage: 12, falloff: { start: 5, end: 22, min: 0.12 },
-};
-
-const TAC_SPEC = {
-  ...pistolBase, name: 'PISTOL TAC .40', cat: 'PISTOL', createModel: () => createPistol(PISTOL_TAC), sound: 'pistol',
-  interval: 0.1, magSize: 12, reloadTactical: 1.7, reloadEmpty: 2.1, aimTime: 0.12, aimPose: pistolPose(PISTOL_TAC),
-  spreadHip: [0.014, 0.014, 0.03, 0.02], spreadAds: [0.0015, 0.002, 0.02, 0.004],
-  recoil: { pitch: 0.012, pitchHeat: 0.006, yaw: 0.004, wave: 0, heatPerShot: 0.2 },
-  kick: { z: 0.035, rot: 0.1 }, flashScale: 0.8, barrelChance: 0.12,
-  damage: 24, falloff: { start: 22, end: 55, min: 0.65 },
-};
-
-const MACHINE_PISTOL_SPEC = {
-  ...pistolBase, name: 'MACHINE PISTOL', cat: 'PISTOL', createModel: () => createPistol(MACHINE_PISTOL), sound: 'pistol',
-  auto: true, interval: 60 / 900, magSize: 20, reloadTactical: 1.9, reloadEmpty: 2.3, aimTime: 0.12,
-  aimPose: pistolPose(MACHINE_PISTOL),
-  spreadHip: [0.022, 0.016, 0.03, 0.025], spreadAds: [0.0035, 0.003, 0.02, 0.006],
-  recoil: { pitch: 0.006, pitchHeat: 0.005, yaw: 0.005, wave: 0.001, heatPerShot: 0.1 },
-  kick: { z: 0.02, rot: 0.05 }, flashScale: 0.65, barrelChance: 0.06,
-  damage: 11, falloff: { start: 12, end: 35, min: 0.5 },
-};
-
-const WEAPON_SPECS = [
-  AK47_SPEC, SMG_SPEC, SHOTGUN_SPEC, RIFLE_SPEC, REVOLVER_SPEC, PISTOL_SPEC, M1911_SPEC, CANNON_SPEC,
-  M4_SPEC, SAW_SPEC, HMG_SPEC, RUSH_SPEC, DRUM_SPEC, DMR_SPEC, AMR_SPEC, AUTO_SG_SPEC, DOUBLE_SG_SPEC,
-  TAC_SPEC, MACHINE_PISTOL_SPEC,
+/** Loadout classes: weapon ids (1 + index in WEAPON_SPECS). Slots 1 and 2 take any class except sidearms. */
+const WEAPON_CLASSES = [
+  { id: 'ar', name: 'ASSAULT RIFLES', short: 'AR', ids: [1, 10] },
+  { id: 'smg', name: 'SMGS', short: 'SMG', ids: [2, 11] },
+  { id: 'lmg', name: 'LMGS', short: 'LMG', ids: [9, 12] },
+  { id: 'sniper', name: 'SNIPERS', short: 'SNIPER', ids: [4, 13] },
+  { id: 'shotgun', name: 'SHOTGUNS', short: 'SHOTGUN', ids: [3, 14] },
+  { id: 'pistol', name: 'SIDEARMS', short: 'SIDEARM', ids: [6, 7, 5, 8] },
 ];
-
-/** Categories in menu order, and the length of the gun shown in the other player's hands. */
-const LOADOUT_CATS = ['ASSAULT', 'LMG', 'SMG', 'SNIPER', 'SHOTGUN', 'PISTOL'];
-const REMOTE_LEN = { ASSAULT: 1, LMG: 1.25, SMG: 0.8, SNIPER: 1.5, SHOTGUN: 1.2, PISTOL: 0.5 };
-
-/** One line of stats for the loadout menu. */
-function weaponStats(spec) {
-  const pel = spec.pellets || 1;
-  const dmg = Math.round(spec.damage * pel);
-  const rpm = Math.round(60 / spec.interval);
-  return 'DMG ' + dmg + (pel > 1 ? ' (' + pel + 'x' + spec.damage + ')' : '') + ' \u00b7 ' + rpm + ' RPM \u00b7 MAG ' + spec.magSize;
-}
+const DEFAULT_LOADOUT = [1, 2, 6]; // primary, secondary, sidearm
+const LOADOUT_SLOTS = ['PRIMARY', 'SECONDARY', 'SIDEARM'];
 
 // ===== js/net/Net.js =====
-const PEER_PREFIX = 'retrofps-m8-';
+const PEER_PREFIX = 'retrofps-m7-';
 const PEERJS_URLS = [
   'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js',
@@ -4042,6 +4172,7 @@ class Net {
     this.status = 'offline';
     this.mode = null; // 'ws' | 'host' | 'guest'
     this.roomMode = 'pvp'; // 'pvp' | 'coop'
+    this.mapSize = 'middle'; // 'small' | 'middle' | 'large', chosen by the host
     this.code = ''; // match code (peer-to-peer)
     this.error = ''; // reason for the last 'error' status
     this.id = 0; // my player id (1 = host) once welcomed
@@ -4074,9 +4205,10 @@ class Net {
 
   // --- Peer-to-peer --------------------------------------------------------
 
-  async host(roomMode) {
+  async host(roomMode, mapSize) {
     this.disconnect();
     this.mode = 'host';
+    this.mapSize = mapSize || 'middle';
     this.roomMode = roomMode === 'coop' ? 'coop' : 'pvp';
     this._set('connecting');
     const Peer = await loadPeerJs();
@@ -4091,7 +4223,7 @@ class Net {
       peer.on('open', () => {
         if (this._peerObj !== peer) return;
         this.code = code;
-        this._receive({ t: 'welcome', id: 1, players: [], mode: this.roomMode, s: this.score.slice() });
+        this._receive({ t: 'welcome', id: 1, players: [], mode: this.roomMode, map: this.mapSize, s: this.score.slice() });
       });
       peer.on('connection', (conn) => {
         conn.on('open', () => {
@@ -4108,7 +4240,7 @@ class Net {
           if (this.roomMode === 'pvp') this.score = [0, 0];
           const others = [1];
           for (const g of this._guests.keys()) if (g !== id) others.push(g);
-          conn.send({ t: 'welcome', id, players: others, peer: true, mode: this.roomMode, s: this.score.slice() });
+          conn.send({ t: 'welcome', id, players: others, peer: true, mode: this.roomMode, map: this.mapSize, s: this.score.slice() });
           this._broadcast({ t: 'peer', present: true, id }, id);
           this._receive({ t: 'peer', present: true, id });
           if (this.roomMode === 'pvp') this._receive({ t: 'score', s: this.score.slice(), victim: 0, killer: 0, quiet: 1 });
@@ -4194,7 +4326,9 @@ class Net {
         }
         break;
       }
-      case 'zhit': // a guest hit a zombie: only the host needs it
+      case 'zhit': // a guest hit a zombie, bought something or placed a mine: only the host needs it
+      case 'zbuy':
+      case 'zmine':
         if (from !== 1) this._receive(msg);
         break;
       default:
@@ -4291,6 +4425,7 @@ class Net {
       clearTimeout(this._joinTimer);
       this.id = m.id;
       this.roomMode = m.mode === 'coop' ? 'coop' : 'pvp';
+      this.mapSize = MAP_SIZES.includes(m.map) ? m.map : 'middle';
       this.players = new Set(Array.isArray(m.players) ? m.players.filter((p) => p !== m.id) : (m.peer ? [m.id === 1 ? 2 : 1] : []));
       this.score = m.s || [0, 0];
       this._set('connected');
@@ -4388,7 +4523,12 @@ class RemotePlayer {
     this.pivot.position.set(0, 1.3, 0);
     this.torso.add(this.pivot);
     box(0.12, 0.12, 0.5, skin, 0.22, -0.05, -0.3, this.pivot);
-    this.gun = box(0.08, 0.1, 0.6, metal, 0.2, 0, -0.45, this.pivot);
+    // The real weapon model of whatever they hold, made on first use.
+    this.gunPivot = new THREE.Group();
+    this.gunPivot.position.set(0.2, -0.045, -0.15);
+    this.pivot.add(this.gunPivot);
+    this.gunModels = new Map();
+    this._gunShown = 0;
     this.muzzle = new THREE.PointLight(0xffc060, 0, 6);
     this.muzzle.position.set(0.2, 0, -0.85);
     this.pivot.add(this.muzzle);
@@ -4445,8 +4585,28 @@ class RemotePlayer {
     this.pivot.rotation.x = this.pitch;
     this.flash = Math.max(0, this.flash - dt * 20);
     this.muzzle.intensity = this.flash * 2.5;
-    const sp = WEAPON_SPECS[this.slot - 1];
-    this.gun.scale.set(1, 1, (sp && REMOTE_LEN[sp.cat]) || 1);
+    this._showGun(this.slot);
+    const gm = this.gunModels.get(this._gunShown);
+    if (gm) gm.flash.visible = this.flash > 0.45;
+  }
+
+  /** Show the model for weapon id `id` (index into WEAPON_SPECS + 1) in their hands. */
+  _showGun(id) {
+    if (id === this._gunShown) return;
+    const spec = WEAPON_SPECS[id - 1];
+    if (!spec) return;
+    let m = this.gunModels.get(id);
+    if (!m) {
+      m = spec.createModel();
+      m.root.rotation.y = 0;
+      m.flash.visible = false;
+      this.gunPivot.add(m.root);
+      this.gunModels.set(id, m);
+    }
+    const old = this.gunModels.get(this._gunShown);
+    if (old) { old.root.visible = false; old.flash.visible = false; }
+    m.root.visible = true;
+    this._gunShown = id;
   }
 
   /** The other player fired: muzzle light. */
@@ -4539,7 +4699,6 @@ class Weapon {
     this.scopeEase = 0; // scope overlay amount (scoped weapons only)
     this.shellClock = 0;
     this.slot = 0;
-    this.hudSlot = 0; // position in the loadout (1-5), 0 = not in it
     this.sprintBlend = 0;
     this.spread = 0;
     this.crosshairNdc = 0;
@@ -4602,7 +4761,7 @@ class Weapon {
       this.reloadTime += dt;
       if (spec.shellTime) {
         // Shells go in one at a time.
-        this.shellClock += dt;
+        this.shellClock += dt * (this.player.reloadMul || 1);
         while (this.shellClock >= spec.shellTime && this.ammo < this.magSize) {
           this.shellClock -= spec.shellTime;
           this.ammo++;
@@ -4656,7 +4815,7 @@ class Weapon {
     }
     p.lookScale = 1 - spec.zoom * aimE;
     p.aimEase = aimE;
-    p.speedScale = (1 - 0.3 * aimE) * (spec.moveMul || 1);
+    p.speedScale = 1 - 0.3 * aimE;
 
     // Spread (radians): worse when moving, airborne or after sustained fire; better crouched.
     const speed = Math.hypot(p.vx, p.vz) / p.sprintSpeed;
@@ -4757,7 +4916,7 @@ class Weapon {
     const f = spec.falloff;
     let mul = 1;
     if (f && dist > f.start) mul = Math.max(f.min, 1 - ((1 - f.min) * (dist - f.start)) / (f.end - f.start));
-    return (spec.damage || 0) * mul;
+    return (spec.damage || 0) * mul * (this.player.damageMul || 1);
   }
 
   _startReload() {
@@ -4765,7 +4924,7 @@ class Weapon {
     this.reloading = true;
     this.reloadTime = 0;
     this.reloadEmpty = this.ammo === 0;
-    this.reloadDuration = this.reloadEmpty ? spec.reloadEmpty : spec.reloadTactical;
+    this.reloadDuration = (this.reloadEmpty ? spec.reloadEmpty : spec.reloadTactical) / (this.player.reloadMul || 1);
     this.shellClock = -0.2;
     if (!spec.shellTime) this.audio.reload(this.reloadDuration, this.reloadEmpty, spec.sound);
   }
@@ -4869,8 +5028,8 @@ const RAISE_TIME = 0.25; // seconds to bring up the next one
 
 /**
  * Owns the weapons plus the effects and audio they share.
- * Slots: 1 AK-47, 2 SMG, 3 shotgun, 4 hunting rifle, 5 revolver, 6-8 pistols.
- * Number keys pick a slot, the mouse wheel cycles, Q returns to the previous weapon.
+ * `all` holds every weapon (index = id - 1); `weapons` is the current loadout:
+ * keys 1-3 pick primary, secondary or sidearm, the mouse wheel cycles, Q returns to the previous one.
  */
 class WeaponManager {
   constructor({ engine, input, player, collision, settings, onHit, targets, onShoot, onTargetHit, onEnemyHit }) {
@@ -4879,48 +5038,47 @@ class WeaponManager {
     this.audio = new WeaponAudio();
 
     const deps = { engine, input, player, collision, settings, effects: this.effects, audio: this.audio, onHit, targets, onShoot, onTargetHit, onEnemyHit };
-    this.weapons = WEAPON_SPECS
-      .map((spec, i) => {
-        const weapon = new Weapon({ ...deps, spec });
-        weapon.slot = i + 1;
-        return weapon;
-      });
+    this.all = WEAPON_SPECS.map((spec, i) => {
+      const weapon = new Weapon({ ...deps, spec });
+      weapon.slot = i + 1; // weapon id, also sent over the network
+      weapon.loadoutSlot = 0;
+      return weapon;
+    });
+    this.loadout = DEFAULT_LOADOUT.slice();
+    this.weapons = [];
     this.previous = 1;
     this.index = 0;
     this.target = 0;
-    this.loadout = [0, 1, 2, 3, 4]; // roster indices in slots 1-5
     this.state = 'idle'; // 'idle' | 'lowering' | 'raising'
-    this.weapons[0].model.root.visible = true;
     this.setLoadout(this.loadout);
   }
 
-  /** Choose the 5 carried weapons (roster indices). Equips slot 1 at once with full ammo. */
+  /** Choose the three weapons (ids). Switches to the first one. */
   setLoadout(ids) {
-    const seen = new Set();
     const valid = [];
-    for (const i of ids) {
-      if (Number.isInteger(i) && i >= 0 && i < this.weapons.length && !seen.has(i)) { seen.add(i); valid.push(i); }
+    for (let k = 0; k < 3; k++) {
+      const id = ids && ids[k];
+      valid.push(this.all[id - 1] ? id : DEFAULT_LOADOUT[k]);
     }
-    if (valid.length === 0) return;
-    this.loadout = valid.slice(0, 5);
-    for (const w of this.weapons) w.hudSlot = 0;
-    this.loadout.forEach((id, pos) => { this.weapons[id].hudSlot = pos + 1; });
-    const cur = this.active;
-    cur.cancelReload();
-    cur.model.root.visible = false;
-    this.index = this.loadout[0];
+    if (valid[0] === valid[1]) valid[1] = DEFAULT_LOADOUT[1] === valid[0] ? DEFAULT_LOADOUT[0] : DEFAULT_LOADOUT[1];
+    const current = this.weapons[this.index];
+    for (const w of this.all) { w.model.root.visible = false; w.loadoutSlot = 0; w.cancelReload(); }
+    this.loadout = valid;
+    this.weapons = valid.map((id) => this.all[id - 1]);
+    this.weapons.forEach((w, k) => { w.loadoutSlot = k + 1; });
+    // Keep the weapon in hand if it is still in the loadout.
+    const keep = current ? this.weapons.indexOf(current) : -1;
+    this.index = keep >= 0 ? keep : 0;
     this.target = this.index;
-    this.previous = this.loadout.length > 1 ? this.loadout[1] : this.index;
+    this.previous = this.index === 0 ? 1 : 0;
     this.state = 'idle';
-    const next = this.active;
-    next.raise = 1;
-    next.model.root.visible = true;
-    this.refill();
+    this.active.raise = 1;
+    this.active.model.root.visible = true;
   }
 
   /** Full ammo for every weapon (on respawn). */
   refill() {
-    for (const w of this.weapons) {
+    for (const w of this.all) {
       w.ammo = w.magSize;
       w.reloading = false;
       w.heat = 0;
@@ -4945,12 +5103,12 @@ class WeaponManager {
     const slot = this.input.consumeSlot();
     const wheel = this.input.consumeWheel();
     if ((slot || wheel) && this.state === 'idle' && this.active.throwTimer <= 0) {
-      const n = this.loadout.length;
+      const n = this.weapons.length;
       let next = this.index;
       if (slot === -1) next = this.previous;
-      else if (slot) next = slot <= n ? this.loadout[slot - 1] : this.index;
-      else next = this.loadout[(Math.max(0, this.loadout.indexOf(this.index)) + wheel + n) % n];
-      if (next !== this.index && next >= 0 && next < this.weapons.length) {
+      else if (slot) next = slot - 1;
+      else next = (this.index + wheel + n) % n;
+      if (next !== this.index && next >= 0 && next < n) {
         this.previous = this.index;
         this.target = next;
         this.state = 'lowering';
@@ -5180,10 +5338,13 @@ const GR_RELEASE = 0.18; // seconds into the animation when the grenade leaves t
 const GR_SPEED = 17; // m/s
 const GR_GRAVITY = 18;
 const GR_RADIUS = 0.06;
-const GR_MAX_FLIGHT = 8; // seconds; explodes in mid-air if it never hits anything
+const GR_MAX_FLIGHT = 2.6; // seconds of fuse: it bounces around, then goes off
+const GR_BOUNCE = 0.5; // how much speed a bounce keeps
+const GR_FRICTION = 0.7; // sideways speed kept on a bounce
 
 /**
- * Grenades: E throws one that explodes on impact, 5 s cooldown.
+ * Grenades: E throws one that bounces off walls and floors and explodes when
+ * the fuse runs out (or at once when it hits an enemy), 5 s cooldown.
  * There are two grenade slots: mine and the other player's. A throw is sent
  * to the other player (onThrow), whose game flies an identical grenade
  * through the same static level, so both see it explode in the same place.
@@ -5273,6 +5434,8 @@ class GrenadeSystem {
     g.x = x; g.y = y; g.z = z;
     g.vx = vx; g.vy = vy; g.vz = vz;
     g.life = GR_MAX_FLIGHT;
+    g.resting = false;
+    g.spin = 1;
     g.mesh.position.set(x, y, z);
     g.mesh.visible = true;
   }
@@ -5280,6 +5443,13 @@ class GrenadeSystem {
   _fly(g, dt) {
     if (!g.active) return;
     g.life -= dt;
+    if (g.life <= 0) {
+      // Fuse over. A grenade lying on the floor leaves a scorch mark.
+      if (g.resting) this._explode(g, g.x, g.y + 0.15, g.z, g.x, g.y - GR_RADIUS, g.z, 0, 1, 0);
+      else this._explode(g, g.x, g.y, g.z, 0, 0, 0, 0, 0, 0);
+      return;
+    }
+    if (g.resting) return;
     g.vy -= GR_GRAVITY * dt;
 
     const sx = g.vx * dt, sy = g.vy * dt, sz = g.vz * dt;
@@ -5287,20 +5457,37 @@ class GrenadeSystem {
     if (len > 1e-6) {
       const hit = this._hit;
       if (this.collision.raycast(g.x, g.y, g.z, sx / len, sy / len, sz / len, len + GR_RADIUS, hit)) {
-        // Explodes on impact, slightly off the surface so the fireball is not buried in it.
-        this._explode(g, hit.x + hit.nx * 0.15, hit.y + hit.ny * 0.15, hit.z + hit.nz * 0.15,
-          hit.x, hit.y, hit.z, hit.nx, hit.ny, hit.nz);
+        if (hit.box && hit.box.enemy) {
+          // Straight into a soldier or zombie: goes off on contact.
+          this._explode(g, hit.x + hit.nx * 0.15, hit.y + hit.ny * 0.15, hit.z + hit.nz * 0.15, 0, 0, 0, 0, 0, 0);
+          return;
+        }
+        // Bounce: back to just in front of the surface, then reflect.
+        g.x = hit.x + hit.nx * (GR_RADIUS + 0.01);
+        g.y = hit.y + hit.ny * (GR_RADIUS + 0.01);
+        g.z = hit.z + hit.nz * (GR_RADIUS + 0.01);
+        const vn = g.vx * hit.nx + g.vy * hit.ny + g.vz * hit.nz;
+        if (vn < 0) {
+          const tx = g.vx - vn * hit.nx, ty = g.vy - vn * hit.ny, tz = g.vz - vn * hit.nz; // along the surface
+          g.vx = tx * GR_FRICTION - vn * GR_BOUNCE * hit.nx;
+          g.vy = ty * GR_FRICTION - vn * GR_BOUNCE * hit.ny;
+          g.vz = tz * GR_FRICTION - vn * GR_BOUNCE * hit.nz;
+          if (-vn > 1.5) this.audio.clink(Math.min(1, -vn / 12));
+        }
+        g.spin = 0.5;
+        if (hit.ny > 0.7 && Math.hypot(g.vx, g.vy, g.vz) < 1.6) {
+          g.vx = g.vy = g.vz = 0;
+          g.resting = true;
+        }
+        g.mesh.position.set(g.x, g.y, g.z);
         return;
       }
     }
     g.x += sx; g.y += sy; g.z += sz;
-    if (g.life <= 0) {
-      this._explode(g, g.x, g.y, g.z, 0, 0, 0, 0, 0, 0);
-      return;
-    }
     g.mesh.position.set(g.x, g.y, g.z);
-    g.mesh.rotation.x += dt * 9;
-    g.mesh.rotation.z += dt * 6;
+    g.spin = Math.min(1, (g.spin || 1) + dt * 2);
+    g.mesh.rotation.x += dt * 9 * g.spin;
+    g.mesh.rotation.z += dt * 6 * g.spin;
   }
 
   _explode(g, x, y, z, hx, hy, hz, nx, ny, nz) {
@@ -5317,30 +5504,51 @@ const DOOR_H = 3.0; // doorway height
 // World size (metres) covered by one texture repeat.
 const TILE = { concrete: 3, floor: 3, panel: 3, ceiling: 3, crate: 1, hazard: 1, lamp: 1 };
 
+/** Which rooms exist for each map size. 'plug*' rooms are wall pieces that close a doorway to a room that is not there. */
+const ROOMS_BY_SIZE = {
+  small: ['hall', 'east', 'pump', 'plugWest', 'plugNorth', 'plugPumpEast', 'plugGarage'],
+  middle: ['hall', 'east', 'pump', 'warehouse', 'corridor', 'control', 'plugPumpEast', 'plugBoiler', 'plugGarage'],
+  large: ['hall', 'east', 'pump', 'warehouse', 'corridor', 'control', 'dock', 'boiler', 'garage'],
+};
+const MAP_SIZES = ['small', 'middle', 'large'];
+
+/** Respawn points: { x, y, z, yaw, room }. */
+const ALL_SPAWNS = [
+  { x: 0, y: 0, z: 7.5, yaw: 0, room: 'hall' }, { x: -22, y: 0, z: 0, yaw: -Math.PI / 2, room: 'warehouse' },
+  { x: 31, y: 0, z: 0, yaw: Math.PI / 2, room: 'pump' }, { x: 0, y: 0, z: -27, yaw: 0, room: 'corridor' },
+  { x: -3, y: 0, z: -33, yaw: 0, room: 'control' }, { x: 13, y: 0, z: 4, yaw: -Math.PI / 2, room: 'east' },
+  { x: 52, y: 0, z: 0, yaw: Math.PI / 2, room: 'dock' }, { x: -48, y: 0, z: 0, yaw: -Math.PI / 2, room: 'boiler' },
+  { x: 17, y: 0, z: 20, yaw: 0, room: 'garage' },
+];
+/** Medkit spots, by room. */
+const ALL_PICKUPS = [
+  { x: 9, y: 0, z: -9, room: 'hall' }, { x: -18, y: 0, z: 0, room: 'warehouse' }, { x: 0, y: 0, z: -28, room: 'corridor' },
+  { x: 0, y: 1.8, z: -47, room: 'control' }, { x: 13, y: 0, z: 4, room: 'east' }, { x: 31, y: 0, z: 2, room: 'pump' },
+  { x: -33, y: 2.4, z: -11.5, room: 'warehouse' }, { x: 62, y: 1.2, z: 0, room: 'dock' },
+  { x: -61, y: 1.2, z: 0, room: 'boiler' }, { x: 17, y: 0, z: 30, room: 'garage' },
+];
+
 /**
- * The static test level: a main hall with pillars, crates and a dais, a low
- * corridor with cover to hop over, and a side room with stairs, a platform
- * and a low beam. All geometry is axis-aligned boxes; every solid is also a
- * collision box.
+ * The static level: a main hall with pillars, crates and a dais in the middle,
+ * and up to eight more areas around it. Every area is its own group, so the
+ * map can be small, middle or large (setSize). All geometry is axis-aligned
+ * boxes; every solid is also a collision box.
  */
 class World {
-  constructor(scene) {
+  constructor(scene, size) {
     this.scene = scene;
     this.collision = new CollisionWorld();
+    this.size = 'middle';
+    this.rooms = {}; // name -> { group, boxes, barrels }
+    this.activeRooms = new Set();
+    this._room = null;
     this.spawn = { x: 0, y: 0, z: 7.5, yaw: 0 };
-    /** Explosive barrels: { mesh, box, x, y, z, alive, fused, respawn }. */
+    /** Explosive barrels of the rooms that exist: { mesh, box, x, y, z, alive, fused, respawn }. */
     this.barrels = [];
-    /** Respawn points (multiplayer, and single player with enemies). */
-    this.spawnPoints = [
-      { x: 0, y: 0, z: 7.5, yaw: 0 }, { x: -22, y: 0, z: 0, yaw: -Math.PI / 2 },
-      { x: 31, y: 0, z: 0, yaw: Math.PI / 2 }, { x: 0, y: 0, z: -27, yaw: 0 },
-      { x: -6, y: 0, z: -33, yaw: 0 }, { x: 13, y: 0, z: 4, yaw: -Math.PI / 2 },
-    ];
-    /** Medkit spots (data only; the Health system owns their state). */
-    this.pickupSpots = [
-      { x: 9, y: 0, z: -9 }, { x: -18, y: 0, z: 0 }, { x: 0, y: 0, z: -28 }, { x: 0, y: 1.8, z: -47 },
-      { x: 13, y: 0, z: 4 }, { x: 31, y: 0, z: 2 }, { x: -33, y: 2.4, z: -11.5 },
-    ];
+    /** Respawn points of the rooms that exist (filled by setSize). */
+    this.spawnPoints = [];
+    /** Medkit spots of all rooms (data only; Health switches the ones in missing rooms off). */
+    this.pickupSpots = ALL_PICKUPS;
 
     const textures = createTextures();
     this.materials = {};
@@ -5354,12 +5562,59 @@ class World {
     this._barrelGeometry = null;
 
     this._buildLighting();
-    this._buildHall();
-    this._buildCorridor();
-    this._buildEastRoom();
-    this._buildWarehouse();
-    this._buildControlRoom();
-    this._buildPumpRoom();
+    const builders = [
+      ['hall', this._buildHall], ['corridor', this._buildCorridor], ['east', this._buildEastRoom],
+      ['warehouse', this._buildWarehouse], ['control', this._buildControlRoom], ['pump', this._buildPumpRoom],
+      ['dock', this._buildDock], ['boiler', this._buildBoiler], ['garage', this._buildGarage], ['plugs', this._buildPlugs],
+    ];
+    for (const [name, build] of builders) {
+      if (name !== 'plugs') this._begin(name);
+      build.call(this);
+    }
+    this._room = null;
+    this.setSize(size || 'middle');
+  }
+
+  /** Switch the map: shows the rooms of that size and closes the doorways to the others. */
+  setSize(size) {
+    if (!ROOMS_BY_SIZE[size]) size = 'middle';
+    this.size = size;
+    const on = new Set(ROOMS_BY_SIZE[size]);
+    this.activeRooms = new Set(ROOMS_BY_SIZE[size].filter((r) => !r.startsWith('plug')));
+    const boxes = this.collision.boxes;
+    this.barrels.length = 0;
+    for (const name of Object.keys(this.rooms)) {
+      const room = this.rooms[name];
+      const active = on.has(name);
+      room.group.visible = active;
+      for (const b of room.boxes) {
+        const k = boxes.indexOf(b);
+        if (active && k < 0) boxes.push(b);
+        else if (!active && k >= 0) boxes.splice(k, 1);
+      }
+      for (const br of room.barrels) {
+        const k = boxes.indexOf(br.box);
+        if (active) {
+          br.alive = true; br.fused = false; br.respawn = 0; br.mesh.visible = true;
+          if (k < 0) boxes.push(br.box);
+          this.barrels.push(br);
+        } else {
+          br.alive = false;
+          if (k >= 0) boxes.splice(k, 1);
+        }
+      }
+    }
+    this.spawnPoints.length = 0;
+    for (const sp of ALL_SPAWNS) if (this.activeRooms.has(sp.room)) this.spawnPoints.push({ x: sp.x, y: sp.y, z: sp.z, yaw: sp.yaw });
+    this.spawn.x = 0; this.spawn.y = 0; this.spawn.z = 7.5; this.spawn.yaw = 0;
+    return size;
+  }
+
+  _begin(name) {
+    const group = new THREE.Group();
+    this.scene.add(group);
+    this._room = { group, boxes: [], barrels: [] };
+    this.rooms[name] = this._room;
   }
 
   // --- Level ---------------------------------------------------------------
@@ -5367,15 +5622,11 @@ class World {
   _buildLighting() {
     // Dim fill light plus a few point lights. No shadows.
     this.scene.add(new THREE.HemisphereLight(0x7a7a82, 0x3a3a38, 2.6));
-    this._pointLight(0xffe6bf, 55, 24, 0, 3.9, 0); // hall: warm white
-    this._pointLight(0xb8d0b0, 30, 16, 0, 3.0, -20); // corridor: sickly green
-    this._pointLight(0xe0a070, 70, 26, 21, 4.2, 0); // east + pump room: amber
-    this._pointLight(0xdad4c0, 110, 34, -23, 6.0, 0); // warehouse: dusty white
-    this._pointLight(0xa8c0d8, 70, 28, 0, 5.0, -40); // control room: cold blue
   }
 
   _buildHall() {
     const H = HALL_H;
+    this._pointLight(0xffe6bf, 55, 24, 0, 3.9, 0); // warm white
 
     this._solid('floor', -11, -1, -11, 11, 0, 11);
     this._solid('ceiling', -11, H, -11, 11, H + 1, 11);
@@ -5433,6 +5684,7 @@ class World {
 
   _buildCorridor() {
     const H = HALL_H;
+    this._pointLight(0xb8d0b0, 30, 16, 0, 3.0, -20); // sickly green
 
     this._solid('floor', -2, -1, -30, 2, 0, -11);
     this._solid('ceiling', -2, 3.5, -30, 2, H, -11); // low ceiling: 3.5 m
@@ -5449,11 +5701,16 @@ class World {
 
   _buildEastRoom() {
     const H = HALL_H;
+    this._pointLight(0xe0a070, 70, 26, 21, 4.2, 0); // amber (also lights the pump room)
 
     this._solid('floor', 11, -1, -7, 23, 0, 7);
     this._solid('ceiling', 11, H, -8, 24, H + 1, 8);
     this._solid('concrete', 11, -1, -8, 24, H, -7);
-    this._solid('concrete', 11, -1, 7, 24, H, 8);
+    // South wall with a doorway (x 12.5..15.5) to the garage.
+    this._solid('concrete', 11, -1, 7, 12.5, H, 8);
+    this._solid('concrete', 15.5, -1, 7, 24, H, 8);
+    this._solid('concrete', 12.5, 3.2, 7, 15.5, H, 8);
+    this._solid('floor', 12.5, -1, 7, 15.5, 0, 8);
     // East wall with a doorway (z -2..2) into the pump room.
     this._solid('concrete', 23, -1, -10, 24, 5.5, -2);
     this._solid('concrete', 23, -1, 2, 24, 5.5, 10);
@@ -5479,9 +5736,14 @@ class World {
 
   _buildWarehouse() {
     const T = 6.5;
+    this._pointLight(0xdad4c0, 110, 34, -23, 6.0, 0); // dusty white
     this._solid('floor', -35, -1, -13, -11, 0, 13);
     this._solid('ceiling', -35, T, -13, -11, T + 1, 13);
-    this._solid('concrete', -36, -1, -14, -35, T, 14);
+    // West wall with a doorway (z -2..2) to the boiler room.
+    this._solid('concrete', -36, -1, -14, -35, T, -2);
+    this._solid('concrete', -36, -1, 2, -35, T, 14);
+    this._solid('concrete', -36, 3.2, -2, -35, T, 2);
+    this._solid('floor', -36, -1, -2, -35, 0, 2);
     this._solid('concrete', -36, -1, -14, -10, T, -13);
     this._solid('concrete', -36, -1, 13, -10, T, 14);
     this._solid('concrete', -11, -1, -13, -10, T, -11);
@@ -5516,6 +5778,7 @@ class World {
 
   _buildControlRoom() {
     const R = 5.5;
+    this._pointLight(0xa8c0d8, 70, 28, 0, 5.0, -40); // cold blue
     this._solid('floor', -10, -1, -51, 10, 0, -30);
     this._solid('ceiling', -10, R, -51, 10, R + 1, -30);
     this._solid('panel', -11, -1, -51, -10, R, -30);
@@ -5552,7 +5815,11 @@ class World {
     this._solid('ceiling', 24, R, -10, 39, R + 1, 10);
     this._solid('concrete', 23, -1, -11, 40, R, -10);
     this._solid('concrete', 23, -1, 10, 40, R, 11);
-    this._solid('concrete', 39, -1, -10, 40, R, 10);
+    // East wall with a doorway (z 4..8) to the loading dock.
+    this._solid('concrete', 39, -1, -10, 40, R, 4);
+    this._solid('concrete', 39, -1, 8, 40, R, 10);
+    this._solid('concrete', 39, 3.2, 4, 40, R, 8);
+    this._solid('floor', 39, -1, 4, 40, 0, 8);
     this._lamp(30, R - 0.1, -1, 32, R, 1);
     this._lamp(35, R - 0.1, -6, 37, R, -5);
     this._lamp(35, R - 0.1, 5, 37, R, 6);
@@ -5571,12 +5838,102 @@ class World {
     for (const [bx, bz] of [[37.5, -8], [36.6, -8.8], [37.8, -9.2], [37.2, 8.6], [36.2, 9.2]]) this._barrel(bx, 0, bz);
   }
 
+  /** Loading dock east of the pump room: containers, a ramp up to a platform. */
+  _buildDock() {
+    const R = 6;
+    this._pointLight(0xe8c890, 80, 30, 54, 4.8, 0);
+    this._solid('floor', 40, -1, -10, 67, 0, 10);
+    this._solid('ceiling', 40, R, -11, 68, R + 1, 11);
+    this._solid('concrete', 40, -1, -11, 68, R, -10);
+    this._solid('concrete', 40, -1, 10, 68, R, 11);
+    this._solid('concrete', 67, -1, -11, 68, R, 11);
+    this._lamp(50, R - 0.1, -1, 52, R, 1);
+    this._lamp(58, R - 0.1, -6, 60, R, -5);
+    this._lamp(58, R - 0.1, 5, 60, R, 6);
+    // Two containers with a lane between them.
+    this._solid('panel', 49, 0, -9.5, 57, 2.8, -6.5);
+    this._solid('panel', 49, 0, 6.5, 57, 2.8, 9.5);
+    // Ramp: 0.3 m steps up to a 1.2 m platform at the far end.
+    for (let i = 0; i < 3; i++) this._solid('panel', 57 + i, 0, -3, 58 + i, 0.3 * (i + 1), 3);
+    this._solid('concrete', 60, 0, -10, 67, 1.2, 10);
+    // Crates.
+    this._solid('crate', 44, 0, -5, 45, 1, -4);
+    this._solid('crate', 45, 0, -5, 46, 1, -4);
+    this._solid('crate', 44.2, 1, -5, 45.2, 2, -4);
+    this._solid('crate', 44, 0, 4, 45, 0.7, 5);
+    this._solid('crate', 64, 1.2, -7, 65, 2.2, -6);
+    this._solid('crate', 64, 1.2, 6, 65, 2.2, 7);
+    for (const [bx, by, bz] of [[43, 0, 8], [63, 1.2, 8], [62, 1.2, -8], [47, 0, -8]]) this._barrel(bx, by, bz);
+  }
+
+  /** Boiler room west of the warehouse: four boilers and a raised walkway. */
+  _buildBoiler() {
+    const R = 6.5;
+    this._pointLight(0xd8a070, 90, 32, -50, 5.0, 0);
+    this._solid('floor', -64, -1, -12, -36, 0, 12);
+    this._solid('ceiling', -65, R, -13, -36, R + 1, 13);
+    this._solid('concrete', -65, -1, -13, -36, R, -12);
+    this._solid('concrete', -65, -1, 12, -36, R, 13);
+    this._solid('concrete', -65, -1, -13, -64, R, 13);
+    this._lamp(-50, R - 0.1, -1, -48, R, 1);
+    this._lamp(-42, R - 0.1, -9, -40, R, -8);
+    this._lamp(-42, R - 0.1, 8, -40, R, 9);
+    for (const [bx, bz] of [[-44, -6.5], [-44, 6.5], [-54, -6.5], [-54, 6.5]]) {
+      this._solid('hazard', bx - 1.7, 0, bz - 1.7, bx + 1.7, 0.3, bz + 1.7);
+      this._solid('concrete', bx - 1.5, 0.3, bz - 1.5, bx + 1.5, 4.6, bz + 1.5);
+    }
+    this._solid('panel', -64, 4.2, -0.4, -36, 4.8, 0.4); // pipe run
+    // Walkway at the west end: 0.3 m steps up to a 1.2 m platform.
+    for (let i = 0; i < 3; i++) this._solid('panel', -58 + i, 0, -3, -57 + i, 0.9 - 0.3 * i, 3);
+    this._solid('concrete', -64, 0, -12, -58, 1.2, 12);
+    this._solid('crate', -62, 1.2, -9, -61, 2.2, -8);
+    this._solid('crate', -62, 1.2, 8, -61, 2.2, 9);
+    for (const [bx, by, bz] of [[-40, 0, 10], [-62, 1.2, 10.5], [-47, 0, -10], [-60, 1.2, -10.5]]) this._barrel(bx, by, bz);
+  }
+
+  /** Garage south of the east room: parked cars and shelves along a long lane. */
+  _buildGarage() {
+    const R = 5.5;
+    this._pointLight(0xd8d0b8, 80, 30, 17, 4.6, 21);
+    this._solid('floor', 12, -1, 8, 22, 0, 34);
+    this._solid('ceiling', 11, R, 8, 23, R + 1, 35);
+    this._solid('concrete', 11, -1, 8, 12, R, 35);
+    this._solid('concrete', 22, -1, 8, 23, R, 35);
+    this._solid('concrete', 11, -1, 34, 23, R, 35);
+    this._lamp(16, R - 0.1, 13, 18, R, 15);
+    this._lamp(16, R - 0.1, 22, 18, R, 24);
+    this._lamp(16, R - 0.1, 29, 18, R, 31);
+    // Cars (low boxes) on both sides of the lane, shelves along the east wall.
+    this._solid('panel', 12.5, 0, 14, 15, 1.4, 19);
+    this._solid('panel', 19, 0, 22, 21.5, 1.4, 27);
+    this._solid('panel', 21, 0, 10, 22, 2.4, 16);
+    this._solid('crate', 12.5, 0, 28, 13.5, 1, 29);
+    this._solid('crate', 13.5, 0, 28, 14.5, 1, 29);
+    this._solid('crate', 13, 1, 28, 14, 2, 29);
+    this._solid('hazard', 17, 0, 15.8, 17.8, 0.3, 16.6);
+    for (const [bx, by, bz] of [[20.5, 0, 12.5], [20, 0, 31], [13, 0, 32.5]]) this._barrel(bx, by, bz);
+  }
+
+  /** Wall pieces for doorways whose room is not part of the current map. */
+  _buildPlugs() {
+    const plug = (name, x0, y0, z0, x1, y1, z1) => {
+      this._begin(name);
+      this._solid('concrete', x0, y0, z0, x1, y1, z1);
+    };
+    plug('plugWest', -11, -1, -2, -10, DOOR_H, 2); // hall -> warehouse
+    plug('plugNorth', -3, -1, -11, 3, HALL_H, -10); // hall -> corridor
+    plug('plugPumpEast', 39, -1, 4, 40, 3.2, 8); // pump room -> dock
+    plug('plugBoiler', -36, -1, -2, -35, 3.2, 2); // warehouse -> boiler room
+    plug('plugGarage', 12.5, -1, 7, 15.5, 3.2, 8); // east room -> garage
+  }
+
   // --- Building blocks -----------------------------------------------------
 
   /** A textured box from (x0,y0,z0) to (x1,y1,z1) that also blocks the player. */
   _solid(kind, x0, y0, z0, x1, y1, z1) {
     this._addBox(kind, x0, y0, z0, x1, y1, z1);
-    this.collision.addBox(x0, y0, z0, x1, y1, z1);
+    const box = this.collision.addBox(x0, y0, z0, x1, y1, z1);
+    this._room.boxes.push(box);
   }
 
   /** Decorative emissive box with no collision. */
@@ -5591,7 +5948,7 @@ class World {
     const mesh = new THREE.Mesh(this._boxGeometry(w, h, d, TILE[kind]), this.materials[kind]);
     mesh.position.set(x0 + w / 2, y0 + h / 2, z0 + d / 2);
     this._freeze(mesh);
-    this.scene.add(mesh);
+    this._room.group.add(mesh);
   }
 
   _barrel(x, y, z) {
@@ -5601,17 +5958,17 @@ class World {
     const mesh = new THREE.Mesh(this._barrelGeometry, this.materials.barrel);
     mesh.position.set(x, y + 0.55, z);
     this._freeze(mesh);
-    this.scene.add(mesh);
+    this._room.group.add(mesh);
     const box = this.collision.addBox(x - 0.35, y, z - 0.35, x + 0.35, y + 1.1, z + 0.35);
     const barrel = { mesh, box, x, y, z, alive: true, fused: false, respawn: 0 };
     box.barrel = barrel;
-    this.barrels.push(barrel);
+    this._room.barrels.push(barrel);
   }
 
   _pointLight(color, intensity, distance, x, y, z) {
     const light = new THREE.PointLight(color, intensity, distance, 2);
     light.position.set(x, y, z);
-    this.scene.add(light);
+    this._room.group.add(light);
   }
 
   /** Boxes of identical size and tiling share one geometry. */
@@ -5657,7 +6014,7 @@ class Pickups {
     this.time += dt;
     for (let i = 0; i < this.items.length; i++) {
       const item = this.items[i];
-      const active = this.health.pickups[i].active;
+      const active = this.health.pickups[i].active && this.health.pickups[i].enabled;
       item.visible = active;
       if (!active) continue;
       item.rotation.y = this.time * 1.5;
@@ -5681,13 +6038,18 @@ const EN_DIFFICULTY = [
   { hp: 120, speed: 4.2, react: 0.32, acc: 0.46, dmg: 12, burst: 4, pause: [0.7, 1.3], view: 46 },
 ];
 
-// Waypoints (x, z) through the level and the walkable links between them.
+// Waypoints (x, z, room) through the level and the walkable links between them.
 const NAV_NODES = {
-  hall: [0, 3], hallN: [0, -10.5], hallW: [-10.5, 0], hallE: [10.5, 0],
-  corr1: [0, -14], corr2: [1.25, -19.7], corr3: [0, -22.3], corr4: [-1.25, -24.7], corr5: [0, -28],
-  ctrlDoor: [0, -30.6], ctrl: [0, -34], ctrlL: [-4.5, -40], ctrlR: [4.5, -40],
-  wh1: [-14, 0], wh2: [-21, 0], wh3: [-28.5, 0], wh4: [-33, 0], wh5: [-21, 8.5], wh6: [-17.5, -5.5], wh7: [-33, 5],
-  east1: [13, 0], east2: [19.5, 0], pumpDoor: [23.5, 0], pump1: [30, 0], pump2: [34.5, 0], pump3: [30, 8.8], pump4: [30, -8.8],
+  hall: [0, 3, 'hall'], hallN: [0, -10.5, 'corridor'], hallW: [-10.5, 0, 'warehouse'], hallE: [10.5, 0, 'east'],
+  corr1: [0, -14, 'corridor'], corr2: [1.25, -19.7, 'corridor'], corr3: [0, -22.3, 'corridor'], corr4: [-1.25, -24.7, 'corridor'], corr5: [0, -28, 'corridor'],
+  ctrlDoor: [0, -30.6, 'control'], ctrl: [0, -34, 'control'], ctrlL: [-4.5, -40, 'control'], ctrlR: [4.5, -40, 'control'],
+  wh1: [-14, 0, 'warehouse'], wh2: [-21, 0, 'warehouse'], wh3: [-28.5, 0, 'warehouse'], wh4: [-33, 0, 'warehouse'],
+  wh5: [-21, 8.5, 'warehouse'], wh6: [-17.5, -5.5, 'warehouse'], wh7: [-33, 5, 'warehouse'],
+  east1: [13, 0, 'east'], east2: [19.5, 0, 'east'], pumpDoor: [23.5, 0, 'pump'],
+  pump1: [30, 0, 'pump'], pump2: [34.5, 0, 'pump'], pump3: [30, 8.8, 'pump'], pump4: [30, -8.8, 'pump'], pumpE: [36, 6, 'pump'],
+  dockDoor: [40.5, 6, 'dock'], dock1: [46, 1, 'dock'], dock2: [53, 0, 'dock'], dock3: [53, 4.5, 'dock'], dock4: [53, -4.5, 'dock'], dock5: [63, 0, 'dock'],
+  boilDoor: [-35.5, 0, 'boiler'], boil1: [-40, 0, 'boiler'], boil2: [-49, 0, 'boiler'], boil3: [-49, 8.5, 'boiler'], boil4: [-49, -8.5, 'boiler'], boil5: [-61, 0, 'boiler'],
+  gDoor: [14, 5.5, 'garage'], gDoor2: [14, 9.5, 'garage'], g1: [17, 12, 'garage'], g2: [17, 19, 'garage'], g3: [17, 26, 'garage'], g4: [17, 31, 'garage'],
 };
 const NAV_LINKS = [
   ['hall', 'hallN'], ['hall', 'hallW'], ['hall', 'hallE'],
@@ -5695,9 +6057,13 @@ const NAV_LINKS = [
   ['corr5', 'ctrlDoor'], ['ctrlDoor', 'ctrl'], ['ctrl', 'ctrlL'], ['ctrl', 'ctrlR'],
   ['hallW', 'wh1'], ['wh1', 'wh2'], ['wh2', 'wh3'], ['wh3', 'wh4'], ['wh4', 'wh7'], ['wh2', 'wh5'], ['wh2', 'wh6'], ['wh1', 'wh6'],
   ['hallE', 'east1'], ['east1', 'east2'], ['east2', 'pumpDoor'], ['pumpDoor', 'pump1'], ['pump1', 'pump2'],
-  ['pump1', 'pump3'], ['pump1', 'pump4'],
+  ['pump1', 'pump3'], ['pump1', 'pump4'], ['pump2', 'pumpE'],
+  ['pumpE', 'dockDoor'], ['dockDoor', 'dock1'], ['dock1', 'dock2'], ['dock2', 'dock3'], ['dock2', 'dock4'], ['dock2', 'dock5'],
+  ['wh4', 'boilDoor'], ['boilDoor', 'boil1'], ['boil1', 'boil2'], ['boil2', 'boil3'], ['boil2', 'boil4'], ['boil2', 'boil5'],
+  ['east1', 'gDoor'], ['gDoor', 'gDoor2'], ['gDoor2', 'g1'], ['g1', 'g2'], ['g2', 'g3'], ['g3', 'g4'],
 ];
-const SPAWN_NODES = ['corr3', 'corr5', 'ctrl', 'ctrlL', 'ctrlR', 'wh2', 'wh3', 'wh5', 'wh6', 'wh7', 'east2', 'pump1', 'pump3', 'pump4'];
+const SPAWN_NODES = ['corr3', 'corr5', 'ctrl', 'ctrlL', 'ctrlR', 'wh2', 'wh3', 'wh5', 'wh6', 'wh7', 'east2', 'pump1', 'pump3', 'pump4',
+  'dock2', 'dock3', 'dock4', 'dock5', 'boil2', 'boil3', 'boil4', 'boil5', 'g2', 'g3', 'g4'];
 
 const rand = (a, b) => a + Math.random() * (b - a);
 const NOT_ENEMY = (b) => !b.enemy && !b.isBase;
@@ -5724,7 +6090,7 @@ class Enemies {
     this.enabled = true; // false during a multiplayer match
     this._hit = { dist: 0, x: 0, y: 0, z: 0, nx: 0, ny: 0, nz: 0, box: null };
 
-    this._buildNav();
+    this._buildNav(world.activeRooms);
     this._buildShared();
 
     explosions.onExplode.push((x, y, z, radius, owner) => this._explosion(x, y, z, radius, owner));
@@ -5746,19 +6112,34 @@ class Enemies {
 
   // --- Setup ---------------------------------------------------------------
 
-  _buildNav() {
+  /** Waypoints of the rooms that exist. Call again when the map changes. */
+  _buildNav(rooms) {
     this.nodes = [];
     const index = {};
     for (const name of Object.keys(NAV_NODES)) {
-      const [x, z] = NAV_NODES[name];
+      const [x, z, room] = NAV_NODES[name];
+      if (rooms && !rooms.has(room)) continue;
       index[name] = this.nodes.length;
       this.nodes.push({ name, x, z, y: this._groundAt(x, z), links: [] });
     }
     for (const [a, b] of NAV_LINKS) {
+      if (index[a] === undefined || index[b] === undefined) continue;
       this.nodes[index[a]].links.push(index[b]);
       this.nodes[index[b]].links.push(index[a]);
     }
-    this.spawnNodes = SPAWN_NODES.map((n) => index[n]);
+    this.spawnNodes = SPAWN_NODES.filter((n) => index[n] !== undefined).map((n) => index[n]);
+  }
+
+  /** The map changed: new waypoints, everyone starts over. */
+  setMap(rooms) {
+    for (const e of this.list) {
+      this._removeBox(e);
+      this.scene.remove(e.root);
+    }
+    this.list = [];
+    if (this.byId) this.byId.clear();
+    this._buildNav(rooms);
+    if (this.enabled) this._syncCount();
   }
 
   _groundAt(x, z) {
@@ -6449,6 +6830,25 @@ const BASE_SPAWNS = [
   { x: -6.5, y: 0, z: -1.5, yaw: -Math.PI / 2 }, { x: 1.5, y: 0, z: -7, yaw: Math.PI },
 ];
 const zr2 = (v) => Math.round(v * 100) / 100;
+const Z_GOLD = { kill: 10, head: 5, wave: 50, turret: 4 };
+const MINE_ARM = 1.0; // seconds before a placed mine is live
+const MINE_TRIGGER = 1.3; // a zombie this close sets it off
+const MINE_RADIUS = 5.5;
+const TURRET_STATS = {
+  mg: { range: 30, interval: [0.12, 0.09, 0.07], dmg: [12, 15, 19] },
+  sentry: { range: 18, interval: [0.26], dmg: [11] },
+};
+/** The zombie-defense shop. cost: price per level. team: helps everyone. */
+const SHOP_ITEMS = [
+  { id: 'mg', team: true, name: 'Base machine pistol', desc: 'A machine pistol on top of the base that shoots zombies up to 30 m away. Only one.', cost: [600] },
+  { id: 'mgup', team: true, name: 'Machine pistol upgrade', desc: 'The base machine pistol fires faster and hits harder.', cost: [500, 800] },
+  { id: 'sentry', team: true, name: 'Sentry tower', desc: 'Built where you are standing. Shoots zombies up to 18 m away. Up to 3.', cost: [350] },
+  { id: 'repair', team: true, name: 'Repair base', desc: '+300 base health.', cost: [150] },
+  { id: 'dmg', name: 'Damage', desc: '+15% bullet damage per level.', cost: [200, 300, 450, 650, 900] },
+  { id: 'hp', name: 'Max health', desc: '+25 max health per level.', cost: [150, 250, 400, 600] },
+  { id: 'reload', name: 'Fast reload', desc: 'Reload 15% faster per level.', cost: [150, 250, 400] },
+  { id: 'mine', name: 'Extra landmine', desc: '+1 landmine now (G to place).', cost: [100] },
+];
 
 /**
  * Zombie defense: waves of zombies come from the edges of the map and go for
@@ -6484,6 +6884,19 @@ class Zombies extends Enemies {
     this._hud = {};
     this._buildBase();
     this._buildHud();
+    this.explosions = opts.explosions;
+    this.gold = {}; // by player id; the host keeps the real numbers
+    this.levels = {}; // host: personal upgrade levels by player id
+    this.my = { dmg: 0, hp: 0, reload: 0 }; // my own upgrade levels
+    this.mines = 0; // my landmines left
+    this.turrets = []; // host: real turrets; guests: copies from snapshots
+    this.mineList = []; // host: live mines
+    this.mgLevel = 0;
+    this.onUpgrade = null; // (levels) after my upgrades change
+    this.onShopChange = null; // gold, levels or items changed
+    this._mineMeshes = [];
+    this._mineRows = [];
+    this._tSig = '';
   }
 
   get myId() {
@@ -6494,11 +6907,25 @@ class Zombies extends Enemies {
   _syncCount() {}
   noise() {}
 
+  setMap(rooms) {
+    super.setMap(rooms);
+    if (this.active && this.role === 'host') this._reset();
+  }
+
   // --- Mode ----------------------------------------------------------------
 
   setActive(on, role) {
     if (on === this.active && role === this.role) return;
     this._clearAll();
+    this._removeTurrets();
+    this.mineList = [];
+    this._mineRows = [];
+    this._drawMines([]);
+    this.gold = {};
+    this.levels = {};
+    this.mgLevel = 0;
+    this._resetMine();
+    document.body.classList.toggle('zmode', on);
     this.active = on;
     this.role = role;
     this.base.visible = on;
@@ -6520,6 +6947,11 @@ class Zombies extends Enemies {
     this.baseHp = Z_BASE_HP;
     this.toSpawn = 0;
     this.scores = {};
+    this.gold = {};
+    this.levels = {};
+    this.mgLevel = 0;
+    this._removeTurrets();
+    this.mineList = [];
     this._event({ k: 'reset' });
   }
 
@@ -6605,6 +7037,10 @@ class Zombies extends Enemies {
       h.bar.classList.toggle('low', f < 0.3);
     }
     this._setText(h.num, 'num', String(Math.ceil(this.baseHp)));
+    this._setText(this._goldEl || (this._goldEl = document.getElementById('gold')), 'gold', 'GOLD ' + this.myGold);
+    const touch = document.body.classList.contains('touch');
+    this._setText(this._mineEl || (this._mineEl = document.getElementById('mine-label')), 'mines',
+      (touch ? '' : '[G] ') + (this.mines === 1 ? '1 LANDMINE' : this.mines + ' LANDMINES'));
     if (this.phase === 'over') this._setText(h.timer, 'otimer', 'New game in ' + Math.max(1, Math.ceil(this.timer)));
     if (this._bannerT > 0) {
       this._bannerT -= dt;
@@ -6637,6 +7073,10 @@ class Zombies extends Enemies {
     if (ev.k === 'wave') {
       this._banner('WAVE ' + ev.n);
       this.audio.horn();
+      // Landmines for this wave: 1, from wave 5 two, from wave 10 three, ...
+      this.mines = 1 + Math.floor(ev.n / 5);
+      this.ui.feed(this.mines + (this.mines === 1 ? ' LANDMINE' : ' LANDMINES') + ' READY');
+      this._shopChanged();
     } else if (ev.k === 'clear') {
       this._banner('WAVE ' + ev.n + ' CLEARED');
       this.ui.feed('BASE REPAIRED +10%');
@@ -6663,6 +7103,13 @@ class Zombies extends Enemies {
       this.scores = {};
       this._hud.over.classList.remove('on');
       this.ui.setKills(0);
+      this._resetMine();
+      if (this.role === 'guest') { this._removeTurrets(); this.gold = {}; this.mgLevel = 0; }
+      this._shopChanged();
+    } else if (ev.k === 'built') {
+      this.ui.feed((ev.by === me ? 'YOU' : 'P' + ev.by) + ' BOUGHT ' + ev.what);
+    } else if (ev.k === 'boom') {
+      this.explosions.explode(ev.x, ev.y + 0.3, ev.z, ev.x, ev.y, ev.z, 0, 1, 0, 0.9, 'mine');
     }
     if (this.onEvent) this.onEvent(ev);
   }
@@ -6762,7 +7209,11 @@ class Zombies extends Enemies {
         this.phase = 'break';
         this.timer = Z_BREAK;
         this.baseHp = Math.min(Z_BASE_HP, this.baseHp + Z_BASE_HP * 0.1);
+        const ids = [this.myId];
+        for (const [id, r] of this.remotes) if (r.present) ids.push(id);
+        for (const id of ids) this.gold[id] = (this.gold[id] || 0) + Z_GOLD.wave;
         this._event({ k: 'clear', n: this.wave });
+        this._shopChanged();
       }
       this.left = this.toSpawn + alive;
     } else if (this.phase === 'over') {
@@ -6779,6 +7230,12 @@ class Zombies extends Enemies {
       this._animate(e, dt);
     }
     this._separate(dt);
+    if (this.phase !== 'over') {
+      this._updateTurrets(dt);
+      this._updateMines(dt);
+    }
+    for (const m of this.mineList) m.armed = m.arm <= 0;
+    this._drawMines(this.mineList.map((m) => [m.x, m.y, m.z, m.arm <= 0 ? 1 : 0]));
 
     if (this.baseHp <= 0 && this.phase !== 'over') {
       this.baseHp = 0;
@@ -6896,6 +7353,9 @@ class Zombies extends Enemies {
     return {
       t: 'zs', w: this.wave, ph: Z_PHASES.indexOf(this.phase), tm: Math.ceil(this.timer),
       bh: Math.round(this.baseHp), left: this.left, z,
+      g: this.gold, ml: this.mgLevel,
+      tu: this.turrets.map((t) => [t.type === 'mg' ? 0 : 1, zr2(t.x), zr2(t.y), zr2(t.z), zr2(t.yaw), zr2(t.pitch), t.fireT > 0 ? 1 : 0]),
+      mi: this.mineList.map((m) => [zr2(m.x), zr2(m.y), zr2(m.z), m.arm <= 0 ? 1 : 0]),
     };
   }
 
@@ -6909,6 +7369,12 @@ class Zombies extends Enemies {
     if (m.bh < this.baseHp - 0.5) this._baseFlash = 1;
     this.baseHp = m.bh;
     this.left = m.left | 0;
+    const before = this.myGold + ':' + this.mgLevel + ':' + this.turrets.length;
+    this.gold = m.g || {};
+    this.mgLevel = m.ml | 0;
+    this._mirrorTurrets(Array.isArray(m.tu) ? m.tu : []);
+    this._mineRows = Array.isArray(m.mi) ? m.mi : [];
+    if (before !== this.myGold + ':' + this.mgLevel + ':' + this.turrets.length) this._shopChanged();
     const seen = new Set();
     for (const row of m.z || []) {
       const [id, x, y, z, yaw, st, runner] = row;
@@ -6940,6 +7406,8 @@ class Zombies extends Enemies {
   }
 
   _updateGuest(dt) {
+    this._updateTurretMirrors(dt);
+    this._drawMines(this._mineRows);
     const k = Math.min(1, dt * 12);
     for (let i = this.list.length - 1; i >= 0; i--) {
       const e = this.list[i];
@@ -6983,33 +7451,36 @@ class Zombies extends Enemies {
     if (e && e.alive && typeof m.dmg === 'number') this._damage(e, Math.min(300, Math.max(0, m.dmg)), !!m.head, m.from | 0);
   }
 
-  _damage(e, amount, head, byId) {
+  _damage(e, amount, head, byId, turretOwner) {
     if (!e.alive) return;
     e.hp -= amount;
     e.hurtT = 0.12;
     if (byId && e.target === 0) { e.target = byId; e.retargetT = 1.5; } // turn on whoever shoots it
     const killed = e.hp <= 0;
-    if (killed) this._kill(e, byId, head);
+    if (killed) this._kill(e, byId, head, turretOwner);
     if (byId && byId === this.myId) {
       this.ui.hitMarker(head || killed);
       this.audio.hitmarker(killed);
     }
   }
 
-  _kill(e, byId, head) {
+  _kill(e, byId, head, turretOwner) {
     if (!e.alive) return;
     e.alive = false;
     e.deadT = 0;
     this._removeBox(e);
     for (const m of e.mats) m.emissive.setRGB(0, 0, 0);
+    if (turretOwner) this.gold[turretOwner] = (this.gold[turretOwner] || 0) + Z_GOLD.turret;
     if (byId) {
+      this.gold[byId] = (this.gold[byId] || 0) + Z_GOLD.kill + (head ? Z_GOLD.head : 0);
+      this._shopChanged();
       this.scores[byId] = (this.scores[byId] || 0) + 1;
       this._event({ k: 'kill', by: byId, head: head ? 1 : 0, s: this.scores });
     }
   }
 
   _explosion(x, y, z, radius, owner) {
-    if (!this.active || this.role !== 'host') return;
+    if (!this.active || this.role !== 'host' || owner === 'mine') return; // mines deal their own damage
     const r = radius * 0.8;
     for (const e of this.list) {
       if (!e.alive) continue;
@@ -7043,6 +7514,349 @@ class Zombies extends Enemies {
     const target = e.state === 'attack' ? Math.sin(e.clawT * 9) * 0.55 - 0.15 : Math.sin(e.clawT * 2.3 + e.id) * 0.08;
     e.arms.rotation.x += (target - e.arms.rotation.x) * Math.min(1, dt * 14);
     e.root.rotation.z = Math.sin(e.stride * 0.5) * 0.06; // shambling sway
+  }
+
+  // --- Economy: gold, shop, turrets, landmines -------------------------------
+
+  get myGold() {
+    return Math.floor(this.gold[this.myId] || 0);
+  }
+
+  _shopChanged() {
+    if (this.onShopChange) this.onShopChange();
+  }
+
+  /** What an item costs for a buyer with `gold` and personal levels `lv`, and whether it can be bought. */
+  _itemState(it, gold, lv) {
+    const hasMg = this.turrets.some((t) => t.type === 'mg');
+    const sentries = this.turrets.filter((t) => t.type === 'sentry').length;
+    let cost = it.cost[0], level = 0, max = it.cost.length, blocked = '';
+    if (it.id === 'mg') {
+      level = hasMg ? 1 : 0; max = 1;
+      if (hasMg) blocked = 'BUILT';
+    } else if (it.id === 'mgup') {
+      level = this.mgLevel; max = it.cost.length;
+      cost = it.cost[Math.min(level, max - 1)];
+      if (!hasMg) blocked = 'BUILD IT FIRST';
+      else if (level >= max) blocked = 'MAX';
+    } else if (it.id === 'sentry') {
+      level = sentries; max = 3;
+      if (sentries >= 3) blocked = 'MAX 3';
+    } else if (it.id === 'repair') {
+      max = 0;
+      if (this.baseHp >= Z_BASE_HP - 1) blocked = 'BASE FULL';
+    } else if (it.id === 'mine') {
+      max = 0;
+    } else {
+      level = lv[it.id] || 0;
+      cost = it.cost[Math.min(level, max - 1)];
+      if (level >= max) blocked = 'MAX';
+    }
+    if (!blocked && this.phase === 'over') blocked = 'GAME OVER';
+    return { cost, level, max, blocked, afford: gold >= cost };
+  }
+
+  /** The shop as shown to this player. */
+  shopItems() {
+    const gold = this.myGold;
+    return SHOP_ITEMS.map((it) => {
+      const st = this._itemState(it, gold, this.my);
+      return Object.assign({ id: it.id, name: it.name, desc: it.desc, team: !!it.team }, st, { can: !st.blocked && st.afford });
+    });
+  }
+
+  buy(itemId) {
+    if (!this.active) return;
+    const p = this.player;
+    if (this.role === 'host') this._handleBuy(this.myId, itemId, p.x, p.y, p.z);
+    else this.net.send({ t: 'zbuy', item: itemId, x: zr2(p.x), y: zr2(p.y), z: zr2(p.z) });
+  }
+
+  /** Host: a guest wants to buy something. */
+  onNetBuy(m) {
+    if (this.role === 'host' && m.from) this._handleBuy(m.from | 0, String(m.item), +m.x || 0, +m.y || 0, +m.z || 0);
+  }
+
+  _handleBuy(id, itemId, x, y, z) {
+    const it = SHOP_ITEMS.find((i) => i.id === itemId);
+    if (!it) return;
+    const lv = this.levels[id] || (this.levels[id] = {});
+    const st = this._itemState(it, this.gold[id] || 0, lv);
+    if (st.blocked || !st.afford) return;
+    if (itemId === 'sentry') {
+      // Not on the base itself, and on solid ground.
+      if (Math.hypot(x, z) < 1.4) { const d = Math.hypot(x, z) || 1; x = (x / d) * 1.4; z = (z / d) * 1.4; }
+      y = this._groundAt(x, z);
+    }
+    this.gold[id] = (this.gold[id] || 0) - st.cost;
+    if (itemId === 'mg') {
+      this._addTurret('mg', 0, 0, 0, id);
+      this._event({ k: 'built', by: id, what: 'THE BASE MACHINE PISTOL' });
+    } else if (itemId === 'mgup') {
+      this.mgLevel++;
+      this._event({ k: 'built', by: id, what: 'MACHINE PISTOL LEVEL ' + (this.mgLevel + 1) });
+    } else if (itemId === 'sentry') {
+      this._addTurret('sentry', x, y, z, id);
+      this._event({ k: 'built', by: id, what: 'A SENTRY TOWER' });
+    } else if (itemId === 'repair') {
+      this.baseHp = Math.min(Z_BASE_HP, this.baseHp + 300);
+      this._event({ k: 'built', by: id, what: 'A BASE REPAIR' });
+    } else if (itemId === 'mine') {
+      this._grant(id, 'mine', 1);
+    } else {
+      lv[itemId] = (lv[itemId] || 0) + 1;
+      this._grant(id, itemId, lv[itemId]);
+    }
+    this._shopChanged();
+  }
+
+  _grant(id, item, level) {
+    if (id === this.myId) this.applyGrant(item, level);
+    else this.net.send({ t: 'zbought', to: id, item, level });
+  }
+
+  /** A purchase of mine went through (personal upgrade or extra landmine). */
+  applyGrant(item, level) {
+    if (!this.active) return;
+    if (item === 'mine') {
+      this.mines++;
+      this.ui.feed('+1 LANDMINE');
+    } else if (item in this.my) {
+      this.my[item] = level | 0;
+      const it = SHOP_ITEMS.find((i) => i.id === item);
+      this.ui.feed((it ? it.name.toUpperCase() : item) + ' LEVEL ' + level);
+      if (this.onUpgrade) this.onUpgrade(this.my);
+    }
+    this.audio.pickup();
+    this._shopChanged();
+  }
+
+  _resetMine() {
+    this.my = { dmg: 0, hp: 0, reload: 0 };
+    this.mines = 0;
+    if (this.onUpgrade) this.onUpgrade(this.my);
+  }
+
+  // --- Turrets -------------------------------------------------------------
+
+  _turretMesh(type) {
+    if (!this._tMetal) {
+      this._tMetal = new THREE.MeshLambertMaterial({ color: 0x4a4f55, flatShading: true });
+      this._tDark = new THREE.MeshLambertMaterial({ color: 0x1c1f22 });
+    }
+    const g = new THREE.Group();
+    if (type === 'sentry') {
+      const post = new THREE.Mesh(new THREE.BoxGeometry(0.22, 1.3, 0.22), this._tMetal);
+      post.position.y = 0.65;
+      g.add(post);
+      const foot = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.08, 0.7), this._tDark);
+      foot.position.y = 0.04;
+      g.add(foot);
+    }
+    const pivot = new THREE.Group();
+    pivot.rotation.order = 'YXZ';
+    pivot.position.y = type === 'sentry' ? 1.42 : 0;
+    g.add(pivot);
+    pivot.add(new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.2, 0.38), this._tMetal));
+    const len = type === 'mg' ? 0.34 : 0.5;
+    const barrel = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, len), this._tDark);
+    barrel.position.set(0, 0, -0.19 - len / 2);
+    pivot.add(barrel);
+    if (type === 'mg') {
+      // Machine pistol: a long stick magazine under the body and a front grip.
+      const mag = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.3, 0.08), this._tDark);
+      mag.position.set(0, -0.23, -0.04);
+      pivot.add(mag);
+      const grip = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.16, 0.07), this._tMetal);
+      grip.position.set(0, -0.16, 0.12);
+      pivot.add(grip);
+    }
+    const flash = new THREE.Mesh(this.geo.flash, this.flashMat);
+    flash.position.z = -0.24 - len;
+    flash.visible = false;
+    pivot.add(flash);
+    this.scene.add(g);
+    return { g, pivot, flash };
+  }
+
+  _addTurret(type, x, y, z, owner) {
+    const m = this._turretMesh(type);
+    const gy = type === 'mg' ? 2.18 : y; // the base gun sits on top of the base
+    m.g.position.set(x, gy, z);
+    const t = Object.assign({
+      type, x, y: gy, z, py: type === 'mg' ? gy : gy + 1.42, owner,
+      yaw: 0, pitch: 0, tyaw: 0, tpitch: 0, cd: 0, seekT: 0, target: null, fireT: 0, flashT: 0, firing: 0, soundT: 0,
+    }, m);
+    this.turrets.push(t);
+    return t;
+  }
+
+  _removeTurrets() {
+    for (const t of this.turrets) this.scene.remove(t.g);
+    this.turrets = [];
+    this._tSig = '';
+  }
+
+  _turretTarget(t, range) {
+    let best = null, bd = range;
+    for (const e of this.list) {
+      if (!e.alive) continue;
+      const d = Math.hypot(e.x - t.x, e.z - t.z);
+      if (d >= bd) continue;
+      if (!this._clearNav(t.x, t.py, t.z, e.x, e.y + 1.2, e.z)) continue;
+      best = e;
+      bd = d;
+    }
+    return best;
+  }
+
+  _updateTurrets(dt) {
+    for (const t of this.turrets) {
+      const st = TURRET_STATS[t.type];
+      const lv = t.type === 'mg' ? this.mgLevel : 0;
+      t.cd -= dt;
+      t.seekT -= dt;
+      t.fireT -= dt;
+      if (t.flashT > 0) { t.flashT -= dt; if (t.flashT <= 0) t.flash.visible = false; }
+      if (t.seekT <= 0) { t.seekT = 0.2; t.target = this._turretTarget(t, st.range); }
+      const e = t.target && t.target.alive ? t.target : null;
+      if (!e) { t.target = null; continue; }
+      const dx = e.x - t.x, dz = e.z - t.z, dy = e.y + 1.2 - t.py;
+      const yaw = Math.atan2(-dx, -dz);
+      const pitch = Math.atan2(dy, Math.hypot(dx, dz));
+      const turn = Math.atan2(Math.sin(yaw - t.yaw), Math.cos(yaw - t.yaw));
+      t.yaw += turn * Math.min(1, dt * 10);
+      t.pitch += (pitch - t.pitch) * Math.min(1, dt * 10);
+      t.pivot.rotation.set(t.pitch, t.yaw, 0);
+      if (t.cd > 0 || Math.abs(turn) > 0.25) continue;
+      t.cd = st.interval[Math.min(lv, st.interval.length - 1)];
+      const dmg = st.dmg[Math.min(lv, st.dmg.length - 1)];
+      const hit = Math.random() < 0.85;
+      const c = Math.cos(t.pitch);
+      const mx = t.x - Math.sin(t.yaw) * c * 0.8, my = t.py + Math.sin(t.pitch) * 0.8, mz = t.z - Math.cos(t.yaw) * c * 0.8;
+      const off = hit ? 0 : 1;
+      this._tracer(mx, my, mz, e.x + rand(-0.6, 0.6) * off, e.y + 1.2 + rand(-0.4, 0.6) * off, e.z + rand(-0.6, 0.6) * off);
+      t.flash.visible = true;
+      t.flash.rotation.z = Math.random() * 3;
+      t.flashT = 0.04;
+      t.fireT = 0.2;
+      if (hit) this._damage(e, dmg, false, 0, t.owner);
+      this.audio.shot('smg', Math.max(0.04, 0.45 * this._volumeAt(t.x, t.z)));
+    }
+  }
+
+  /** Guests: turrets mirrored from the host's snapshot. */
+  _mirrorTurrets(rows) {
+    const sig = rows.map((a) => a[0] + ':' + a[1] + ':' + a[3]).join('|');
+    if (sig !== this._tSig) {
+      this._removeTurrets();
+      for (const a of rows) {
+        const t = this._addTurret(a[0] ? 'sentry' : 'mg', a[1], a[2], a[3], 0);
+        t.yaw = a[4]; t.pitch = a[5];
+      }
+      this._tSig = sig;
+    }
+    rows.forEach((a, i) => {
+      const t = this.turrets[i];
+      t.tyaw = a[4];
+      t.tpitch = a[5];
+      t.firing = a[6];
+    });
+  }
+
+  _updateTurretMirrors(dt) {
+    const k = Math.min(1, dt * 12);
+    for (const t of this.turrets) {
+      t.yaw += Math.atan2(Math.sin(t.tyaw - t.yaw), Math.cos(t.tyaw - t.yaw)) * k;
+      t.pitch += (t.tpitch - t.pitch) * k;
+      t.pivot.rotation.set(t.pitch, t.yaw, 0);
+      t.flash.visible = !!t.firing && Math.random() < 0.5;
+      if (t.firing) {
+        t.soundT -= dt;
+        if (t.soundT <= 0) {
+          t.soundT = TURRET_STATS[t.type].interval[t.type === 'mg' ? Math.min(this.mgLevel, 2) : 0];
+          this.audio.shot('smg', Math.max(0.04, 0.45 * this._volumeAt(t.x, t.z)));
+        }
+      }
+    }
+  }
+
+  // --- Landmines -----------------------------------------------------------
+
+  /** Put one of my landmines down in front of me. */
+  placeMine() {
+    if (!this.active || this.health.dead) return;
+    if (this.mines <= 0) { this.ui.feed('NO LANDMINES LEFT'); return; }
+    const p = this.player;
+    if (!p.onGround) return;
+    let x = p.x - Math.sin(p.yaw) * 0.9, z = p.z - Math.cos(p.yaw) * 0.9;
+    if (this.collision.intersects(x - 0.25, p.y + 0.05, z - 0.25, x + 0.25, p.y + 0.6, z + 0.25)) { x = p.x; z = p.z; }
+    this.mines--;
+    if (this.role === 'host') this._addMine(x, p.y, z, this.myId);
+    else this.net.send({ t: 'zmine', x: zr2(x), y: zr2(p.y), z: zr2(z) });
+    this.audio.shell();
+    this._shopChanged();
+  }
+
+  onNetMine(m) {
+    if (this.role === 'host' && m.from && this.active) this._addMine(+m.x || 0, +m.y || 0, +m.z || 0, m.from | 0);
+  }
+
+  _addMine(x, y, z, owner) {
+    if (this.mineList.length >= 40) return;
+    this.mineList.push({ x, y, z, owner, arm: MINE_ARM });
+  }
+
+  _updateMines(dt) {
+    for (let i = this.mineList.length - 1; i >= 0; i--) {
+      const m = this.mineList[i];
+      if (m.arm > 0) { m.arm -= dt; continue; }
+      let trip = false;
+      for (const e of this.list) {
+        if (e.alive && Math.hypot(e.x - m.x, e.z - m.z) < MINE_TRIGGER && Math.abs(e.y - m.y) < 1) { trip = true; break; }
+      }
+      if (!trip) continue;
+      this.mineList.splice(i, 1);
+      for (const e of this.list) {
+        if (!e.alive) continue;
+        const d = Math.hypot(e.x - m.x, e.y + 0.9 - (m.y + 0.3), e.z - m.z);
+        if (d < MINE_RADIUS) {
+          e.vy = Math.max(e.vy, 5 * (1 - d / MINE_RADIUS));
+          this._damage(e, 260 * (1 - d / MINE_RADIUS), false, m.owner);
+        }
+      }
+      this._event({ k: 'boom', x: zr2(m.x), y: zr2(m.y), z: zr2(m.z) });
+    }
+  }
+
+  /** Draw mines: the host's own list, or a guest's copy from the snapshot ([x, y, z, armed]). */
+  _drawMines(rows) {
+    if (!this._mineGeo) {
+      this._mineGeo = new THREE.CylinderGeometry(0.22, 0.26, 0.07, 10);
+      this._mineMat = new THREE.MeshLambertMaterial({ color: 0x3e4630, flatShading: true });
+      this._mineLed = new THREE.MeshBasicMaterial({ color: 0xff3020, fog: false });
+      this._ledGeo = new THREE.BoxGeometry(0.05, 0.03, 0.05);
+    }
+    const pool = this._mineMeshes;
+    const blink = Math.sin(performance.now() / 160) > 0;
+    for (let i = 0; i < rows.length; i++) {
+      let m = pool[i];
+      if (!m) {
+        m = new THREE.Group();
+        m.add(new THREE.Mesh(this._mineGeo, this._mineMat));
+        const led = new THREE.Mesh(this._ledGeo, this._mineLed);
+        led.position.y = 0.05;
+        m.add(led);
+        m.led = led;
+        this.scene.add(m);
+        pool.push(m);
+      }
+      const r = rows[i];
+      m.visible = true;
+      m.position.set(r[0], r[1] + 0.035, r[2]);
+      m.led.visible = !r[3] || blink;
+    }
+    for (let i = rows.length; i < pool.length; i++) pool[i].visible = false;
   }
 
   /** Like the soldiers' test, but other zombies do not block: crowds would jam in doorways. */
@@ -7154,7 +7968,8 @@ class Zombies extends Enemies {
 }
 
 // ===== js/input/TouchControls.js =====
-const TOUCH_LOOK_SCALE = 1.4;  // finger pixels -> look pixels at touch sensitivity 1
+const TOUCH_LOOK_SCALE = 1.4;
+const TOUCH_LAYOUT_KEY = 'retrofps.touchLayout';  // finger pixels -> look pixels at touch sensitivity 1
 const STICK_RADIUS = 56;       // px at button size 100%
 const STICK_DEADZONE = 0.15;
 
@@ -7185,6 +8000,9 @@ class TouchControls {
       '<div id="tc-lock">LOCK</div>',
       '<div id="tc-rotate">Rotate your device to landscape</div>',
       '<div id="tc-pause" role="button">II</div>',
+      '<div id="tc-shop" class="zonly" role="button">SHOP</div>',
+      '<div id="tc-editbar"><span>Drag the buttons and the joystick where you want them.</span>' +
+        '<button type="button" id="tc-reset">RESET</button><button type="button" id="tc-done">DONE</button></div>',
       '<div class="tc-btn tc-lfire" role="button">FIRE</div>',
       '<div id="tc-btns">',
       '<div class="tc-btn tc-fire" role="button">FIRE</div>',
@@ -7193,6 +8011,7 @@ class TouchControls {
       '<div class="tc-btn tc-crouch" role="button">DUCK</div>',
       '<div class="tc-btn tc-reload" role="button">RELOAD</div>',
       '<div class="tc-btn tc-grenade" role="button">NADE</div>',
+      '<div class="tc-btn tc-mine zonly" role="button">MINE</div>',
       '</div>',
     ].join('');
     document.body.appendChild(root);
@@ -7204,6 +8023,25 @@ class TouchControls {
     this.aimEl = root.querySelector('.tc-aim');
     this.duckEl = root.querySelector('.tc-crouch');
     this.lfireEl = root.querySelector('.tc-lfire');
+
+    this.btns = root.querySelector('#tc-btns');
+    // Buttons that can be moved in the layout editor (settings > touch).
+    this.movable = {
+      fire: root.querySelector('.tc-fire'), aim: this.aimEl, jump: root.querySelector('.tc-jump'),
+      crouch: this.duckEl, reload: root.querySelector('.tc-reload'), grenade: root.querySelector('.tc-grenade'),
+      mine: root.querySelector('.tc-mine'), lfire: this.lfireEl, pause: root.querySelector('#tc-pause'),
+      shop: root.querySelector('#tc-shop'),
+    };
+    for (const [key, el] of Object.entries(this.movable)) {
+      el.dataset.key = key;
+      el.dataset.home = el.parentNode === this.btns ? 'btns' : 'root';
+      const w = parseFloat(getComputedStyle(el).width);
+      if (w && key !== 'pause' && key !== 'shop') el.dataset.base = String(w);
+    }
+    this.layout = TouchControls.loadLayout();
+    this.editing = false;
+    this._drag = null;
+    this._bindEditor();
 
     this._bindMove(root.querySelector('#tc-move'));
     this._bindLook(root.querySelector('#tc-look'));
@@ -7240,16 +8078,135 @@ class TouchControls {
       }
     }, look);
     this._button(root.querySelector('#tc-pause'), () => input.pause(), null, null, true);
+    this._button(root.querySelector('#tc-shop'), () => input.pressShop(), null, null, true);
+    this._button(root.querySelector('.tc-mine'), () => input.pressMine());
 
     // iOS Safari ignores user-scalable=no; stop pinch-zoom gestures.
     document.addEventListener('gesturestart', (e) => e.preventDefault());
-    window.addEventListener('resize', () => { if (this.stick.classList.contains('idle')) this._idleStick(); });
+    window.addEventListener('resize', () => {
+      this._applyLayout();
+      if (this.stick.classList.contains('idle')) this._idleStick();
+    });
     settings.onChange(() => this._apply());
     this._apply();
   }
 
+  // --- Layout editor ---------------------------------------------------------
+
+  static loadLayout() {
+    try {
+      const v = JSON.parse(localStorage.getItem(TOUCH_LAYOUT_KEY) || '{}');
+      return v && typeof v === 'object' ? v : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  _saveLayout() {
+    try { localStorage.setItem(TOUCH_LAYOUT_KEY, JSON.stringify(this.layout)); } catch (_) { /* ignore */ }
+  }
+
+  /** The cluster's own scale on small screens (matches the CSS media queries). */
+  _clusterScale() {
+    const h = window.innerHeight;
+    return h <= 340 ? 0.7 : h <= 420 ? 0.85 : 1;
+  }
+
+  /** Put every button at its saved spot, or back in its default place. */
+  _applyLayout() {
+    const bs = this.settings.get('buttonSize');
+    const k = this._clusterScale();
+    for (const [key, el] of Object.entries(this.movable)) {
+      const pos = this.layout[key];
+      const base = Number(el.dataset.base) || 0;
+      if (pos) {
+        if (el.parentNode !== this.root) this.root.appendChild(el); // out of the scaled cluster
+        el.classList.add('custom');
+        el.style.left = (pos.x * 100).toFixed(2) + '%';
+        el.style.top = (pos.y * 100).toFixed(2) + '%';
+        if (base) el.style.width = el.style.height = Math.round(base * bs * (el.dataset.home === 'btns' ? k : 1)) + 'px';
+      } else {
+        el.classList.remove('custom');
+        el.style.left = el.style.top = '';
+        if (el.dataset.home === 'btns') {
+          if (el.parentNode !== this.btns) this.btns.appendChild(el);
+          el.style.width = el.style.height = '';
+        } else if (base) {
+          el.style.width = el.style.height = Math.round(base * bs) + 'px';
+        }
+      }
+    }
+  }
+
+  /** Show the controls with drag handles; `onDone` runs when the player presses DONE. */
+  startEdit(onDone) {
+    this.editing = true;
+    this._onEditDone = onDone;
+    this.root.classList.add('on', 'editing');
+    document.body.classList.add('tc-editing');
+    this._applyLayout();
+    this._idleStick();
+  }
+
+  _finishEdit() {
+    this.editing = false;
+    this._drag = null;
+    this.root.classList.remove('editing');
+    document.body.classList.remove('tc-editing');
+    this.sync();
+    const cb = this._onEditDone;
+    this._onEditDone = null;
+    if (cb) cb();
+  }
+
+  _bindEditor() {
+    const root = this.root;
+    root.querySelector('#tc-done').addEventListener('click', () => this._finishEdit());
+    root.querySelector('#tc-reset').addEventListener('click', () => {
+      this.layout = {};
+      this._saveLayout();
+      this._applyLayout();
+      this._idleStick();
+    });
+    root.addEventListener('pointerdown', (e) => {
+      if (!this.editing || this._drag) return;
+      if (e.target.closest('#tc-editbar')) return;
+      let key = null;
+      const el = e.target.closest('[data-key]');
+      if (el) key = el.dataset.key;
+      else {
+        const h = this._home();
+        if (Math.hypot(e.clientX - h.x, e.clientY - h.y) < this._radius * 1.2) key = 'stick';
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (!key) return;
+      this._drag = { id: e.pointerId, key };
+      this._dragTo(e);
+    }, true);
+    window.addEventListener('pointermove', (e) => {
+      if (this._drag && e.pointerId === this._drag.id) this._dragTo(e);
+    });
+    const end = (e) => {
+      if (!this._drag || e.pointerId !== this._drag.id) return;
+      this._drag = null;
+      this._saveLayout();
+    };
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+  }
+
+  _dragTo(e) {
+    const x = Math.min(0.97, Math.max(0.03, e.clientX / window.innerWidth));
+    const y = Math.min(0.97, Math.max(0.03, e.clientY / window.innerHeight));
+    this.layout[this._drag.key] = { x, y };
+    if (this._drag.key === 'stick') this._idleStick();
+    else this._applyLayout();
+  }
+
   /** Call whenever the playing state changes. */
   sync() {
+    if (this.editing) return;
     const on = this.input.overlay;
     this.root.classList.toggle('on', on);
     document.body.classList.toggle('touch', on);
@@ -7282,8 +8239,9 @@ class TouchControls {
     this.stick.style.width = this.stick.style.height = ring;
     this.knob.style.width = this.knob.style.height = knob;
     this.lockEl.style.width = this.lockEl.style.height = lock;
-    this.lfireEl.style.width = this.lfireEl.style.height = lfire;
-    this.lfireEl.style.display = st.get('leftFire') ? '' : 'none';
+    this.lfireEl.style.display = st.get('leftFire') || this.editing ? '' : 'none';
+    if (this.movable) this._applyLayout();
+    else this.lfireEl.style.width = this.lfireEl.style.height = lfire;
     if (!st.get('sprintLock')) this._unlockSprint();
     if (!st.get('holdAim')) this._aim = this.input._aimTouch;
     if (this.stick.classList.contains('idle')) this._idleStick();
@@ -7295,6 +8253,8 @@ class TouchControls {
   }
 
   _home() {
+    const s = this.layout && this.layout.stick;
+    if (s) return { x: s.x * window.innerWidth, y: s.y * window.innerHeight };
     const r = this._radius;
     return { x: 30 + r * 1.15, y: window.innerHeight - 30 - r * 1.15 };
   }
@@ -7468,6 +8428,8 @@ const SEND_INTERVAL = 0.05; // 20 state messages per second
 const r2 = (v) => Math.round(v * 100) / 100;
 const REMOTE_COLORS = { 1: 0x6b3a2a, 2: 0x2a4f6b, 3: 0x6b5f2a };
 const MODE_KEY = 'retrofps.mode';
+const MAP_KEY = 'retrofps.map';
+const LOADOUT_KEY = 'retrofps.loadout';
 
 function boot() {
   const canvas = document.getElementById('game');
@@ -7475,7 +8437,9 @@ function boot() {
   const settings = new Settings();
   const engine = new Engine(canvas, settings);
   const input = new Input(canvas);
-  const world = new World(engine.scene);
+  let mapSize = (() => { try { return localStorage.getItem(MAP_KEY); } catch (_) { return null; } })();
+  if (!MAP_SIZES.includes(mapSize)) mapSize = 'middle';
+  const world = new World(engine.scene, mapSize);
   const player = new Player({
     camera: engine.camera,
     input,
@@ -7542,32 +8506,32 @@ function boot() {
   barrels = new Barrels({ world, explosions });
 
   const health = new Health({ player, spots: world.pickupSpots });
+  health.setRooms(world.activeRooms);
   const pickups = new Pickups(engine.scene, health);
   explosions.onPlayerBlast = (damage, owner) => {
+    if (owner === 'mine') return; // landmines only hurt zombies
     if (zombies.active && owner === 'other') return; // no friendly fire in co-op
     health.damage(damage, 'explosion', owner);
   };
   health.onPickup.push(() => weapons.audio.pickup());
   ui = new Ui(settings, input);
-  ui.setSlotCount(5);
-  const LOADOUT_KEY = 'retro-fps.loadout.v1';
-  const applyLoadout = (ids) => {
-    weapons.setLoadout(ids);
-    ui.setLoadout(weapons.loadout);
-    ui.setSlotNames(weapons.loadout.map((id) => WEAPON_SPECS[id].name));
-  };
-  ui.onLoadout = (ids) => {
-    applyLoadout(ids);
-    try { localStorage.setItem(LOADOUT_KEY, JSON.stringify(ids)); } catch (_) { /* ignore */ }
-  };
+  ui.setSlotCount(3);
+  // Loadout: saved choice, three weapon ids.
   try {
-    const savedLoadout = JSON.parse(localStorage.getItem(LOADOUT_KEY));
-    const ok = Array.isArray(savedLoadout) && savedLoadout.length === 5 && new Set(savedLoadout).size === 5 &&
-      savedLoadout.every((i) => Number.isInteger(i) && i >= 0 && i < WEAPON_SPECS.length);
-    applyLoadout(ok ? savedLoadout : weapons.loadout);
-  } catch (_) {
-    applyLoadout(weapons.loadout);
-  }
+    const saved = JSON.parse(localStorage.getItem(LOADOUT_KEY) || 'null');
+    if (Array.isArray(saved)) weapons.setLoadout(saved);
+  } catch (_) { /* keep the default */ }
+  ui.setLoadoutProvider({
+    get: () => weapons.loadout.slice(),
+    equip: (slot, id) => {
+      const next = weapons.loadout.slice();
+      const other = next.indexOf(id);
+      if (other >= 0 && other !== slot) next[other] = next[slot]; // swap when it is already in another slot
+      next[slot] = id;
+      weapons.setLoadout(next);
+      try { localStorage.setItem(LOADOUT_KEY, JSON.stringify(weapons.loadout)); } catch (_) { /* ignore */ }
+    },
+  });
 
   const common = { scene: engine.scene, world, player, input, settings, explosions, audio: weapons.audio, health, ui };
   enemies = new Enemies(common);
@@ -7577,6 +8541,20 @@ function boot() {
     grenades.cooldown = 0;
     enemies.onPlayerRespawn();
   });
+  // Personal upgrades from the shop.
+  zombies.onUpgrade = (lv) => {
+    player.damageMul = 1 + 0.15 * lv.dmg;
+    player.reloadMul = 1 / (1 - 0.15 * lv.reload);
+    const max = 100 + 25 * lv.hp;
+    if (health.max !== max) {
+      const diff = max - health.max;
+      health.max = max;
+      if (diff > 0) health.heal(diff);
+      else health.value = Math.min(health.value, max);
+    }
+  };
+  ui.setShop({ items: () => zombies.shopItems(), gold: () => zombies.myGold, buy: (id) => zombies.buy(id) });
+  zombies.onShopChange = () => ui.refreshShop();
   zombies.onEvent = (ev) => {
     if (ev.k === 'clear') {
       // Between waves: fresh ammo and a patch-up for everyone.
@@ -7588,6 +8566,13 @@ function boot() {
   };
 
   const touch = new TouchControls(input, settings, player);
+  ui.onEditLayout = () => {
+    ui.menu.classList.add('hidden');
+    touch.startEdit(() => {
+      ui.menu.classList.remove('hidden');
+      ui._showView('settings');
+    });
+  };
   weapons.audio.setVolume(settings.get('volume'));
   settings.onChange((key, value) => { if (key === 'volume') weapons.audio.setVolume(value); });
   const baseLockChange = input.onLockChange;
@@ -7597,6 +8582,31 @@ function boot() {
     document.body.classList.toggle('free-mouse', input.freeMouse);
   };
 
+  // ---- map size ----
+  const mapTabs = Array.from(document.querySelectorAll('#map-tabs button'));
+  const mapNote = document.getElementById('map-note');
+  const applyMap = (size) => {
+    if (!MAP_SIZES.includes(size)) size = 'middle';
+    const changed = size !== world.size;
+    mapSize = size;
+    if (changed) {
+      world.setSize(size);
+      health.setRooms(world.activeRooms);
+      enemies.setMap(world.activeRooms);
+      zombies.setMap(world.activeRooms);
+      barrels.fuses.length = 0;
+      health.respawn(); // new spawn point on the new map
+    }
+    for (const b of mapTabs) b.classList.toggle('on', b.dataset.map === size);
+  };
+  for (const b of mapTabs) {
+    b.addEventListener('click', () => {
+      if (b.disabled) return;
+      try { localStorage.setItem(MAP_KEY, b.dataset.map); } catch (_) { /* ignore */ }
+      applyMap(b.dataset.map);
+    });
+  }
+
   // ---- game mode: soldiers (solo / 1v1 online) or zombie defense (solo / co-op) ----
   let gameMode = (() => { try { return localStorage.getItem(MODE_KEY); } catch (_) { return null; } })() === 'zombies' ? 'zombies' : 'soldiers';
   const modeTabs = Array.from(document.querySelectorAll('#mode-tabs button'));
@@ -7605,10 +8615,13 @@ function boot() {
     const online = net.online;
     const coop = online ? net.roomMode === 'coop' : gameMode === 'zombies';
     const shown = online ? (coop ? 'zombies' : 'soldiers') : gameMode;
+    const locked = net.status === 'connected' || net.status === 'connecting';
     for (const b of modeTabs) {
       b.classList.toggle('on', b.dataset.mode === shown);
-      b.disabled = net.status === 'connected' || net.status === 'connecting';
+      b.disabled = locked;
     }
+    for (const b of mapTabs) b.disabled = locked;
+    mapNote.textContent = locked ? (net.mode === 'guest' ? '(set by the host)' : '') : '';
     modeNote.textContent = shown === 'zombies'
       ? 'Defend the base in the middle of the map against waves of zombies. Solo, or co-op with up to 2 friends.'
       : (online ? '1v1 against your friend.' : 'Fight enemy soldiers. Online: 1v1 against a friend.');
@@ -7669,8 +8682,17 @@ function boot() {
   net.on('welcome', (m) => {
     for (const r of remotes.values()) r.setPresent(false);
     for (const id of net.players) remoteFor(id).setPresent(true);
+    // The host's map counts online.
+    if (net.mode === 'guest' || net.mode === 'host') applyMap(net.mapSize);
     if (net.roomMode === 'pvp') {
-      player.spawn = world.spawnPoints[m.id === 1 ? 0 : 2];
+      // Player 1 starts at the first spawn point, player 2 at the one farthest from it.
+      const pts = world.spawnPoints;
+      let far = pts[pts.length - 1], best = -1;
+      for (const q of pts) {
+        const d = Math.hypot(q.x - pts[0].x, q.z - pts[0].z);
+        if (d > best) { best = d; far = q; }
+      }
+      player.spawn = m.id === 1 ? pts[0] : far;
       player.respawn();
     }
     ui.setScore(0, 0);
@@ -7720,6 +8742,9 @@ function boot() {
   net.on('zhit', (m) => zombies.onNetHit(m));
   net.on('zdmg', (m) => { if (typeof m.dmg === 'number') zombies.hurtMe(Math.min(100, m.dmg), m.x, m.z); });
   net.on('zev', (m) => { if (zombies.role === 'guest') zombies.handleEvent(m); });
+  net.on('zbuy', (m) => zombies.onNetBuy(m));
+  net.on('zbought', (m) => zombies.applyGrant(m.item, m.level));
+  net.on('zmine', (m) => zombies.onNetMine(m));
 
   const netCode = document.getElementById('net-code');
   const netHost = document.getElementById('net-host');
@@ -7767,7 +8792,7 @@ function boot() {
       net.disconnect();
       return;
     }
-    net.host(gameMode === 'zombies' ? 'coop' : 'pvp');
+    net.host(gameMode === 'zombies' ? 'coop' : 'pvp', mapSize);
   });
   const join = () => { if (!netJoin.disabled) net.join(netCode.value); };
   netJoin.addEventListener('click', join);
@@ -7797,6 +8822,7 @@ function boot() {
     net.connect(url);
   });
   ui.setNetStatus('offline');
+  applyMap(mapSize);
   applyMode();
   let sendTimer = 0;
 
@@ -7804,6 +8830,11 @@ function boot() {
     ui.updateFps(dt);
     input.update(dt);
     input.blocked = health.dead; // no shooting or grenades while dead
+    if (input.consumeShop() && zombies.active) {
+      ui.pendingView = 'shop';
+      input.pause();
+    }
+    if (input.consumeMine() && zombies.active) zombies.placeMine();
     // The world keeps rendering behind the menu, but the player only
     // simulates while playing.
     if (input.locked) player.update(dt);

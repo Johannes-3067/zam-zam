@@ -63,6 +63,25 @@ html, body {
 #weapon-name { font-size: 12px; letter-spacing: 3px; color: #8f8d85; }
 #ammo { font-size: 14px; color: #8f8d85; }
 #ammo-count { font-size: 40px; color: #d0a84a; }
+#reload-bar {
+  position: fixed;
+  left: 50%;
+  top: calc(50% + 34px);
+  width: 150px;
+  margin-left: -75px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #e6e2d2;
+  text-shadow: 1px 1px 0 #000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 4;
+}
+#reload-bar.on { opacity: 1; }
+#reload-bar i { display: block; height: 5px; margin-top: 4px; background: rgba(0, 0, 0, 0.55); border: 1px solid rgba(255, 255, 255, 0.5); }
+#reload-bar b { display: block; height: 100%; width: 0; background: #d0a84a; }
 #reload-label { min-height: 14px; font-size: 12px; letter-spacing: 2px; color: #c9c6ba; }
 
 #fps {
@@ -233,6 +252,69 @@ body.zmode #mine-label { display: block; font-size: 12px; letter-spacing: 2px; c
 @media (pointer: coarse) { #play-full { display: none; } }
 .mode-note { margin: -6px 0 12px; font-size: 11px; line-height: 1.5; color: #8f8d85; }
 #mode-tabs button:disabled { opacity: 0.6; cursor: default; }
+
+/* ---- 5v5 team deathmatch ---- */
+#tdmhud {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 2px 2px 0 #000;
+  pointer-events: none;
+  z-index: 4;
+}
+#tdmhud.on { display: block; }
+#tdmhud span { font-size: 20px; letter-spacing: 3px; padding: 0 12px; }
+#tdm-a { color: #6fa0e0; }
+#tdm-b { color: #e0795f; }
+#tdm-time { font-size: 20px; letter-spacing: 3px; color: #e6e2d2; }
+#tdm-you { margin-top: 2px; font-size: 11px; letter-spacing: 3px; }
+#tdmover {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 12%;
+  background: rgba(0, 0, 0, 0.45);
+  text-shadow: 2px 2px 0 #000;
+  pointer-events: none;
+  z-index: 6;
+}
+#tdmover.on { display: flex; }
+#tdmover h2 { margin: 0; font-size: 46px; letter-spacing: 6px; color: #e6e2d2; text-align: center; }
+#tdmover p { margin: 8px 0 0; letter-spacing: 3px; color: #c9c6ba; text-align: center; }
+#tdmboard {
+  position: fixed;
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+  display: none;
+  min-width: 420px;
+  max-width: calc(100vw - 24px);
+  padding: 12px 16px;
+  color: #e6e2d2;
+  font-size: 13px;
+  background: rgba(14, 14, 16, 0.82);
+  border: 2px solid #55554f;
+  pointer-events: none;
+  z-index: 7;
+}
+#tdmboard.on { display: block; }
+#tdmboard .tb-wrap { display: flex; gap: 24px; }
+#tdmboard .tb-col { flex: 1; }
+#tdmboard h3 { margin: 0 0 6px; font-size: 14px; letter-spacing: 3px; }
+#tdmboard table { width: 100%; border-collapse: collapse; }
+#tdmboard th { text-align: right; color: #77756e; font-weight: normal; font-size: 11px; }
+#tdmboard td { padding: 1px 0; text-align: right; }
+#tdmboard td:first-child, #tdmboard th:first-child { text-align: left; }
+#tdmboard tr.me td { color: #d0a84a; font-weight: bold; }
+body.touch #tdmhud { top: calc(44px + env(safe-area-inset-top, 0px)); }
+body.touch #tdmhud span, body.touch #tdm-time { font-size: 14px; padding: 0 6px; }
 
 /* ---- Zombie defense ---- */
 #zhud {
@@ -602,6 +684,7 @@ body.touch #ammo-count { font-size: 30px; }
   <div id="crosshair"><i></i></div>
   <div id="fps">-- FPS</div>
 
+  <div id="reload-bar"><span>RELOADING</span><i><b></b></i></div>
   <div id="scope"></div>
   <div id="damage"></div>
   <div id="dmg-dir"><i></i></div>
@@ -627,11 +710,12 @@ body.touch #ammo-count { font-size: 30px; }
     <div class="panel">
       <div id="view-main">
         <h1>RETRO FPS</h1>
-        <p class="sub">Prototype &middot; Milestone 7</p>
+        <p class="sub">Prototype &middot; build 9 &middot; reload hands + 5v5</p>
 
         <div class="tabs" id="mode-tabs">
           <button type="button" data-mode="soldiers">SOLDIERS</button>
-          <button type="button" data-mode="zombies">ZOMBIE DEFENSE</button>
+          <button type="button" data-mode="zombies">ZOMBIES</button>
+          <button type="button" data-mode="tdm">5V5 TEAM DM</button>
         </div>
         <p class="mode-note" id="mode-note"></p>
 
@@ -693,6 +777,7 @@ body.touch #ammo-count { font-size: 30px; }
           <li><b>Q</b> previous weapon</li>
           <li><b>E</b> throw grenade</li>
           <li><b>B</b> shop (zombie defense)</li>
+          <li><b>Tab</b> scoreboard (5v5)</li>
           <li><b>G</b> place landmine (zombie defense)</li>
           <li><b>Esc</b> menu / settings</li>
         </ul>
@@ -786,6 +871,7 @@ const LIMITS = {
   buttonOpacity: { min: 0.2, max: 1 },
   crosshairSize: { min: 2, max: 10 },
   enemyCount: { min: 0, max: 12 },
+  fillBots: { min: 0, max: 1 },
   difficulty: { min: 0, max: 2 },
 };
 
@@ -810,6 +896,7 @@ function createDefaults() {
     buttonOpacity: 0.8,
     crosshairSize: 3,
     enemyCount: 6,
+    fillBots: 1,
     difficulty: 1,
   };
 }
@@ -980,6 +1067,8 @@ const mult = (v) => v.toFixed(2) + 'x';
 const SETTINGS_SCHEMA = [
   { tab: 'general', key: 'enemyCount', label: 'Enemies', step: 1, format: (v) => (v ? String(Math.round(v)) : 'Off'),
     note: 'Single player only. Off during a multiplayer match.' },
+  { tab: 'general', key: 'fillBots', label: 'Bots fill empty 5v5 slots', toggle: true,
+    note: 'Both teams are topped up to five with bots.' },
   { tab: 'general', key: 'difficulty', label: 'Difficulty', step: 1, format: (v) => ['Easy', 'Normal', 'Hard'][Math.round(v)] },
   { tab: 'general', key: 'fov', label: 'Field of view', step: 1, format: (v) => Math.round(v) + '°' },
   { tab: 'general', key: 'renderScale', label: 'Render scale', step: 0.05, format: pct,
@@ -1027,6 +1116,8 @@ class Ui {
     this._weaponName = '';
     this._grenadeText = '';
     this.reloadLabel = document.getElementById('reload-label');
+    this.reloadBar = document.getElementById('reload-bar');
+    this.reloadFill = this.reloadBar.querySelector('b');
     this.healthNum = document.getElementById('health-num');
     this.healthBar = document.getElementById('health-bar');
     this.damageEl = document.getElementById('damage');
@@ -1237,6 +1328,16 @@ class Ui {
 
   /** Ammo counter, reload label and a crosshair that follows the weapon spread. */
   updateHud(weapon, grenades, health) {
+    // Reload progress under the crosshair.
+    const reloadFrac = weapon.reloading
+      ? (weapon.spec.shellTime ? weapon.ammo / weapon.magSize : Math.min(1, weapon.reloadTime / weapon.reloadDuration))
+      : 0;
+    const reloadShown = weapon.reloading && !health.dead;
+    if (reloadShown !== this._reloadShown) {
+      this._reloadShown = reloadShown;
+      this.reloadBar.classList.toggle('on', reloadShown);
+    }
+    if (reloadShown) this.reloadFill.style.width = Math.round(reloadFrac * 100) + '%';
     const hp = Math.ceil(health.value);
     if (hp !== this._hp) {
       this._hp = hp;
@@ -1256,7 +1357,8 @@ class Ui {
       if (health.dead) {
         this.deathCause.textContent = health.cause === 'fall' ? 'YOU FELL TO YOUR DEATH'
           : health.cause === 'enemy' ? 'KILLED BY AN ENEMY'
-          : health.cause === 'zombie' ? 'EATEN BY ZOMBIES' : 'YOU WERE BLOWN UP';
+          : health.cause === 'zombie' ? 'EATEN BY ZOMBIES'
+          : health.cause === 'bot' ? 'KILLED BY A BOT' : 'YOU WERE BLOWN UP';
       }
     }
     if (health.dead && this.killedBy) this.deathCause.textContent = this.killedBy;
@@ -1584,6 +1686,7 @@ class Input {
     this._fireTouch = false;
     /** While true (e.g. the player is dead) fire, aim and grenades are ignored. */
     this.blocked = false;
+    this.scoreHeld = false; // Tab: scoreboard in team matches
     // Aim sources: right mouse button, Z key, touch AIM button.
     this._aimMouse = false;
     this._aimTouch = false;
@@ -2009,6 +2112,7 @@ class Input {
     if (e.code === RELOAD) this._reloadQueued = true;
     if (e.code === GRENADE) this._grenadeQueued = true;
     if (e.code === CROUCH) this._crouchPressed = true;
+    if (e.code === 'Tab') { e.preventDefault(); this.scoreHeld = true; return; }
     if (e.code === SHOP_KEY) this._shopQueued = true;
     if (e.code === MINE_KEY) this._mineQueued = true;
     if (SLOT_KEYS[e.code]) this._slotQueued = SLOT_KEYS[e.code];
@@ -2016,6 +2120,7 @@ class Input {
 
   _onKeyUp(e) {
     this._keys.delete(e.code);
+    if (e.code === 'Tab') this.scoreHeld = false;
   }
 
   _onLockChange() {
@@ -2050,6 +2155,7 @@ class Input {
       this._crouchPressed = false;
       this._shopQueued = false;
       this._mineQueued = false;
+      this.scoreHeld = false;
     }
     if (this.onLockChange) this.onLockChange(playing);
   }
@@ -3506,16 +3612,18 @@ function createPistol(o) {
   root.add(flash);
 
   let slideT = 0;
+  let reloadSlide = 0;
   return {
     root, flash,
     applyReload(r) {
       mag.position.y = magRestY + r.magY * 0.5;
       mag.visible = r.magVisible;
+      reloadSlide = r.charge; // the slide is racked after an empty reload
     },
     onShot() { slideT = 0.09; },
     update(dt) {
       slideT = Math.max(0, slideT - dt);
-      slide.position.z = slideRestZ + (slideT > 0 ? 0.03 * Math.sin(Math.PI * (1 - slideT / 0.09)) : 0);
+      slide.position.z = slideRestZ + 0.04 * reloadSlide + (slideT > 0 ? 0.03 * Math.sin(Math.PI * (1 - slideT / 0.09)) : 0);
     },
   };
 }
@@ -4134,6 +4242,27 @@ Object.assign(AUTO12_SPEC, { damage: 8, falloff: { start: 5, end: 22, min: 0.15 
 const WEAPON_SPECS = [AK47_SPEC, SMG_SPEC, SHOTGUN_SPEC, RIFLE_SPEC, REVOLVER_SPEC, PISTOL_SPEC, M1911_SPEC, CANNON_SPEC, LMG_SPEC,
   M4_SPEC, VECTOR_SPEC, RPK_SPEC, DMR_SPEC, AUTO12_SPEC];
 
+/** Hand anchors per weapon (model space): G grip, F front hold, M magazine well / cylinder, C bolt or charging handle, P loading port. */
+const pistolHands = (o) => ({
+  kind: 'mag', magScale: 0.5, backZ: 0.04, carryScale: 0.7,
+  G: [0, -o.height / 2 - o.gripH * 0.5, 0.016], F: [-0.036, -o.height / 2 - o.gripH * 0.55, 0.0],
+  M: [-0.01, -o.height / 2 - o.gripH * 0.85, 0.02], C: [-0.01, o.height / 2 + 0.012, 0.022],
+});
+Object.assign(AK47_SPEC, { hands: { kind: 'mag', G: [0, -0.10, 0.02], F: [0, -0.06, -0.36], M: [0, -0.14, -0.135], C: [0.035, 0.05, -0.06], backZ: 0.055 } });
+Object.assign(SMG_SPEC, { hands: { kind: 'mag', G: [0, -0.09, 0.03], F: [0, -0.07, -0.28], M: [0, -0.12, -0.12], C: [-0.035, 0.04, -0.12], backZ: 0.04 } });
+Object.assign(SHOTGUN_SPEC, { hands: { kind: 'shells', G: [0, -0.06, 0.06], F: [0, -0.05, -0.30], P: [0, -0.06, -0.03] } });
+Object.assign(RIFLE_SPEC, { hands: { kind: 'bolt', G: [0, -0.05, 0.10], F: [0, -0.05, -0.35], C: [0.04, 0.012, 0.03], P: [0, 0.03, -0.05], backZ: 0.06 } });
+Object.assign(REVOLVER_SPEC, { hands: { kind: 'revolver', G: [0, -0.09, 0.06], F: [-0.034, -0.085, 0.045], M: [-0.045, -0.015, -0.06] } });
+Object.assign(PISTOL_SPEC, { hands: pistolHands(PISTOL_9MM) });
+Object.assign(M1911_SPEC, { hands: pistolHands(PISTOL_45) });
+Object.assign(CANNON_SPEC, { hands: pistolHands(HAND_CANNON) });
+Object.assign(LMG_SPEC, { hands: { kind: 'mag', magScale: 1.2, carryScale: 1.3, G: [0, -0.10, 0.06], F: [0, -0.05, -0.31], M: [0.006, -0.12, -0.12], C: [0.035, 0.04, -0.12], backZ: 0.04 } });
+Object.assign(M4_SPEC, { hands: { kind: 'mag', G: [0, -0.105, 0.045], F: [0, -0.06, -0.37], M: [0, -0.10, -0.06], C: [0, 0.05, 0.06], backZ: 0.04 } });
+Object.assign(VECTOR_SPEC, { hands: { kind: 'mag', magScale: 0.8, G: [0, -0.10, 0.08], F: [0, -0.085, -0.27], M: [0, -0.17, 0.05], C: [0.035, 0.05, -0.02], backZ: 0.04 } });
+Object.assign(RPK_SPEC, { hands: { kind: 'mag', magScale: 1.1, carryScale: 1.2, G: [0, -0.10, 0.05], F: [0, -0.06, -0.34], M: [0, -0.17, -0.12], C: [0.035, 0.04, -0.10], backZ: 0.04 } });
+Object.assign(DMR_SPEC, { hands: { kind: 'mag', magScale: 0.9, G: [0, -0.08, 0.08], F: [0, -0.06, -0.38], M: [0, -0.10, -0.04], C: [0.035, 0.03, 0.0], backZ: 0.05 } });
+Object.assign(AUTO12_SPEC, { hands: { kind: 'mag', G: [0, -0.10, 0.05], F: [0, -0.05, -0.25], M: [0, -0.12, -0.10], C: [0.035, 0.04, -0.06], backZ: 0.04 } });
+
 /** Loadout classes: weapon ids (1 + index in WEAPON_SPECS). Slots 1 and 2 take any class except sidearms. */
 const WEAPON_CLASSES = [
   { id: 'ar', name: 'ASSAULT RIFLES', short: 'AR', ids: [1, 10] },
@@ -4145,6 +4274,178 @@ const WEAPON_CLASSES = [
 ];
 const DEFAULT_LOADOUT = [1, 2, 6]; // primary, secondary, sidearm
 const LOADOUT_SLOTS = ['PRIMARY', 'SECONDARY', 'SIDEARM'];
+
+// ===== js/weapon/ViewHands.js =====
+/** Where the left hand goes to fetch a fresh magazine, shell or round: low and to the left, out of view. */
+const HAND_AWAY = [-0.12, -0.30, 0.08];
+
+const hLerp = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+const hEase = (a, b, t) => specEase(a, b, t);
+
+/**
+ * First-person hands for a viewmodel. The right hand holds the grip. The left
+ * hand holds the front of the gun and does the reloading: it follows the
+ * reload timeline of the weapon kind:
+ *  'mag'      pull the magazine out, take it away, bring a fresh one, seat it, rack the bolt if empty
+ *  'revolver' open the cylinder, bring rounds, load, close
+ *  'shells'   fetch a shell, push it in, repeat (once per shell cycle)
+ *  'bolt'     right hand works the bolt, left hand brings the rounds
+ * cfg anchors are in the weapon's own model space:
+ *  G grip, F front hold, M magazine well (or cylinder), C bolt / slide / charging handle, P loading port.
+ */
+class ViewHands {
+  constructor(parent, cfg, scene) {
+    this.cfg = cfg;
+    this.root = new THREE.Group();
+    parent.add(this.root);
+    const skin = new THREE.MeshLambertMaterial({ color: 0xc89a74 });
+    const sleeve = new THREE.MeshLambertMaterial({ color: 0x46543a });
+    const gloveDark = new THREE.MeshLambertMaterial({ color: 0x2c3326 });
+    skin.name = 'skin';
+    sleeve.name = 'sleeve';
+    const make = (side) => {
+      const g = new THREE.Group();
+      g.rotation.order = 'YXZ';
+      const fist = new THREE.Mesh(new THREE.BoxGeometry(0.054, 0.046, 0.085), skin);
+      const thumb = new THREE.Mesh(new THREE.BoxGeometry(0.017, 0.017, 0.055), skin);
+      thumb.position.set(-0.026 * side, 0.026, -0.012);
+      const cuff = new THREE.Mesh(new THREE.BoxGeometry(0.066, 0.058, 0.05), gloveDark);
+      cuff.position.set(0, 0, 0.065);
+      const arm = new THREE.Group(); // forearm slopes down and out towards the camera
+      arm.rotation.order = 'YXZ';
+      arm.rotation.x = 0.32;
+      arm.rotation.y = 0.32 * side;
+      const sleeveBox = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.5), sleeve);
+      sleeveBox.position.set(0, 0, 0.33);
+      arm.add(sleeveBox);
+      g.add(fist, thumb, cuff, arm);
+      return g;
+    };
+    this.left = make(-1);
+    this.right = make(1);
+    this.root.add(this.left, this.right);
+
+    // What the left hand carries while it fetches: a magazine, rounds or a shell.
+    const kind = cfg.kind;
+    const carryMat = new THREE.MeshLambertMaterial({ color: kind === 'mag' ? 0x2b2b2d : kind === 'shells' ? 0xa83a2a : 0xc9a24a });
+    carryMat.name = 'carry';
+    const size = kind === 'mag' ? [0.03, 0.11 * (cfg.carryScale || 1), 0.045] : kind === 'shells' ? [0.024, 0.024, 0.07] : [0.04, 0.022, 0.05];
+    this.carry = new THREE.Mesh(new THREE.BoxGeometry(size[0], size[1], size[2]), carryMat);
+    this.carry.position.set(0, kind === 'mag' ? -0.05 : 0, -0.01);
+    this.carry.visible = false;
+    this.left.add(this.carry);
+
+    this.lp = cfg.F.slice();
+    this.rp = cfg.G.slice();
+    this._first = true;
+
+    // The magazine that gets dropped: a loose box in the view scene with a little gravity.
+    this.scene = scene || parent.parent || null;
+    this.prevT = 0;
+    this.dropAge = -1;
+    this.dropV = [0, 0, 0];
+    this.drop = null;
+    if (cfg.kind === 'mag' && this.scene) {
+      this.drop = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.11 * (cfg.carryScale || 1), 0.045), carryMat);
+      this.drop.visible = false;
+      this.scene.add(this.drop);
+    }
+  }
+
+  _spawnDrop() {
+    if (!this.drop || !this.left.getWorldPosition || !THREE.Vector3) return;
+    const v = new THREE.Vector3();
+    this.left.getWorldPosition(v);
+    this.drop.position.copy(v);
+    this.drop.rotation.set(0, 0, 0);
+    this.dropV = [-0.25, -0.05, -0.15];
+    this.dropAge = 0;
+    this.drop.visible = true;
+  }
+
+  /**
+   * t: reload phase 0..1 (a shell cycle for 'shells'), r: the reload pose output
+   * (magY, charge), empty: the weapon was empty when the reload began.
+   */
+  update(dt, reloading, t, empty, r) {
+    const c = this.cfg;
+    let L = c.F;
+    let R = c.G;
+    let carry = false;
+    if (reloading) {
+      const A = c.A || HAND_AWAY;
+      if (c.kind === 'mag') {
+        const ms = c.magScale || 1;
+        const follow = [c.M[0], c.M[1] + r.magY * ms, c.M[2]];
+        const out = [c.M[0], c.M[1] - 0.3 * ms, c.M[2]];
+        if (t < 0.16) L = hLerp(c.F, c.M, hEase(0, 0.16, t));
+        else if (t < 0.34) L = follow;
+        else if (t < 0.44) L = hLerp(out, A, hEase(0.34, 0.44, t));
+        else if (t < 0.52) L = hLerp(A, out, hEase(0.44, 0.52, t));
+        else if (t < 0.72) L = follow;
+        else if (empty) {
+          const back = [c.C[0], c.C[1], c.C[2] + (c.backZ || 0.05) * r.charge];
+          if (t < 0.78) L = hLerp(c.M, c.C, hEase(0.72, 0.78, t));
+          else if (t < 0.92) L = back;
+          else L = hLerp(c.C, c.F, hEase(0.92, 1, t));
+        } else {
+          L = hLerp(c.M, c.F, hEase(0.74, 0.92, t));
+        }
+        carry = t >= 0.34 && t < 0.52;
+      } else if (c.kind === 'revolver') {
+        if (t < 0.14) L = hLerp(c.F, c.M, hEase(0, 0.14, t));
+        else if (t < 0.5) L = c.M;
+        else if (t < 0.58) L = hLerp(c.M, A, hEase(0.5, 0.58, t));
+        else if (t < 0.66) L = hLerp(A, c.M, hEase(0.58, 0.66, t));
+        else if (t < 0.8) L = c.M;
+        else L = hLerp(c.M, c.F, hEase(0.8, 0.9, t));
+        carry = t >= 0.54 && t < 0.72;
+      } else if (c.kind === 'shells') {
+        if (t < 0.4) L = hLerp(A, c.P, hEase(0, 0.4, t));
+        else if (t < 0.5) L = c.P;
+        else L = hLerp(c.P, A, hEase(0.5, 0.9, t));
+        carry = t < 0.46;
+      } else if (c.kind === 'bolt') {
+        // Left hand: two rounds, one after the other.
+        if (t < 0.26) L = hLerp(c.F, A, hEase(0.1, 0.26, t));
+        else if (t < 0.72) {
+          const q = ((t - 0.26) / 0.46) * 2;
+          const f = q - Math.floor(q);
+          L = f < 0.55 ? hLerp(A, c.P, hEase(0, 0.5, f)) : hLerp(c.P, A, hEase(0.55, 1, f));
+          carry = f < 0.5;
+        } else L = hLerp(A, c.F, hEase(0.72, 0.9, t));
+        // Right hand: opens the bolt, lets go, closes it again.
+        const b = hEase(0.1, 0.16, t) - hEase(0.28, 0.34, t) + hEase(0.64, 0.7, t) - hEase(0.8, 0.86, t);
+        R = hLerp(c.G, [c.C[0], c.C[1], c.C[2] + (c.backZ || 0.06) * r.charge], b);
+      }
+    }
+    const k = this._first ? 1 : Math.min(1, dt * 26);
+    this._first = false;
+    for (let i = 0; i < 3; i++) {
+      this.lp[i] += (L[i] - this.lp[i]) * k;
+      this.rp[i] += (R[i] - this.rp[i]) * k;
+    }
+    this.left.position.set(this.lp[0], this.lp[1], this.lp[2]);
+    this.right.position.set(this.rp[0], this.rp[1], this.rp[2]);
+    this.carry.visible = carry;
+
+    if (this.drop) {
+      // The old magazine is let go the moment the hand takes it away.
+      if (reloading && this.prevT < 0.34 && t >= 0.34) this._spawnDrop();
+      this.prevT = reloading ? t : 0;
+      if (this.dropAge >= 0) {
+        this.dropAge += dt;
+        this.dropV[1] -= 2.6 * dt;
+        this.drop.position.x += this.dropV[0] * dt;
+        this.drop.position.y += this.dropV[1] * dt;
+        this.drop.position.z += this.dropV[2] * dt;
+        this.drop.rotation.x += 5 * dt;
+        this.drop.rotation.z += 3 * dt;
+        if (this.dropAge > 0.9) { this.dropAge = -1; this.drop.visible = false; }
+      }
+    }
+  }
+}
 
 // ===== js/net/Net.js =====
 const PEER_PREFIX = 'retrofps-m7-';
@@ -4193,6 +4494,10 @@ class Net {
     this.error = ''; // reason for the last 'error' status
     this.id = 0; // my player id (1 = host) once welcomed
     this.players = new Set(); // ids of the other players present
+    this.teams = {}; // player id -> team (0 / 1) in team matches
+    this.team = 0; // my team
+    this._latest = {}; // host, team matches: newest state of every player
+    this._flushT = 0;
     this.score = [0, 0]; // 1v1 kills for player 1 and player 2
     this.handlers = {};
     this.onStatus = null;
@@ -4212,7 +4517,15 @@ class Net {
   }
 
   get maxPlayers() {
-    return this.roomMode === 'coop' ? 3 : 2;
+    return this.roomMode === 'coop' ? 3 : this.roomMode === 'tdm' ? 10 : 2;
+  }
+
+  /** The smaller team gets the next player (a tie goes to team 0). */
+  _pickTeam() {
+    if (this.roomMode !== 'tdm') return 0;
+    const n = [0, 0];
+    for (const id of Object.keys(this.teams)) n[this.teams[id] ? 1 : 0]++;
+    return n[1] < n[0] ? 1 : 0;
   }
 
   on(type, fn) {
@@ -4225,7 +4538,7 @@ class Net {
     this.disconnect();
     this.mode = 'host';
     this.mapSize = mapSize || 'middle';
-    this.roomMode = roomMode === 'coop' ? 'coop' : 'pvp';
+    this.roomMode = roomMode === 'coop' ? 'coop' : roomMode === 'tdm' ? 'tdm' : 'pvp';
     this._set('connecting');
     const Peer = await loadPeerJs();
     if (this.mode !== 'host') return; // cancelled meanwhile
@@ -4239,7 +4552,8 @@ class Net {
       peer.on('open', () => {
         if (this._peerObj !== peer) return;
         this.code = code;
-        this._receive({ t: 'welcome', id: 1, players: [], mode: this.roomMode, map: this.mapSize, s: this.score.slice() });
+        this.teams = { 1: 0 };
+        this._receive({ t: 'welcome', id: 1, players: [], mode: this.roomMode, map: this.mapSize, team: 0, teams: { 1: 0 }, s: this.score.slice() });
       });
       peer.on('connection', (conn) => {
         conn.on('open', () => {
@@ -4254,11 +4568,13 @@ class Net {
           conn._pid = id;
           this._guests.set(id, conn);
           if (this.roomMode === 'pvp') this.score = [0, 0];
+          const team = this._pickTeam();
+          this.teams[id] = team;
           const others = [1];
           for (const g of this._guests.keys()) if (g !== id) others.push(g);
-          conn.send({ t: 'welcome', id, players: others, peer: true, mode: this.roomMode, map: this.mapSize, s: this.score.slice() });
-          this._broadcast({ t: 'peer', present: true, id }, id);
-          this._receive({ t: 'peer', present: true, id });
+          conn.send({ t: 'welcome', id, players: others, peer: true, mode: this.roomMode, map: this.mapSize, team, teams: Object.assign({}, this.teams), s: this.score.slice() });
+          this._broadcast({ t: 'peer', present: true, id, team }, id);
+          this._receive({ t: 'peer', present: true, id, team });
           if (this.roomMode === 'pvp') this._receive({ t: 'score', s: this.score.slice(), victim: 0, killer: 0, quiet: 1 });
         });
         conn.on('data', (m) => { if (conn._pid) this._serve(conn._pid, m); });
@@ -4266,6 +4582,8 @@ class Net {
           const id = conn._pid;
           if (!id || this._guests.get(id) !== conn) return;
           this._guests.delete(id);
+          delete this.teams[id];
+          delete this._latest[id];
           this._broadcast({ t: 'peer', present: false, id }, id);
           this._receive({ t: 'peer', present: false, id });
         };
@@ -4323,13 +4641,26 @@ class Net {
     if (!m || typeof m.t !== 'string') return;
     const msg = Object.assign({}, m, { from });
     switch (m.t) {
-      case 'hit': { // 1v1: my bullet hit player `to`
+      case 's':
+        if (this.roomMode === 'tdm') {
+          // Team matches: states are batched and sent a few times a second (see flush).
+          this._latest[from] = m;
+          if (from !== 1) this._receive(msg);
+          break;
+        }
+        if (from !== 1) this._receive(msg);
+        this._broadcast(msg, from);
+        break;
+      case 'hit': { // my bullet hit player `to`
         const to = m.to || (from === 1 ? 2 : 1);
+        if (this.roomMode === 'tdm' && (this.teams[from] === undefined || this.teams[from] === this.teams[to])) break; // no friendly fire
         if (to !== from && typeof m.dmg === 'number') this._deliver(to, { t: 'dmg', dmg: Math.min(250, Math.max(0, m.dmg)), head: m.head ? 1 : 0, from });
         break;
       }
       case 'died': {
-        if (this.roomMode === 'pvp') {
+        if (this.roomMode === 'tdm') {
+          this._receive(msg); // the host's match logic scores it
+        } else if (this.roomMode === 'pvp') {
           const killer = m.self ? 0 : (from === 1 ? 2 : 1);
           if (killer) this.score[killer - 1]++;
           const sc = { t: 'score', s: this.score.slice(), victim: from, killer };
@@ -4345,6 +4676,7 @@ class Net {
       case 'zhit': // a guest hit a zombie, bought something or placed a mine: only the host needs it
       case 'zbuy':
       case 'zmine':
+      case 'bhit':
         if (from !== 1) this._receive(msg);
         break;
       default:
@@ -4354,6 +4686,23 @@ class Net {
           if (from !== 1) this._receive(msg);
           this._broadcast(msg, from);
         }
+    }
+  }
+
+  /** Host, team matches: send everyone's newest state to every guest (call every frame). */
+  flush(dt) {
+    if (this.mode !== 'host' || this.roomMode !== 'tdm' || this.status !== 'connected') return;
+    this._flushT -= dt;
+    if (this._flushT > 0) return;
+    this._flushT = 0.066;
+    const rows = [];
+    for (const id of Object.keys(this._latest)) {
+      const m = this._latest[id];
+      rows.push([+id, m.x, m.y, m.z, m.yaw, m.pitch, m.c, m.w, m.d]);
+    }
+    for (const [gid, conn] of this._guests) {
+      const others = rows.filter((r) => r[0] !== gid);
+      if (others.length) this._sendTo(conn, { t: 'sa', a: others });
     }
   }
 
@@ -4413,6 +4762,8 @@ class Net {
     if (conn) { try { conn.close(); } catch (_) { /* ignore */ } }
     if (peer) { try { peer.destroy(); } catch (_) { /* ignore */ } }
     this.players.clear();
+    this.teams = {};
+    this._latest = {};
     this.id = 0;
     const h = this.handlers.clear;
     if (h) h();
@@ -4440,7 +4791,9 @@ class Net {
     if (m.t === 'welcome') {
       clearTimeout(this._joinTimer);
       this.id = m.id;
-      this.roomMode = m.mode === 'coop' ? 'coop' : 'pvp';
+      this.roomMode = m.mode === 'coop' ? 'coop' : m.mode === 'tdm' ? 'tdm' : 'pvp';
+      this.team = m.team | 0;
+      this.teams = m.teams ? Object.assign({}, m.teams) : { [m.id]: this.team };
       this.mapSize = MAP_SIZES.includes(m.map) ? m.map : 'middle';
       this.players = new Set(Array.isArray(m.players) ? m.players.filter((p) => p !== m.id) : (m.peer ? [m.id === 1 ? 2 : 1] : []));
       this.score = m.s || [0, 0];
@@ -4452,9 +4805,14 @@ class Net {
       this._set('full');
       this.mode = null;
       return;
+    } else if (m.t === 'sa') {
+      const h = this.handlers.s;
+      if (h) for (const a of m.a) h({ t: 's', from: a[0], x: a[1], y: a[2], z: a[3], yaw: a[4], pitch: a[5], c: a[6], w: a[7], d: a[8] });
+      return;
     } else if (m.t === 'peer') {
       if (m.id === undefined) m.id = this.id === 1 ? 2 : 1;
-      if (m.present) this.players.add(m.id); else this.players.delete(m.id);
+      if (m.present) { this.players.add(m.id); if (m.team !== undefined) this.teams[m.id] = m.team; }
+      else { this.players.delete(m.id); delete this.teams[m.id]; }
     } else if (m.t === 'score') {
       this.score = m.s;
       if (m.quiet) {
@@ -4519,6 +4877,8 @@ class RemotePlayer {
     this.flash = 0;
 
     const body = new THREE.MeshLambertMaterial({ color: color || 0x6b3a2a });
+    this.bodyMat = body;
+    this.team = undefined; // set in team matches
     const dark = new THREE.MeshLambertMaterial({ color: 0x3a3a40 });
     const skin = new THREE.MeshLambertMaterial({ color: 0xc09070 });
     const metal = new THREE.MeshLambertMaterial({ color: 0x222226 });
@@ -4549,6 +4909,41 @@ class RemotePlayer {
     this.muzzle.position.set(0.2, 0, -0.85);
     this.pivot.add(this.muzzle);
     scene.add(this.root);
+  }
+
+  /** Team colour for the uniform (team matches). */
+  setTeam(team) {
+    this.team = team;
+    if (team === 0 || team === 1) this.bodyMat.color.setHex(TEAM_HEX[team]);
+  }
+
+  /** A floating name above the head, drawn through walls (for teammates). */
+  setLabel(text, color) {
+    if (!this.tag) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 40;
+      this._tagCanvas = canvas;
+      const tex = new THREE.CanvasTexture(canvas);
+      this.tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+      this.tag.scale.set(0.9, 0.28, 1);
+      this.tag.position.set(0, 2.15, 0);
+      this.tag.renderOrder = 10;
+      this.tag.visible = false;
+      this.root.add(this.tag);
+    }
+    if (this._tagText === text + color) return;
+    this._tagText = text + color;
+    const g = this._tagCanvas.getContext('2d');
+    g.clearRect(0, 0, 128, 40);
+    g.font = 'bold 26px monospace';
+    g.textAlign = 'center';
+    g.lineWidth = 5;
+    g.strokeStyle = '#000';
+    g.strokeText(text, 64, 28);
+    g.fillStyle = color;
+    g.fillText(text, 64, 28);
+    this.tag.material.map.needsUpdate = true;
   }
 
   get active() {
@@ -4684,11 +5079,14 @@ class Weapon {
     this.onShoot = onShoot; // (slot, impactPoint | null)
     this.onTargetHit = onTargetHit; // (damage, head)
     this.onEnemyHit = onEnemyHit; // (box, hit, damage, headMul) -> true if an enemy was hit
+    this.shotFilter = null; // (box) => false lets bullets pass through that box (allies in team matches)
     this.lastImpact = null;
 
     this.model = spec.createModel();
     this.model.root.visible = false;
     engine.viewScene.add(this.model.root);
+    this.hands = spec.hands ? new ViewHands(this.model.root, spec.hands, engine.viewScene) : null;
+    this.reloadEnv = 0;
 
     this.name = spec.name;
     this.magSize = spec.magSize;
@@ -4881,7 +5279,7 @@ class Weapon {
       let dz = fz + rz * ox + uz * oy;
       const len = Math.hypot(dx, dy, dz);
       dx /= len; dy /= len; dz /= len;
-      const worldHit = this.collision.raycast(cam.position.x, cam.position.y, cam.position.z, dx, dy, dz, spec.range, hit);
+      const worldHit = this.collision.raycast(cam.position.x, cam.position.y, cam.position.z, dx, dy, dz, spec.range, hit, this.shotFilter);
       if (targets && targets.active) {
         // The other player counts if they are closer than the wall behind them.
         const dp = targets.raycast(cam.position.x, cam.position.y, cam.position.z, dx, dy, dz, worldHit ? hit.dist : spec.range);
@@ -5007,16 +5405,28 @@ class Weapon {
 
     // Reload animation.
     let anim = this._idleReload;
+    let phase = 0;
     if (this.reloading) {
       const r = this._reload;
-      const phase = spec.shellTime ? Math.max(0, this.shellClock) / spec.shellTime : this.reloadTime / this.reloadDuration;
+      phase = spec.shellTime ? Math.max(0, this.shellClock) / spec.shellTime : this.reloadTime / this.reloadDuration;
       spec.reloadPose(phase, this.reloadEmpty, r);
       x += r.x; y += r.y; z += r.z;
       rx += r.rx; ry += r.ry; rz += r.rz;
       anim = r;
     }
+    // The whole weapon dips towards the middle and rolls, so the reload is easy to see.
+    this.reloadEnv += ((this.reloading ? 1 : 0) - this.reloadEnv) * Math.min(1, dt * 7);
+    const env = this.reloadEnv;
+    if (env > 0.001) {
+      x -= 0.05 * env;
+      y -= 0.07 * env;
+      z += 0.02 * env;
+      rx += 0.18 * env;
+      rz += 0.22 * env;
+    }
     m.applyReload(anim);
     if (m.update) m.update(dt);
+    if (this.hands) this.hands.update(dt, this.reloading, phase, this.reloadEmpty, anim);
 
     // Switching (lowered) and grenade throw (dip and tip down).
     const lowered = 1 - akSmooth(this.raise);
@@ -5090,6 +5500,11 @@ class WeaponManager {
     this.state = 'idle';
     this.active.raise = 1;
     this.active.model.root.visible = true;
+  }
+
+  /** Bullets ignore the boxes this returns false for (or null: everything counts). */
+  setShotFilter(fn) {
+    for (const w of this.all) w.shotFilter = fn;
   }
 
   /** Full ammo for every weapon (on respawn). */
@@ -5388,14 +5803,14 @@ class GrenadeSystem {
     const capGeometry = new THREE.BoxGeometry(0.03, 0.03, 0.03);
     const bodyMaterial = new THREE.MeshLambertMaterial({ color: 0x4b5a3a });
     const capMaterial = new THREE.MeshLambertMaterial({ color: 0x6a6a6a });
-    this.list = ['me', 'other'].map((owner) => {
+    this.list = ['me', 'other', 'other', 'other', 'other', 'other', 'other', 'other', 'other'].map((owner) => {
       const mesh = new THREE.Group();
       const cap = new THREE.Mesh(capGeometry, capMaterial);
       cap.position.y = GR_RADIUS;
       mesh.add(new THREE.Mesh(bodyGeometry, bodyMaterial), cap);
       mesh.visible = false;
       this.scene.add(mesh);
-      return { owner, mesh, active: false, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, life: 0 };
+      return { owner, ownerId: 0, mesh, active: false, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, life: 0 };
     });
   }
 
@@ -5419,7 +5834,15 @@ class GrenadeSystem {
 
   /** The other player threw a grenade. */
   spawnRemote(m) {
-    this._launch(this.list[1], m.x, m.y, m.z, m.vx, m.vy, m.vz);
+    // First free slot of the other players' grenades; the oldest one if all are in flight.
+    let slot = null;
+    for (let i = 1; i < this.list.length; i++) {
+      const g = this.list[i];
+      if (!g.active) { slot = g; break; }
+      if (!slot || g.life < slot.life) slot = g;
+    }
+    slot.ownerId = m.from || 0;
+    this._launch(slot, m.x, m.y, m.z, m.vx, m.vy, m.vz);
     this.audio.whoosh();
   }
 
@@ -5509,7 +5932,9 @@ class GrenadeSystem {
   _explode(g, x, y, z, hx, hy, hz, nx, ny, nz) {
     g.active = false;
     g.mesh.visible = false;
+    this.explosions.ownerId = g.ownerId || 0; // who threw it, for team rules
     this.explosions.explode(x, y, z, hx, hy, hz, nx, ny, nz, 1, g.owner);
+    this.explosions.ownerId = 0;
   }
 }
 
@@ -5518,13 +5943,14 @@ const HALL_H = 4.5; // wall height
 const DOOR_H = 3.0; // doorway height
 
 // World size (metres) covered by one texture repeat.
-const TILE = { concrete: 3, floor: 3, panel: 3, ceiling: 3, crate: 1, hazard: 1, lamp: 1 };
+const TILE = { concrete: 3, floor: 3, panel: 3, ceiling: 3, crate: 1, hazard: 1, lamp: 1, sand: 3, dirt: 4, asphalt: 4, olive: 3, rust: 3 };
 
 /** Which rooms exist for each map size. 'plug*' rooms are wall pieces that close a doorway to a room that is not there. */
 const ROOMS_BY_SIZE = {
   small: ['hall', 'east', 'pump', 'plugWest', 'plugNorth', 'plugPumpEast', 'plugGarage'],
   middle: ['hall', 'east', 'pump', 'warehouse', 'corridor', 'control', 'plugPumpEast', 'plugBoiler', 'plugGarage'],
   large: ['hall', 'east', 'pump', 'warehouse', 'corridor', 'control', 'dock', 'boiler', 'garage'],
+  crash: ['crash'], // outdoor map for 5v5 team deathmatch
 };
 const MAP_SIZES = ['small', 'middle', 'large'];
 
@@ -5535,6 +5961,18 @@ const ALL_SPAWNS = [
   { x: -3, y: 0, z: -33, yaw: 0, room: 'control' }, { x: 13, y: 0, z: 4, yaw: -Math.PI / 2, room: 'east' },
   { x: 52, y: 0, z: 0, yaw: Math.PI / 2, room: 'dock' }, { x: -48, y: 0, z: 0, yaw: -Math.PI / 2, room: 'boiler' },
   { x: 17, y: 0, z: 20, yaw: 0, room: 'garage' },
+  { x: 0, y: 0, z: 10, yaw: 0, room: 'crash' },
+];
+/** Team spawns on the Crash map: team 0 starts at the west end of the street, team 1 at the east end. */
+const CRASH_SPAWNS = [
+  [
+    { x: -34, y: 0, z: 0, yaw: -Math.PI / 2 }, { x: -34, y: 0, z: -3, yaw: -Math.PI / 2 }, { x: -34, y: 0, z: 3, yaw: -Math.PI / 2 },
+    { x: -31, y: 0, z: -3.5, yaw: -Math.PI / 2 }, { x: -31, y: 0, z: 3.5, yaw: -Math.PI / 2 }, { x: -30, y: 0, z: -8, yaw: -Math.PI / 2 },
+  ],
+  [
+    { x: 34, y: 0, z: 0, yaw: Math.PI / 2 }, { x: 34, y: 0, z: -3, yaw: Math.PI / 2 }, { x: 34, y: 0, z: 3, yaw: Math.PI / 2 },
+    { x: 31, y: 0, z: -3.5, yaw: Math.PI / 2 }, { x: 31, y: 0, z: 3.5, yaw: Math.PI / 2 }, { x: 30, y: 0, z: 8, yaw: Math.PI / 2 },
+  ],
 ];
 /** Medkit spots, by room. */
 const ALL_PICKUPS = [
@@ -5542,6 +5980,9 @@ const ALL_PICKUPS = [
   { x: 0, y: 1.8, z: -47, room: 'control' }, { x: 13, y: 0, z: 4, room: 'east' }, { x: 31, y: 0, z: 2, room: 'pump' },
   { x: -33, y: 2.4, z: -11.5, room: 'warehouse' }, { x: 62, y: 1.2, z: 0, room: 'dock' },
   { x: -61, y: 1.2, z: 0, room: 'boiler' }, { x: 17, y: 0, z: 30, room: 'garage' },
+  { x: 0, y: 0, z: -12, room: 'crash' }, { x: 0, y: 0, z: 12, room: 'crash' }, { x: 24, y: 0, z: -18, room: 'crash' },
+  { x: 24, y: 3.8, z: -14, room: 'crash' }, { x: -20, y: 0, z: 18, room: 'crash' }, { x: -20, y: 3.8, z: 22, room: 'crash' },
+  { x: -28, y: 0, z: -27.5, room: 'crash' }, { x: 20, y: 0, z: 15, room: 'crash' },
 ];
 
 /**
@@ -5556,6 +5997,7 @@ class World {
     this.collision = new CollisionWorld();
     this.size = 'middle';
     this.rooms = {}; // name -> { group, boxes, barrels }
+    this.outdoor = false;
     this.activeRooms = new Set();
     this._room = null;
     this.spawn = { x: 0, y: 0, z: 7.5, yaw: 0 };
@@ -5573,6 +6015,13 @@ class World {
     }
     this.materials.barrel.flatShading = true;
     this.materials.lamp = new THREE.MeshBasicMaterial({ color: 0xe6dcb8 });
+    // Outdoor materials: the same textures, tinted.
+    const tint = (map, color) => new THREE.MeshLambertMaterial({ map, color });
+    this.materials.sand = tint(textures.concrete, 0xe6cfa2);
+    this.materials.dirt = tint(textures.floor, 0xb89a6e);
+    this.materials.asphalt = tint(textures.floor, 0x5c5d63);
+    this.materials.olive = tint(textures.panel, 0x6c7658);
+    this.materials.rust = tint(textures.panel, 0xa56a4a);
 
     this._geometries = new Map();
     this._barrelGeometry = null;
@@ -5581,7 +6030,8 @@ class World {
     const builders = [
       ['hall', this._buildHall], ['corridor', this._buildCorridor], ['east', this._buildEastRoom],
       ['warehouse', this._buildWarehouse], ['control', this._buildControlRoom], ['pump', this._buildPumpRoom],
-      ['dock', this._buildDock], ['boiler', this._buildBoiler], ['garage', this._buildGarage], ['plugs', this._buildPlugs],
+      ['dock', this._buildDock], ['boiler', this._buildBoiler], ['garage', this._buildGarage], ['crash', this._buildCrash],
+      ['plugs', this._buildPlugs],
     ];
     for (const [name, build] of builders) {
       if (name !== 'plugs') this._begin(name);
@@ -5620,6 +6070,16 @@ class World {
         }
       }
     }
+    // Sky and fog: bright outdoors on Crash, dark inside the facility.
+    const outdoor = size === 'crash';
+    this.outdoor = outdoor;
+    this.scene.background = new THREE.Color(outdoor ? 0x9ec3e6 : CLEAR_COLOR);
+    this.scene.fog = outdoor ? new THREE.Fog(0xb9d2ea, 45, 140) : new THREE.Fog(CLEAR_COLOR, 4, 55);
+    if (this.hemi) {
+      this.hemi.intensity = outdoor ? 3.3 : 2.6;
+      this.hemi.color.set(outdoor ? 0xcfe0f5 : 0x7a7a82);
+      this.hemi.groundColor.set(outdoor ? 0x8a7b62 : 0x3a3a38);
+    }
     this.spawnPoints.length = 0;
     for (const sp of ALL_SPAWNS) if (this.activeRooms.has(sp.room)) this.spawnPoints.push({ x: sp.x, y: sp.y, z: sp.z, yaw: sp.yaw });
     this.spawn.x = 0; this.spawn.y = 0; this.spawn.z = 7.5; this.spawn.yaw = 0;
@@ -5637,7 +6097,8 @@ class World {
 
   _buildLighting() {
     // Dim fill light plus a few point lights. No shadows.
-    this.scene.add(new THREE.HemisphereLight(0x7a7a82, 0x3a3a38, 2.6));
+    this.hemi = new THREE.HemisphereLight(0x7a7a82, 0x3a3a38, 2.6);
+    this.scene.add(this.hemi);
   }
 
   _buildHall() {
@@ -5930,6 +6391,190 @@ class World {
     for (const [bx, by, bz] of [[20.5, 0, 12.5], [20, 0, 31], [13, 0, 32.5]]) this._barrel(bx, by, bz);
   }
 
+  /**
+   * A straight wall along x (at z = fixed) or along z (at x = fixed), with doors and windows.
+   * openings: [{ a, b, type: 'door' | 'window' }] in coordinates along the wall.
+   */
+  _wall(kind, axis, fixed, a0, a1, y0, y1, thick, openings) {
+    const box = (lo, hi, ylo, yhi) => {
+      if (hi - lo < 0.01 || yhi - ylo < 0.01) return;
+      if (axis === 'x') this._solid(kind, lo, ylo, fixed - thick / 2, hi, yhi, fixed + thick / 2);
+      else this._solid(kind, fixed - thick / 2, ylo, lo, fixed + thick / 2, yhi, hi);
+    };
+    let cur = a0;
+    for (const o of (openings || []).slice().sort((p, q) => p.a - q.a)) {
+      box(cur, o.a, y0, y1);
+      const h0 = o.type === 'window' ? y0 + 1.0 : y0;
+      const h1 = o.type === 'window' ? y0 + 2.3 : y0 + 2.6;
+      if (h0 > y0) box(o.a, o.b, y0, h0);
+      box(o.a, o.b, h1, y1);
+      cur = o.b;
+    }
+    box(cur, a1, y0, y1);
+  }
+
+  /** Steps of 0.3 m rise from y0, starting at (x0, z0) and running in direction dir ('+x', '-x', '+z', '-z'). */
+  _stairs(kind, x0, z0, dir, width, steps, rise, depth, y0) {
+    for (let i = 0; i < steps; i++) {
+      const top = y0 + rise * (i + 1);
+      const a = i * depth, b = (i + 1) * depth;
+      if (dir === '+x') this._solid(kind, x0 + a, y0, z0, x0 + b, top, z0 + width);
+      else if (dir === '-x') this._solid(kind, x0 - b, y0, z0, x0 - a, top, z0 + width);
+      else if (dir === '+z') this._solid(kind, x0, y0, z0 + a, x0 + width, top, z0 + b);
+      else this._solid(kind, x0, y0, z0 - b, x0 + width, top, z0 - a);
+    }
+  }
+
+  /**
+   * A building shell. o: x0, z0, x1, z1, floors (1 or 2), kind, n/s/w/e (ground floor openings),
+   * un/us/uw/ue (upper floor openings), part (interior wall), stair { x, z, dir, w }.
+   */
+  _house(o) {
+    const T = 0.4, H = o.h || 3.4, U = 3.2, kind = o.kind || 'sand';
+    const { x0, z0, x1, z1 } = o;
+    this._wall(kind, 'x', z0 + T / 2, x0, x1, 0, H, T, o.n);
+    this._wall(kind, 'x', z1 - T / 2, x0, x1, 0, H, T, o.s);
+    this._wall(kind, 'z', x0 + T / 2, z0 + T, z1 - T, 0, H, T, o.w);
+    this._wall(kind, 'z', x1 - T / 2, z0 + T, z1 - T, 0, H, T, o.e);
+    if (o.part) this._wall(kind, o.part.axis, o.part.pos, o.part.from, o.part.to, 0, H, T, o.part.doors);
+    let roofY = H;
+    if (o.floors === 2) {
+      const top = H + T;
+      const hole = o.hole; // [hx0, hz0, hx1, hz1]
+      this._solid(kind, x0, H, z0, hole[0], top, z1);
+      this._solid(kind, hole[2], H, z0, x1, top, z1);
+      this._solid(kind, hole[0], H, z0, hole[2], top, hole[1]);
+      this._solid(kind, hole[0], H, hole[3], hole[2], top, z1);
+      this._wall(kind, 'x', z0 + T / 2, x0, x1, top, top + U, T, o.un);
+      this._wall(kind, 'x', z1 - T / 2, x0, x1, top, top + U, T, o.us);
+      this._wall(kind, 'z', x0 + T / 2, z0 + T, z1 - T, top, top + U, T, o.uw);
+      this._wall(kind, 'z', x1 - T / 2, z0 + T, z1 - T, top, top + U, T, o.ue);
+      if (o.part) this._wall(kind, o.part.axis, o.part.pos, o.part.from, o.part.to, top, top + U, T, o.part.udoors || o.part.doors);
+      roofY = top + U;
+      // Parapet on the roof.
+      this._solid(kind, x0, roofY + T, z0, x1, roofY + T + 0.9, z0 + 0.25);
+      this._solid(kind, x0, roofY + T, z1 - 0.25, x1, roofY + T + 0.9, z1);
+      this._solid(kind, x0, roofY + T, z0, x0 + 0.25, roofY + T + 0.9, z1);
+      this._solid(kind, x1 - 0.25, roofY + T, z0, x1, roofY + T + 0.9, z1);
+    }
+    this._solid(kind, x0, roofY, z0, x1, roofY + T, z1);
+  }
+
+  /** Windows spaced along a wall from a0 to a1, skipping the given [a, b] ranges. */
+  _windows(a0, a1, skip) {
+    const out = [];
+    for (let a = a0 + 1.5; a + 2.4 <= a1 - 1.5; a += 4.6) {
+      if ((skip || []).some((r) => a < r[1] + 0.6 && a + 2.4 > r[0] - 0.6)) continue;
+      out.push({ a, b: a + 2.4, type: 'window' });
+    }
+    return out;
+  }
+
+  /** Outdoor map for 5v5: a town crossroads with a crashed helicopter in the middle. */
+  _buildCrash() {
+    const sun = new THREE.DirectionalLight(0xfff0d8, 1.7);
+    sun.position.set(-20, 40, 25);
+    this._room.group.add(sun);
+
+    // Ground, streets (visual only) and the perimeter wall.
+    this._solid('dirt', -37, -1, -31, 37, 0, 31);
+    this._addBox('asphalt', -36, 0, -5, 36, 0.02, 5);
+    this._addBox('asphalt', -5, 0, -30, 5, 0.02, 30);
+    this._solid('sand', -38, -1, -32, 38, 8, -30);
+    this._solid('sand', -38, -1, 30, 38, 8, 32);
+    this._solid('sand', -38, -1, -30, -36, 8, 30);
+    this._solid('sand', 36, -1, -30, 38, 8, 30);
+
+    // The crashed helicopter: fuselage, nose, tail boom with a fin, broken blades.
+    this._solid('olive', -3.5, 0, -1.4, 3.5, 2.0, 1.4);
+    this._solid('olive', -5.2, 0, -1.0, -3.5, 1.5, 1.0);
+    this._solid('olive', 3.5, 0, -0.5, 11, 1.4, 0.5);
+    this._solid('olive', 10.6, 1.4, -0.2, 11.2, 3.2, 0.2);
+    this._solid('rust', -0.4, 2.0, -0.4, 0.4, 2.7, 0.4); // rotor mast stub
+    this._solid('olive', -9, 0, 3.0, -4, 0.25, 3.4);
+    this._solid('olive', 4.5, 0, -4.4, 10, 0.25, -4.0);
+    this._solid('olive', -2.6, 0, -4.9, -0.4, 0.2, -4.5);
+    // Burnt cars, sandbags, concrete barriers.
+    this._solid('rust', 12, 0, 7.5, 16.2, 1.5, 9.3);
+    this._solid('rust', -14, 0, -9.3, -9.8, 1.5, -7.5);
+    this._solid('sand', -18, 0, 2.2, -14, 1.0, 3.0);
+    this._solid('sand', 14, 0, -3.0, 18, 1.0, -2.2);
+    for (const [bx, bz, w, d] of [[-26, -1, 2.6, 0.8], [22, 2, 2.6, 0.8], [-2, -14, 1.6, 0.6], [1, 13, 1.6, 0.8], [-12, 12, 0.8, 3], [11, -12, 0.8, 3]]) {
+      this._solid('concrete', bx, 0, bz, bx + w, 1.1, bz + d);
+    }
+
+    // Gas station (north-west): shop, canopy on four pillars, pumps.
+    this._house({
+      x0: -35, z0: -29.6, x1: -22, z1: -25.6, floors: 1, h: 3.2,
+      s: [{ a: -31, b: -28.5, type: 'door' }, { a: -26, b: -23.5, type: 'window' }],
+    });
+    this._solid('rust', -27, 0, -28.2, -23, 1.0, -27.4); // counter
+    this._solid('panel', -33, 4.4, -23, -15, 4.8, -12);
+    for (const [px, pz] of [[-32.5, -22.5], [-15.5, -22.5], [-32.5, -12.5], [-15.5, -12.5]]) this._solid('sand', px - 0.3, 0, pz - 0.3, px + 0.3, 4.4, pz + 0.3);
+    for (const [px, pz] of [[-27, -19], [-27, -15.5], [-21, -19], [-21, -15.5]]) {
+      this._solid('hazard', px - 0.8, 0, pz - 0.6, px + 0.8, 0.2, pz + 0.6);
+      this._solid('rust', px - 0.35, 0.2, pz - 0.25, px + 0.35, 1.6, pz + 0.25);
+    }
+    this._barrel(-29.5, 0, -14);
+    this._barrel(-16.5, 0, -21);
+
+    // Hotel (north-east): two floors, stairs along the west wall, a wall down the middle.
+    const hn = [{ a: 26, b: 28.5, type: 'door' }];
+    const hs = [{ a: 12, b: 14.5, type: 'door' }, { a: 22, b: 24.5, type: 'door' }];
+    const hw = [{ a: -26, b: -23.5, type: 'door' }];
+    const he = [{ a: -20, b: -17.5, type: 'door' }];
+    this._house({
+      x0: 8, z0: -28, x1: 30, z1: -10, floors: 2,
+      n: hn.concat(this._windows(8, 30, [[26, 28.5]])), s: hs.concat(this._windows(8, 30, [[12, 14.5], [22, 24.5]])),
+      w: hw.concat(this._windows(-28, -10, [[-26, -23.5]])), e: he.concat(this._windows(-28, -10, [[-20, -17.5]])),
+      un: this._windows(8, 30), us: this._windows(8, 30), uw: this._windows(-28, -10), ue: this._windows(-28, -10),
+      part: { axis: 'z', pos: 19, from: -28, to: -10, doors: [{ a: -24, b: -21.5, type: 'door' }, { a: -15, b: -12.5, type: 'door' }] },
+      hole: [8.6, -20.4, 10.6, -16],
+    });
+    this._stairs('panel', 8.6, -16, '-z', 2, 13, 3.8 / 13, 0.34, 0);
+    this._solid('crate', 22, 0, -26.5, 23.5, 1.2, -25.3); // clutter
+    this._solid('crate', 13, 0, -13, 14, 1, -12.4);
+    this._solid('crate', 24, 3.8, -26.5, 25.2, 4.8, -25.3);
+
+    // House (south-west): two floors, stairs along the west wall.
+    this._house({
+      x0: -30, z0: 10, x1: -12, z1: 26, floors: 2,
+      n: [{ a: -26, b: -23.5, type: 'door' }, { a: -18, b: -15.5, type: 'door' }].concat(this._windows(-30, -12, [[-26, -23.5], [-18, -15.5]])),
+      s: this._windows(-30, -12), w: [{ a: 21, b: 23.5, type: 'door' }].concat(this._windows(10, 26, [[21, 23.5]])),
+      e: [{ a: 14, b: 16.5, type: 'door' }].concat(this._windows(10, 26, [[14, 16.5]])),
+      un: this._windows(-30, -12), us: this._windows(-30, -12), uw: this._windows(10, 26), ue: this._windows(10, 26),
+      hole: [-29.4, 12.5, -27.4, 16.92],
+    });
+    this._stairs('panel', -29.4, 12.5, '+z', 2, 13, 3.8 / 13, 0.34, 0);
+    this._solid('crate', -22, 0, 18, -19, 0.8, 19.2); // sofas and tables
+    this._solid('crate', -17, 0, 21, -15, 0.9, 22.4);
+    this._solid('crate', -24, 3.8, 20, -22, 4.7, 21.2);
+
+    // Courtyard (south-east): walls with two gates, a small shop, a bus wreck, crates.
+    this._wall('sand', 'x', 9.2, 10, 34, 0, 2.6, 0.4, [{ a: 18, b: 22, type: 'door' }]);
+    this._wall('sand', 'z', 10.2, 9.4, 28, 0, 2.6, 0.4, [{ a: 16, b: 20, type: 'door' }]);
+    this._solid('sand', 10, 0, 27.8, 34, 2.6, 28.2);
+    this._solid('sand', 33.8, 0, 9.4, 34.2, 2.6, 28);
+    this._house({
+      x0: 25, z0: 19, x1: 32, z1: 26.4, floors: 1, h: 3.0,
+      w: [{ a: 22, b: 24.5, type: 'door' }], n: this._windows(25, 32), s: this._windows(25, 32),
+    });
+    this._solid('rust', 12, 0, 24.2, 21.4, 2.7, 26.8); // bus
+    this._solid('crate', 13, 0, 11, 14, 1, 12); this._solid('crate', 14, 0, 11, 15, 1, 12); this._solid('crate', 13.5, 1, 11, 14.5, 2, 12);
+    this._solid('crate', 28, 0, 12, 29, 1, 13); this._solid('crate', 28, 0, 13, 29, 1, 14);
+    this._solid('crate', 22, 0, 14, 23.5, 1.2, 15.2);
+    this._barrel(31, 0, 12);
+    this._barrel(15, 0, 22);
+
+    // Cover on the side lots.
+    this._solid('concrete', 32, 0, -26, 34.6, 1.1, -25.2);
+    this._solid('crate', 32, 0, -14, 33, 1, -13); this._solid('crate', 33, 0, -14, 34, 1, -13);
+    this._solid('concrete', -34, 0, 12, -33.2, 1.1, 16);
+    this._solid('concrete', -34, 0, -10, -33.2, 1.1, -6);
+    this._solid('crate', -6, 0, -24, -4.8, 1.2, -22.8);
+    this._solid('crate', 5.8, 0, 22, 7, 1.2, 23.2);
+  }
+
   /** Wall pieces for doorways whose room is not part of the current map. */
   _buildPlugs() {
     const plug = (name, x0, y0, z0, x1, y1, z1) => {
@@ -6066,6 +6711,24 @@ const NAV_NODES = {
   dockDoor: [40.5, 6, 'dock'], dock1: [46, 1, 'dock'], dock2: [53, 0, 'dock'], dock3: [53, 4.5, 'dock'], dock4: [53, -4.5, 'dock'], dock5: [63, 0, 'dock'],
   boilDoor: [-35.5, 0, 'boiler'], boil1: [-40, 0, 'boiler'], boil2: [-49, 0, 'boiler'], boil3: [-49, 8.5, 'boiler'], boil4: [-49, -8.5, 'boiler'], boil5: [-61, 0, 'boiler'],
   gDoor: [14, 5.5, 'garage'], gDoor2: [14, 9.5, 'garage'], g1: [17, 12, 'garage'], g2: [17, 19, 'garage'], g3: [17, 26, 'garage'], g4: [17, 31, 'garage'],
+  // Crash (outdoor map). The optional 4th value is the floor height for upstairs waypoints.
+  c_w1: [-33, 0, 'crash'], c_w2: [-27, 3, 'crash'], c_w3: [-18, 0.5, 'crash'], c_w4: [-11, 0.5, 'crash'],
+  c_nw: [-6, -4, 'crash'], c_nm: [0, -4, 'crash'], c_ne: [6, -4, 'crash'], c_sw: [-6, 4, 'crash'], c_sm: [0, 4, 'crash'], c_se: [6, 4, 'crash'],
+  c_e1: [13, 2.5, 'crash'], c_e2: [21, -4, 'crash'], c_e3: [28, 0, 'crash'], c_e4: [33, 0, 'crash'],
+  c_n1: [1.5, -10, 'crash'], c_n2: [1.5, -17, 'crash'], c_n3: [1.5, -24, 'crash'], c_n4: [1.5, -28, 'crash'],
+  c_s1: [-1.5, 10, 'crash'], c_s2: [-1.5, 17, 'crash'], c_s3: [-1.5, 24, 'crash'], c_s4: [-1.5, 28, 'crash'],
+  c_g1: [-18, -7, 'crash'], c_g2: [-23.5, -11, 'crash'], c_g3: [-23.5, -17.5, 'crash'], c_g4: [-29.7, -23.4, 'crash'], c_g5: [-29.7, -27.2, 'crash'],
+  c_h1o: [13.2, -8, 'crash'], c_h1i: [13.2, -12.5, 'crash'], c_h2o: [23.3, -8, 'crash'], c_h2i: [23.3, -12.5, 'crash'],
+  c_hw1: [13.2, -17, 'crash'], c_hw2: [16, -22, 'crash'], c_hp1: [19, -13.75, 'crash'], c_hp2: [19, -22.75, 'crash'],
+  c_he1: [24, -17, 'crash'], c_he2: [25, -23, 'crash'], c_heE: [27.5, -18.75, 'crash'], c_eD: [31.8, -18.75, 'crash'],
+  c_hwD: [6, -24.75, 'crash'], c_hwI: [10.8, -24.7, 'crash'], c_st0: [9.6, -15.4, 'crash'], c_st1: [9.6, -20.55, 'crash', 3.8],
+  c_up1: [9.6, -23, 'crash', 3.8], c_up2: [15, -22, 'crash', 3.8], c_upP1: [19, -22.75, 'crash', 3.8], c_up3: [24, -22, 'crash', 3.8],
+  c_up4: [24, -14, 'crash', 3.8], c_upP2: [19, -13.75, 'crash', 3.8], c_up5: [14, -14, 'crash', 3.8],
+  c_s1o: [-24.8, 8.5, 'crash'], c_s1i: [-24.8, 12.5, 'crash'], c_s2o: [-16.8, 8.5, 'crash'], c_s2i: [-16.8, 12.5, 'crash'],
+  c_sm1: [-21, 17, 'crash'], c_hsb: [-28.4, 12.1, 'crash'], c_sd: [-28.4, 17.05, 'crash', 3.8], c_sei: [-14, 15.2, 'crash'], c_seo: [-10, 15.2, 'crash'],
+  c_u1: [-28.4, 20.5, 'crash', 3.8], c_u2: [-21, 16, 'crash', 3.8], c_u3: [-16, 15, 'crash', 3.8], c_u4: [-21, 13, 'crash', 3.8],
+  c_y1o: [20, 7, 'crash'], c_y1i: [20, 11.5, 'crash'], c_y2o: [8, 18, 'crash'], c_y2i: [13, 18, 'crash'], c_yc: [20, 17, 'crash'],
+  c_ys1: [23, 23.2, 'crash'], c_ys2: [27, 23.2, 'crash'], c_y3: [28, 15.5, 'crash'],
 };
 const NAV_LINKS = [
   ['hall', 'hallN'], ['hall', 'hallW'], ['hall', 'hallE'],
@@ -6074,15 +6737,32 @@ const NAV_LINKS = [
   ['hallW', 'wh1'], ['wh1', 'wh2'], ['wh2', 'wh3'], ['wh3', 'wh4'], ['wh4', 'wh7'], ['wh2', 'wh5'], ['wh2', 'wh6'], ['wh1', 'wh6'],
   ['hallE', 'east1'], ['east1', 'east2'], ['east2', 'pumpDoor'], ['pumpDoor', 'pump1'], ['pump1', 'pump2'],
   ['pump1', 'pump3'], ['pump1', 'pump4'], ['pump2', 'pumpE'],
+  ['c_w1', 'c_w2'], ['c_w2', 'c_w3'], ['c_w3', 'c_w4'], ['c_w4', 'c_nw'], ['c_w4', 'c_sw'], ['c_nw', 'c_nm'], ['c_nm', 'c_ne'],
+  ['c_sw', 'c_sm'], ['c_sm', 'c_se'], ['c_se', 'c_e1'], ['c_e1', 'c_e2'], ['c_ne', 'c_e2'], ['c_e2', 'c_e3'], ['c_e3', 'c_e4'],
+  ['c_nm', 'c_n1'], ['c_n1', 'c_n2'], ['c_n2', 'c_n3'], ['c_n3', 'c_n4'], ['c_sm', 'c_s1'], ['c_s1', 'c_s2'], ['c_s2', 'c_s3'], ['c_s3', 'c_s4'],
+  ['c_w3', 'c_g1'], ['c_g1', 'c_g2'], ['c_g2', 'c_g3'], ['c_g3', 'c_g4'], ['c_g4', 'c_g5'],
+  ['c_ne', 'c_h1o'], ['c_h1o', 'c_h1i'], ['c_e2', 'c_h2o'], ['c_h2o', 'c_h2i'], ['c_h1i', 'c_hw1'], ['c_hw1', 'c_st0'],
+  ['c_hw1', 'c_hp1'], ['c_hw1', 'c_hw2'], ['c_hw2', 'c_hp2'], ['c_hw2', 'c_hwI'], ['c_hwI', 'c_hwD'], ['c_hwD', 'c_n3'],
+  ['c_hp1', 'c_he1'], ['c_hp2', 'c_he2'], ['c_he1', 'c_he2'], ['c_he1', 'c_h2i'], ['c_he1', 'c_heE'], ['c_heE', 'c_eD'], ['c_eD', 'c_e3'],
+  ['c_st0', 'c_st1'], ['c_st1', 'c_up1'], ['c_up1', 'c_up2'], ['c_up2', 'c_upP1'], ['c_upP1', 'c_up3'], ['c_up3', 'c_up4'],
+  ['c_up4', 'c_upP2'], ['c_upP2', 'c_up5'], ['c_up5', 'c_up2'],
+  ['c_w3', 'c_s1o'], ['c_w4', 'c_s2o'], ['c_s1o', 'c_s1i'], ['c_s2o', 'c_s2i'], ['c_s1i', 'c_sm1'], ['c_s2i', 'c_sm1'], ['c_s1i', 'c_hsb'],
+  ['c_sm1', 'c_sei'], ['c_sei', 'c_seo'], ['c_seo', 'c_s1'], ['c_hsb', 'c_sd'], ['c_sd', 'c_u1'], ['c_u1', 'c_u2'], ['c_u2', 'c_u3'], ['c_u2', 'c_u4'],
+  ['c_se', 'c_y1o'], ['c_e1', 'c_y1o'], ['c_y1o', 'c_y1i'], ['c_s2', 'c_y2o'], ['c_y2o', 'c_y2i'], ['c_y1i', 'c_yc'], ['c_y2i', 'c_yc'],
+  ['c_yc', 'c_ys1'], ['c_ys1', 'c_ys2'], ['c_yc', 'c_y3'],
   ['pumpE', 'dockDoor'], ['dockDoor', 'dock1'], ['dock1', 'dock2'], ['dock2', 'dock3'], ['dock2', 'dock4'], ['dock2', 'dock5'],
   ['wh4', 'boilDoor'], ['boilDoor', 'boil1'], ['boil1', 'boil2'], ['boil2', 'boil3'], ['boil2', 'boil4'], ['boil2', 'boil5'],
   ['east1', 'gDoor'], ['gDoor', 'gDoor2'], ['gDoor2', 'g1'], ['g1', 'g2'], ['g2', 'g3'], ['g3', 'g4'],
 ];
+/** Bot spawn waypoints per team on the Crash map. */
+const CRASH_BOT_SPAWNS = [['c_w1', 'c_w2', 'c_g1', 'c_w3'], ['c_e4', 'c_e3', 'c_eD', 'c_e2']];
 const SPAWN_NODES = ['corr3', 'corr5', 'ctrl', 'ctrlL', 'ctrlR', 'wh2', 'wh3', 'wh5', 'wh6', 'wh7', 'east2', 'pump1', 'pump3', 'pump4',
   'dock2', 'dock3', 'dock4', 'dock5', 'boil2', 'boil3', 'boil4', 'boil5', 'g2', 'g3', 'g4'];
 
 const rand = (a, b) => a + Math.random() * (b - a);
 const NOT_ENEMY = (b) => !b.enemy && !b.isBase;
+const TRACER_TIME = 1.0; // seconds a bullet trail stays visible
+const TRACER_POOL = 30;
 
 /**
  * Enemy soldiers: simple waypoint navigation, sight checks against the level,
@@ -6133,10 +6813,10 @@ class Enemies {
     this.nodes = [];
     const index = {};
     for (const name of Object.keys(NAV_NODES)) {
-      const [x, z, room] = NAV_NODES[name];
+      const [x, z, room, floorY] = NAV_NODES[name];
       if (rooms && !rooms.has(room)) continue;
       index[name] = this.nodes.length;
-      this.nodes.push({ name, x, z, y: this._groundAt(x, z), links: [] });
+      this.nodes.push({ name, x, z, y: floorY !== undefined ? floorY : this._groundAt(x, z), links: [] });
     }
     for (const [a, b] of NAV_LINKS) {
       if (index[a] === undefined || index[b] === undefined) continue;
@@ -6144,6 +6824,7 @@ class Enemies {
       this.nodes[index[b]].links.push(index[a]);
     }
     this.spawnNodes = SPAWN_NODES.filter((n) => index[n] !== undefined).map((n) => index[n]);
+    this.teamSpawnNodes = CRASH_BOT_SPAWNS.map((list) => list.filter((n) => index[n] !== undefined).map((n) => index[n]));
   }
 
   /** The map changed: new waypoints, everyone starts over. */
@@ -6182,7 +6863,7 @@ class Enemies {
 
     // Tracers: one shared line segment per pooled shot.
     this.tracers = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < TRACER_POOL; i++) {
       const g = new THREE.BufferGeometry();
       g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
       const line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xffe2a0, transparent: true, opacity: 0.85 }));
@@ -6266,7 +6947,8 @@ class Enemies {
   }
 
   _syncCount() {
-    const want = this.enabled ? Math.round(this.settings.get('enemyCount')) : 0;
+    // No soldier waypoints on this map (e.g. the 5v5 map): no soldiers.
+    const want = this.enabled && this.spawnNodes.length ? Math.round(this.settings.get('enemyCount')) : 0;
     while (this.list.length < want) {
       const e = this._createEnemy();
       this.list.push(e);
@@ -6442,11 +7124,7 @@ class Enemies {
       this._animate(e, dt);
     }
 
-    for (const t of this.tracers) {
-      if (t.t <= 0) continue;
-      t.t -= dt;
-      if (t.t <= 0) t.line.visible = false;
-    }
+    this._updateTracers(dt);
     for (const p of this.puffs) {
       if (p.t < 0) continue;
       p.t += dt;
@@ -6692,6 +7370,16 @@ class Enemies {
     }
   }
 
+  /** Bullet trails fade out and are gone after TRACER_TIME. */
+  _updateTracers(dt) {
+    for (const t of this.tracers) {
+      if (t.t <= 0) continue;
+      t.t -= dt;
+      if (t.t <= 0) t.line.visible = false;
+      else t.line.material.opacity = 0.85 * (t.t / TRACER_TIME);
+    }
+  }
+
   _updateDead(e, dt) {
     if (!e.root.visible && e.respawnT <= 0) return;
     e.deadT += dt;
@@ -6819,7 +7507,8 @@ class Enemies {
     pos.setXYZ(1, bx, by, bz);
     pos.needsUpdate = true;
     t.line.visible = true;
-    t.t = 0.05;
+    t.t = TRACER_TIME;
+    t.line.material.opacity = 0.85;
   }
 
   _puff(x, y, z) {
@@ -7189,6 +7878,7 @@ class Zombies extends Enemies {
   // --- Per frame -----------------------------------------------------------
 
   update(dt) {
+    this._updateTracers(dt);
     if (!this.active) return;
     if (this.role === 'host') this._updateHost(dt);
     else this._updateGuest(dt);
@@ -7983,6 +8673,725 @@ class Zombies extends Enemies {
   }
 }
 
+// ===== js/game/TeamMatch.js =====
+const TDM_LIMIT = 50;     // kills to win
+const TDM_TIME = 600;     // seconds per match
+const TDM_OVER = 10;      // seconds the result stays up
+const TDM_SIDE = 5;       // players per team
+const TEAM_HEX = [0x3e6fb0, 0xb04a34];
+const TEAM_NAME = ['BLUE', 'RED'];
+const TM_SNAPSHOT = 0.08; // host -> guests, about 12 per second
+const tr2 = (v) => Math.round(v * 100) / 100;
+
+/**
+ * 5v5 team deathmatch on the Crash map. Empty places are filled with bots.
+ * The host runs the bots and the match (score, timer); guests show the bots as
+ * puppets from snapshots and report their own hits.
+ *
+ * Players: id 1 is the host, 2..10 are guests, bots are 101 and up.
+ * team 0 = BLUE, team 1 = RED.
+ */
+class TeamMatch extends Enemies {
+  constructor(opts) {
+    super(opts);
+    this.net = opts.net;
+    this.remotes = opts.remotes;
+    this.enabled = false;
+    this.active = false;
+    this.role = 'host';
+    this.myTeam = 0;
+    this.scores = [0, 0];
+    this.timeLeft = TDM_TIME;
+    this.phase = 'play'; // 'play' | 'over'
+    this.overT = 0;
+    this.winner = -1;
+    this.stats = new Map(); // id -> { name, team, k, d }
+    this.byId = new Map();
+    this.nextBotId = 101;
+    this.lastAttacker = null;
+    this.lastAttackerT = 0;
+    this.onEvent = null;
+    this._tl = [];
+    this._snapT = 0;
+    this._statT = 0;
+    this._fillT = 0;
+    this._boardT = 0;
+    this._buildHud();
+  }
+
+  // The soldiers' own spawning does not apply here.
+  _syncCount() {}
+  noise() {}
+
+  get myId() {
+    return this.net.online ? this.net.id : 1;
+  }
+
+  teamOf(id) {
+    if (id === this.myId) return this.myTeam;
+    if (id >= 100) { const e = this.byId.get(id); return e ? e.team : -1; }
+    const r = this.remotes.get(id);
+    if (r && r.team !== undefined) return r.team;
+    return this.net.teams[id] !== undefined ? this.net.teams[id] : -1;
+  }
+
+  label(id) {
+    if (id >= 100) return 'BOT ' + (id - 100);
+    return 'P' + id;
+  }
+
+  // --- Mode ----------------------------------------------------------------
+
+  setActive(on, role) {
+    if (on === this.active && role === this.role) return;
+    this._clearBots();
+    this.active = on;
+    this.role = role;
+    this._hud.root.classList.toggle('on', on);
+    this._hud.over.classList.remove('on');
+    this._board.classList.remove('on');
+    if (on && role === 'host') this._reset(true);
+  }
+
+  _clearBots() {
+    for (const e of this.list) {
+      this._removeBox(e);
+      this.scene.remove(e.root);
+    }
+    this.list = [];
+    this.byId.clear();
+  }
+
+  _reset(silent) {
+    this._clearBots();
+    this.scores = [0, 0];
+    this.timeLeft = TDM_TIME;
+    this.phase = 'play';
+    this.winner = -1;
+    this.stats.clear();
+    this._fillT = 0;
+    this._event({ k: 'reset' });
+    this._ensureStat(this.myId);
+  }
+
+  // --- Roster --------------------------------------------------------------
+
+  _ensureStat(id) {
+    let s = this.stats.get(id);
+    if (!s) {
+      s = { name: this.label(id), team: this.teamOf(id), k: 0, d: 0 };
+      this.stats.set(id, s);
+    }
+    s.team = this.teamOf(id);
+    return s;
+  }
+
+  _humanIds() {
+    const ids = [this.myId];
+    for (const [id, r] of this.remotes) if (r.present) ids.push(id);
+    return ids;
+  }
+
+  /** Host: keep both teams at five by adding or removing bots. */
+  _fillTeams() {
+    const want = [0, 0];
+    if (this.settings.get('fillBots')) {
+      const humans = [0, 0];
+      for (const id of this._humanIds()) { const t = this.teamOf(id); if (t >= 0) humans[t]++; }
+      want[0] = Math.max(0, TDM_SIDE - humans[0]);
+      want[1] = Math.max(0, TDM_SIDE - humans[1]);
+    }
+    for (let t = 0; t < 2; t++) {
+      const mine = this.list.filter((e) => e.team === t);
+      while (mine.length < want[t]) mine.push(this._addBot(t));
+      while (mine.length > want[t]) {
+        // Prefer sending a dead bot home.
+        let idx = mine.findIndex((e) => !e.alive);
+        if (idx < 0) idx = mine.length - 1;
+        const e = mine.splice(idx, 1)[0];
+        this._removeBot(e);
+      }
+    }
+  }
+
+  _createBot(team) {
+    const e = this._createEnemy();
+    e.team = team;
+    e.mats[0].color.setHex(TEAM_HEX[team]);
+    e.mats[1].color.setHex(team === 0 ? 0x24405f : 0x5f2a1f);
+    e.goalNode = -1;
+    e.target = null;
+    e.lastY = 0;
+    e.tx = 0; e.ty = 0; e.tz = 0; e.tyaw = 0;
+    return e;
+  }
+
+  _addBot(team) {
+    const e = this._createBot(team);
+    e.id = this.nextBotId++;
+    this.list.push(e);
+    this.byId.set(e.id, e);
+    this.stats.set(e.id, { name: this.label(e.id), team, k: 0, d: 0 });
+    this._respawnBot(e);
+    return e;
+  }
+
+  _removeBot(e) {
+    this._removeBox(e);
+    this.scene.remove(e.root);
+    this.byId.delete(e.id);
+    this.stats.delete(e.id);
+    const i = this.list.indexOf(e);
+    if (i >= 0) this.list.splice(i, 1);
+  }
+
+  /** Put a bot at its team's spawn waypoint that is farthest from the enemy. */
+  _respawnBot(e) {
+    const nodes = this.teamSpawnNodes && this.teamSpawnNodes[e.team] ? this.teamSpawnNodes[e.team] : this.spawnNodes;
+    this._collectTargets();
+    let best = nodes[0], bd = -1;
+    for (const i of nodes) {
+      const n = this.nodes[i];
+      let near = 99;
+      for (const t of this._tl) if (t.team !== e.team) near = Math.min(near, Math.hypot(t.x - n.x, t.z - n.z));
+      if (this._occupied(n.x, n.z, e)) near -= 20;
+      if (near > bd) { bd = near; best = i; }
+    }
+    const n = this.nodes[best];
+    e.x = n.x + rand(-1.5, 1.5);
+    e.z = n.z + rand(-1.5, 1.5);
+    e.y = n.y + 0.05;
+    if (this._blocked(e, e.x, e.y, e.z)) { e.x = n.x; e.z = n.z; }
+    e.vy = 0;
+    e.yaw = e.team === 0 ? -Math.PI / 2 : Math.PI / 2;
+    e.hp = this.difficulty.hp;
+    e.alive = true;
+    e.state = 'patrol';
+    e.sees = false;
+    e.target = null;
+    e.goalNode = -1;
+    e.pathT = 0;
+    e.deadT = 0;
+    e.burst = this.difficulty.burst;
+    e.shotT = 0;
+    e.root.visible = true;
+    e.root.rotation.set(0, e.yaw, 0);
+    for (const mat of e.mats) mat.emissive.setRGB(0, 0, 0);
+    this._addBox(e);
+  }
+
+  // --- HUD -----------------------------------------------------------------
+
+  _buildHud() {
+    const root = document.createElement('div');
+    root.id = 'tdmhud';
+    root.innerHTML = '<span id="tdm-a"></span><b id="tdm-time"></b><span id="tdm-b"></span><div id="tdm-you"></div>';
+    document.body.appendChild(root);
+    const over = document.createElement('div');
+    over.id = 'tdmover';
+    over.innerHTML = '<h2></h2><p id="tdm-over-score"></p><p id="tdm-over-timer"></p>';
+    document.body.appendChild(over);
+    const board = document.createElement('div');
+    board.id = 'tdmboard';
+    document.body.appendChild(board);
+    this._board = board;
+    this._hud = {
+      root, over, a: root.querySelector('#tdm-a'), b: root.querySelector('#tdm-b'), time: root.querySelector('#tdm-time'),
+      you: root.querySelector('#tdm-you'), overTitle: over.querySelector('h2'), overScore: over.querySelector('#tdm-over-score'),
+      overTimer: over.querySelector('#tdm-over-timer'), last: {},
+    };
+  }
+
+  _setText(el, key, text) {
+    if (this._hud.last[key] === text) return;
+    this._hud.last[key] = text;
+    el.textContent = text;
+  }
+
+  _updateHud(dt) {
+    const h = this._hud;
+    this._setText(h.a, 'a', TEAM_NAME[0] + ' ' + this.scores[0]);
+    this._setText(h.b, 'b', TEAM_NAME[1] + ' ' + this.scores[1]);
+    const t = Math.max(0, Math.ceil(this.timeLeft));
+    this._setText(h.time, 'time', Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'));
+    this._setText(h.you, 'you', 'YOU: ' + TEAM_NAME[this.myTeam]);
+    h.you.style.color = '#' + TEAM_HEX[this.myTeam].toString(16).padStart(6, '0');
+    if (this.phase === 'over') {
+      this._setText(h.overTitle, 'ot', this.winner < 0 ? 'DRAW' : TEAM_NAME[this.winner] + ' TEAM WINS');
+      this._setText(h.overScore, 'os', TEAM_NAME[0] + ' ' + this.scores[0] + '  :  ' + this.scores[1] + ' ' + TEAM_NAME[1]);
+      this._setText(h.overTimer, 'ox', 'New match in ' + Math.max(1, Math.ceil(this.overT)));
+      h.over.classList.add('on');
+    } else {
+      h.over.classList.remove('on');
+    }
+    const show = this.input.scoreHeld || this.phase === 'over' || this.health.dead;
+    this._board.classList.toggle('on', show);
+    this._boardT -= dt;
+    if (show && this._boardT <= 0) {
+      this._boardT = 0.4;
+      this._renderBoard();
+    }
+  }
+
+  _renderBoard() {
+    const me = this.myId;
+    const rows = [[], []];
+    for (const [id, s] of this.stats) if (s.team === 0 || s.team === 1) rows[s.team].push([id, s]);
+    const col = (team) => {
+      rows[team].sort((p, q) => q[1].k - p[1].k || p[1].d - q[1].d);
+      let html = '<div class="tb-col"><h3 style="color:#' + TEAM_HEX[team].toString(16).padStart(6, '0') + '">' + TEAM_NAME[team] + ' &middot; ' + this.scores[team] + '</h3>';
+      html += '<table><tr><th></th><th>K</th><th>D</th></tr>';
+      for (const [id, s] of rows[team]) {
+        html += '<tr' + (id === me ? ' class="me"' : '') + '><td>' + (id === me ? 'YOU' : s.name) + '</td><td>' + s.k + '</td><td>' + s.d + '</td></tr>';
+      }
+      return html + '</table></div>';
+    };
+    this._board.innerHTML = '<div class="tb-wrap">' + col(0) + col(1) + '</div>';
+  }
+
+  // --- Events (host decides, everyone shows) --------------------------------
+
+  _event(ev) {
+    ev.sc = this.scores.slice();
+    this.handleEvent(ev);
+    if (this.net.online) this.net.send(Object.assign({ t: 'tev' }, ev));
+  }
+
+  handleEvent(ev) {
+    if (ev.sc) this.scores = ev.sc.slice();
+    if (ev.k === 'kill') {
+      this.ui.feed(ev.a + ' > ' + ev.v);
+    } else if (ev.k === 'over') {
+      this.phase = 'over';
+      this.winner = ev.w;
+      this.overT = TDM_OVER;
+    } else if (ev.k === 'reset') {
+      this.phase = 'play';
+      this.winner = -1;
+      this.timeLeft = TDM_TIME;
+      this._hud.over.classList.remove('on');
+      if (this.role === 'guest') { this._clearBots(); this.stats.clear(); }
+    }
+    if (this.onEvent) this.onEvent(ev);
+  }
+
+  // --- Targets and AI (host) ------------------------------------------------
+
+  _collectTargets() {
+    const L = this._tl;
+    L.length = 0;
+    const p = this.player;
+    if (!this.health.dead) L.push({ kind: 'h', id: this.myId, team: this.myTeam, x: p.x, y: p.y, z: p.z });
+    for (const [id, r] of this.remotes) {
+      if (r.present && !r.dead && r.team !== undefined) L.push({ kind: 'h', id, team: r.team, x: r.x, y: r.y, z: r.z });
+    }
+    for (const e of this.list) if (e.alive) L.push({ kind: 'b', id: e.id, team: e.team, x: e.x, y: e.y, z: e.z, bot: e });
+  }
+
+  update(dt) {
+    this._updateTracers(dt);
+    if (!this.active) return;
+    if (this.role === 'host') this._updateHost(dt);
+    else this._updateGuest(dt);
+    for (const p of this.puffs) {
+      if (p.t < 0) continue;
+      p.t += dt;
+      const k = p.t / 0.35;
+      if (k >= 1) { p.t = -1; p.sprite.visible = false; continue; }
+      p.sprite.scale.setScalar(0.15 + 0.4 * k);
+      p.sprite.material.opacity = 0.9 * (1 - k);
+    }
+    this._updateHud(dt);
+  }
+
+  _updateHost(dt) {
+    if (!this.net.online && !this.input.locked) return; // solo: everything waits while the menu is open
+    this._collectTargets();
+    this._fillT -= dt;
+    if (this._fillT <= 0) { this._fillT = 1.5; this._fillTeams(); }
+
+    if (this.phase === 'play') {
+      this.timeLeft -= dt;
+      if (this.scores[0] >= TDM_LIMIT || this.scores[1] >= TDM_LIMIT || this.timeLeft <= 0) {
+        const w = this.scores[0] === this.scores[1] ? -1 : this.scores[0] > this.scores[1] ? 0 : 1;
+        this._event({ k: 'over', w });
+      }
+    } else {
+      this.overT -= dt;
+      if (this.overT <= 0) this._reset(false);
+    }
+
+    for (let i = this.list.length - 1; i >= 0; i--) {
+      const e = this.list[i];
+      if (!e.alive) { this._updateDeadBot(e, dt); continue; }
+      if (this.phase === 'play') this._thinkBot(e, dt);
+      else e.speedNow = 0;
+      this._physics(e, dt);
+      this._animate(e, dt);
+    }
+
+    if (this.net.online && this.net.peer) {
+      this._snapT -= dt;
+      if (this._snapT <= 0) {
+        this._snapT = TM_SNAPSHOT;
+        this.net.send({
+          t: 'tm', sc: this.scores.slice(), tl: Math.ceil(this.timeLeft), ph: this.phase === 'play' ? 0 : 1, w: this.winner,
+          b: this.list.map((e) => [e.id, e.team, tr2(e.x), tr2(e.y), tr2(e.z), tr2(e.yaw), e.alive ? (e.flashT > 0 ? 1 : 0) : 2]),
+        });
+      }
+      this._statT -= dt;
+      if (this._statT <= 0) {
+        this._statT = 1.2;
+        for (const id of this._humanIds()) this._ensureStat(id);
+        const s = [];
+        for (const [id, v] of this.stats) s.push([id, v.name, v.team, v.k, v.d]);
+        this.net.send({ t: 'tms', s });
+      }
+    }
+  }
+
+  _pickGoal(e) {
+    const goals = [];
+    for (let i = 0; i < this.nodes.length; i++) {
+      const n = this.nodes[i];
+      if (Math.random() < 0.25 || (e.team === 0 ? n.x > 8 : n.x < -8)) goals.push(i);
+    }
+    return goals.length ? goals[Math.floor(Math.random() * goals.length)] : 0;
+  }
+
+  _thinkBot(e, dt) {
+    const diff = this.difficulty;
+    const ex = e.x, ey = e.y, ez = e.z;
+
+    e.senseT -= dt;
+    if (e.senseT <= 0) {
+      e.senseT = 0.2;
+      let best = null, bd = Infinity;
+      for (const t of this._tl) {
+        if (t.team === e.team) continue;
+        const d = Math.hypot(t.x - ex, t.z - ez);
+        if (d >= bd || d > diff.view) continue;
+        if (!this._clearNav(ex, ey + EN_EYE, ez, t.x, t.y + 1.45, t.z) && !this._clearNav(ex, ey + EN_EYE, ez, t.x, t.y + 0.7, t.z)) continue;
+        best = t;
+        bd = d;
+      }
+      if (best && (!e.target || e.target.id !== best.id)) e.reactT = diff.react * rand(0.8, 1.3);
+      e.target = best;
+      e.sees = !!best;
+      if (best) { e.lastX = best.x; e.lastZ = best.z; e.lastY = best.y; e.lostT = 0; e.state = 'combat'; }
+    }
+    if (!e.sees && e.state === 'combat') {
+      e.lostT += dt;
+      if (e.lostT > 0.6) { e.state = 'search'; e.searchT = 8; }
+    }
+    if (e.state === 'search') {
+      e.searchT -= dt;
+      if (e.searchT <= 0 || Math.hypot(e.lastX - ex, e.lastZ - ez) < 1.5) { e.state = 'patrol'; e.goalNode = -1; }
+    }
+
+    let tx = ex, tz = ez, speed = 0, face = null;
+    const t = e.target;
+    if (e.state === 'combat' && t) {
+      const dxp = t.x - ex, dzp = t.z - ez;
+      const dist = Math.hypot(dxp, dzp);
+      face = Math.atan2(-dxp, -dzp);
+      e.strafeT -= dt;
+      if (e.strafeT <= 0) { e.strafe = Math.random() < 0.5 ? -1 : 1; e.strafeT = rand(0.8, 2); }
+      const nx = dist > 0 ? dxp / dist : 0, nz = dist > 0 ? dzp / dist : 0;
+      let mx = -nz * e.strafe, mz = nx * e.strafe;
+      if (dist > 16) { mx = nx; mz = nz; }
+      else if (dist < 5) { mx = -nx * 0.8 + mx * 0.6; mz = -nz * 0.8 + mz * 0.6; }
+      tx = ex + mx; tz = ez + mz;
+      speed = diff.speed * (dist > 16 ? 0.95 : 0.6);
+      this._shootBot(e, dt, t, dist);
+    } else if (e.state === 'search') {
+      const goal = this._goalPoint(e, e.lastX, e.lastZ, dt, e.lastY || 0);
+      tx = goal.x; tz = goal.z;
+      speed = diff.speed * 0.9;
+    } else {
+      if (e.goalNode < 0 || Math.hypot(this.nodes[e.goalNode].x - ex, this.nodes[e.goalNode].z - ez) < 1.8) e.goalNode = this._pickGoal(e);
+      const n = this.nodes[e.goalNode];
+      const goal = this._goalPoint(e, n.x, n.z, dt, n.y);
+      tx = goal.x; tz = goal.z;
+      speed = diff.speed * 0.85;
+    }
+
+    const mx = tx - ex, mz = tz - ez;
+    const ml = Math.hypot(mx, mz);
+    if (ml > 0.05 && speed > 0) {
+      e.moveX = mx / ml; e.moveZ = mz / ml;
+      e.speedNow = speed;
+      if (face === null) face = Math.atan2(-e.moveX, -e.moveZ);
+    } else {
+      e.speedNow = 0;
+    }
+    if (face !== null) {
+      let d = face - e.yaw;
+      d = Math.atan2(Math.sin(d), Math.cos(d));
+      e.yaw += d * Math.min(1, dt * 8);
+    }
+  }
+
+  _shootBot(e, dt, t, dist) {
+    const diff = this.difficulty;
+    e.reactT -= dt;
+    if (e.reactT > 0) return;
+    e.shotT -= dt;
+    if (e.shotT > 0) return;
+    if (e.burst <= 0) {
+      e.burst = diff.burst;
+      e.shotT = rand(diff.pause[0], diff.pause[1]);
+      return;
+    }
+    e.burst--;
+    e.shotT = 0.12;
+    const chance = diff.acc * Math.max(0.3, Math.min(1.15, 1.25 - dist / 32));
+    const hit = Math.random() < chance;
+    const s = Math.sin(e.yaw), c = Math.cos(e.yaw);
+    const mx = e.x - s * 0.86 + c * 0.08, my = e.y + 1.32, mz = e.z - c * 0.86 - s * 0.08;
+    let ax = t.x, ay = t.y + 1.0, az = t.z;
+    if (!hit) { ax += rand(-1, 1) * 0.9; ay += rand(-0.6, 0.8); az += rand(-1, 1) * 0.9; }
+    this._tracer(mx, my, mz, ax, ay, az);
+    e.flash.visible = true;
+    e.flash.rotation.z = Math.random() * 3;
+    e.flashT = 0.05;
+    const p = this.player;
+    const vol = Math.max(0.1, 0.7 / (1 + Math.hypot(p.x - e.x, p.z - e.z) * 0.12));
+    this.audio.shot('ak', vol);
+    if (hit) this._hurt(t, diff.dmg * rand(0.85, 1.15), e);
+  }
+
+  /** A bot's bullet hit target t. */
+  _hurt(t, dmg, bot) {
+    if (t.kind === 'b') {
+      this._damageBot(t.bot, dmg, { k: 'b', id: bot.id, team: bot.team });
+    } else if (t.id === this.myId) {
+      this.noteAttacker({ k: 'b', id: bot.id, team: bot.team });
+      this.hurtLocal(dmg, bot.x, bot.z);
+    } else {
+      this.net.send({ t: 'bdmg', to: t.id, dmg: Math.round(dmg), x: tr2(bot.x), z: tr2(bot.z), b: bot.id, bt: bot.team });
+    }
+  }
+
+  noteAttacker(info) {
+    this.lastAttacker = info;
+    this.lastAttackerT = performance.now();
+  }
+
+  /** A bullet hit me (host: from a bot; guests: told by the host). */
+  hurtLocal(dmg, x, z) {
+    if (!this.input.locked && !this.net.online) return;
+    const applied = this.health.damage(dmg, 'bot', 'bot');
+    if (applied <= 0) return;
+    const p = this.player;
+    this.ui.damageDir(Math.atan2(x - p.x, z - p.z) - (p.yaw + Math.PI));
+    this.audio.hurt();
+  }
+
+  /** My own death: tell the host who did it so the score is right. */
+  reportDeath() {
+    const recent = this.lastAttacker && performance.now() - this.lastAttackerT < 8000;
+    const by = recent ? this.lastAttacker : null;
+    this.lastAttacker = null;
+    this.ui.killedBy = by ? 'KILLED BY ' + this.label(by.id) : '';
+    if (this.net.online) this.net.send({ t: 'died', by });
+    else this.onDied({ from: 1, by });
+  }
+
+  /** Host: a human died. m: { from, by: { k: 'h' | 'b', id, team } | null }. */
+  onDied(m) {
+    if (!this.active || this.role !== 'host' || this.phase !== 'play') return;
+    const v = m.from | 0;
+    this._ensureStat(v).d++;
+    let team = -1;
+    let a = 'THE MAP';
+    const by = m.by;
+    if (by && by.k === 'h' && by.id !== v) {
+      team = this.teamOf(by.id);
+      a = this.label(by.id);
+      this._ensureStat(by.id).k++;
+    } else if (by && by.k === 'b') {
+      team = by.team | 0;
+      a = this.label(by.id);
+      const s = this.stats.get(by.id);
+      if (s) s.k++;
+    }
+    if (team === 0 || team === 1) this.scores[team]++;
+    this._event({ k: 'kill', a, v: this.label(v), t: team });
+  }
+
+  _updateDeadBot(e, dt) {
+    e.deadT += dt;
+    const fall = Math.min(1, e.deadT / 0.45);
+    e.root.rotation.x = (Math.PI / 2) * fall * fall;
+    e.root.position.set(e.x, e.deadT > 3 ? e.y - (e.deadT - 3) * 0.6 : e.y, e.z);
+    if (e.deadT > 4.5) e.root.visible = false;
+    e.respawnT -= dt;
+    if (e.respawnT <= 0 && this.phase === 'play') {
+      e.root.rotation.x = 0;
+      this._respawnBot(e);
+    }
+  }
+
+  // --- Damage --------------------------------------------------------------
+
+  /** The local player's bullet hit a bot (the weapon lets shots pass through allies). */
+  bulletHit(box, hit, damage, headMul) {
+    const e = box && box.enemy;
+    if (!e || !e.alive || e.team === this.myTeam) return false;
+    const head = hit.y > e.y + 1.52;
+    const dmg = damage * (head ? headMul : 1);
+    this._puff(hit.x, hit.y, hit.z);
+    if (this.role === 'host') {
+      this._damageBot(e, dmg, { k: 'h', id: this.myId, team: this.myTeam }, head);
+      this.ui.hitMarker(head || e.hp <= 0);
+      this.audio.hitmarker(e.hp <= 0);
+    } else {
+      this.net.send({ t: 'bhit', b: e.id, dmg: Math.round(dmg), head: head ? 1 : 0 });
+      this.ui.hitMarker(head);
+      this.audio.hitmarker(false);
+    }
+    return true;
+  }
+
+  /** Host: a guest's bullet hit a bot. */
+  onNetHit(m) {
+    if (this.role !== 'host' || !this.active) return;
+    const e = this.byId.get(m.b);
+    const from = m.from | 0;
+    if (!e || !e.alive || typeof m.dmg !== 'number' || e.team === this.teamOf(from)) return;
+    this._damageBot(e, Math.min(300, Math.max(0, m.dmg)), { k: 'h', id: from, team: this.teamOf(from) }, !!m.head);
+  }
+
+  _damageBot(e, dmg, by, head) {
+    if (!e.alive || this.phase !== 'play') return;
+    e.hp -= dmg;
+    e.hurtT = 0.12;
+    // Being shot gives the shooter away.
+    if (by.k === 'h') {
+      const pos = by.id === this.myId ? this.player : this.remotes.get(by.id);
+      if (pos && e.state !== 'combat') { e.lastX = pos.x; e.lastZ = pos.z; e.lastY = pos.y; e.state = 'search'; e.searchT = 8; e.pathT = 0; }
+    }
+    if (e.hp <= 0) this._killBot(e, by, head);
+  }
+
+  _killBot(e, by, head) {
+    e.alive = false;
+    e.deadT = 0;
+    e.respawnT = 5;
+    e.flash.visible = false;
+    for (const m of e.mats) m.emissive.setRGB(0, 0, 0);
+    this._removeBox(e);
+    const vs = this.stats.get(e.id);
+    if (vs) vs.d++;
+    const ks = by.k === 'h' ? this._ensureStat(by.id) : this.stats.get(by.id);
+    if (ks) ks.k++;
+    const team = by.k === 'h' ? this.teamOf(by.id) : by.team;
+    if (team === 0 || team === 1) this.scores[team]++;
+    this._event({ k: 'kill', a: this.label(by.id), v: this.label(e.id), t: team });
+  }
+
+  _explosion(x, y, z, radius, owner) {
+    if (!this.active || this.role !== 'host' || owner === 'mine') return;
+    const r = radius * 0.8;
+    const id = owner === 'me' ? this.myId : this.explosions.ownerId || 0;
+    const team = id ? this.teamOf(id) : -1;
+    for (const e of this.list) {
+      if (!e.alive || (team >= 0 && e.team === team)) continue;
+      const d = Math.hypot(e.x - x, e.y + 0.9 - y, e.z - z);
+      if (d < r) {
+        e.vy = Math.max(e.vy, 4 * (1 - d / r));
+        this._damageBot(e, 200 * (1 - d / r), id ? { k: 'h', id, team } : { k: 'b', id: 0, team: -1 });
+      }
+    }
+  }
+
+  // --- Guest: puppets from snapshots ---------------------------------------
+
+  applySnapshot(m) {
+    if (!this.active || this.role !== 'guest') return;
+    this.scores = m.sc.slice();
+    this.timeLeft = m.tl;
+    this.phase = m.ph === 0 ? 'play' : 'over';
+    this.winner = m.w;
+    const seen = new Set();
+    for (const row of m.b || []) {
+      const [id, team, x, y, z, yaw, st] = row;
+      seen.add(id);
+      let e = this.byId.get(id);
+      if (!e) {
+        if (st === 2) continue;
+        e = this._createBot(team);
+        e.id = id;
+        e.x = e.tx = x; e.y = e.ty = y; e.z = e.tz = z; e.yaw = e.tyaw = yaw;
+        e.alive = true;
+        e.root.visible = true;
+        this._addBox(e);
+        this.list.push(e);
+        this.byId.set(id, e);
+      }
+      e.tx = x; e.ty = y; e.tz = z; e.tyaw = yaw;
+      if (st === 1) { e.flash.visible = true; e.flashT = 0.05; e.flash.rotation.z = Math.random() * 3; }
+      if (st === 2 && e.alive) { e.alive = false; e.deadT = 0; this._removeBox(e); }
+      if (st !== 2 && !e.alive) {
+        // Respawned: stand up again.
+        e.alive = true; e.deadT = 0; e.root.rotation.x = 0; e.root.visible = true;
+        e.x = x; e.y = y; e.z = z;
+        this._addBox(e);
+      }
+    }
+    for (let i = this.list.length - 1; i >= 0; i--) {
+      const e = this.list[i];
+      if (!seen.has(e.id)) this._removeBot(e);
+    }
+  }
+
+  applyStats(m) {
+    if (this.role !== 'guest') return;
+    this.stats = new Map((m.s || []).map((r) => [r[0], { name: r[1], team: r[2], k: r[3], d: r[4] }]));
+    const mine = this.stats.get(this.myId);
+    if (mine) this.ui.setKills(mine.k);
+  }
+
+  _updateGuest(dt) {
+    const k = Math.min(1, dt * 12);
+    for (let i = this.list.length - 1; i >= 0; i--) {
+      const e = this.list[i];
+      if (!e.alive) { this._updateDeadBot(e, dt); continue; }
+      const ox = e.x, oz = e.z;
+      e.x += (e.tx - e.x) * k;
+      e.y += (e.ty - e.y) * k;
+      e.z += (e.tz - e.z) * k;
+      let d = e.tyaw - e.yaw;
+      d = Math.atan2(Math.sin(d), Math.cos(d));
+      e.yaw += d * k;
+      e.speedNow = dt > 0 ? Math.hypot(e.x - ox, e.z - oz) / dt : 0;
+      e.onGround = true;
+      e.state = 'combat';
+      this._syncBox(e);
+      this._animate(e, dt);
+    }
+  }
+
+  _animate(e, dt) {
+    super._animate(e, dt);
+    // Aim the rifle at the bot's own target, not at the local player.
+    const t = e.target;
+    let pitch = 0;
+    if (t && e.state === 'combat') {
+      const d = Math.hypot(t.x - e.x, t.z - e.z);
+      pitch = Math.atan2(t.y + 1.0 - (e.y + 1.35), Math.max(0.5, d));
+    }
+    e.arms.rotation.x = pitch;
+  }
+
+  /** Called every frame while playing: my kills on the HUD (host: from the stats). */
+  syncKills() {
+    const s = this.stats.get(this.myId);
+    this.ui.setKills(s ? s.k : 0);
+  }
+}
+
 // ===== js/input/TouchControls.js =====
 const TOUCH_LOOK_SCALE = 1.4;
 const TOUCH_LAYOUT_KEY = 'retrofps.touchLayout';  // finger pixels -> look pixels at touch sensitivity 1
@@ -8483,6 +9892,7 @@ function boot() {
   let ui = null;
   let enemies = null;
   let zombies = null;
+  let tdm = null;
   const net = new Net();
 
   // Other players, by id. Created on demand.
@@ -8501,13 +9911,14 @@ function boot() {
     lastId: 0,
     get active() {
       if (zombies && zombies.active) return false;
-      for (const r of remotes.values()) if (r.active) return true;
+      for (const r of remotes.values()) if (r.active && !(tdm && tdm.active && r.team === tdm.myTeam)) return true;
       return false;
     },
     raycast(ox, oy, oz, dx, dy, dz, max) {
       let best = -1;
       for (const [id, r] of remotes) {
         if (!r.active) continue;
+        if (tdm && tdm.active && r.team === tdm.myTeam) continue; // no friendly fire
         const d = r.raycast(ox, oy, oz, dx, dy, dz, best < 0 ? max : best);
         if (d >= 0 && (best < 0 || d < best)) { best = d; this.head = r.head; this.lastId = id; }
       }
@@ -8542,6 +9953,8 @@ function boot() {
   const pickups = new Pickups(engine.scene, health);
   explosions.onPlayerBlast = (damage, owner) => {
     if (owner === 'mine') return; // landmines only hurt zombies
+    // A teammate's grenade does not hurt me.
+    if (tdm && tdm.active && owner === 'other' && tdm.teamOf(explosions.ownerId) === tdm.myTeam) return;
     if (zombies.active && owner === 'other') return; // no friendly fire in co-op
     health.damage(damage, 'explosion', owner);
   };
@@ -8568,6 +9981,11 @@ function boot() {
   const common = { scene: engine.scene, world, player, input, settings, explosions, audio: weapons.audio, health, ui };
   enemies = new Enemies(common);
   zombies = new Zombies(Object.assign({ net, remotes }, common));
+  tdm = new TeamMatch(Object.assign({ net, remotes }, common));
+  tdm.onEvent = (ev) => {
+    // A new match: everybody starts over at their team's spawn.
+    if (ev.k === 'reset' && (input.locked || net.online)) health.respawn();
+  };
   health.onRespawn.push(() => {
     weapons.refill();
     grenades.cooldown = 0;
@@ -8618,18 +10036,19 @@ function boot() {
   const mapTabs = Array.from(document.querySelectorAll('#map-tabs button'));
   const mapNote = document.getElementById('map-note');
   const applyMap = (size) => {
-    if (!MAP_SIZES.includes(size)) size = 'middle';
+    if (!MAP_SIZES.includes(size) && size !== 'crash') size = 'middle';
     const changed = size !== world.size;
-    mapSize = size;
+    if (size !== 'crash') mapSize = size; // the facility size the player picked
     if (changed) {
       world.setSize(size);
       health.setRooms(world.activeRooms);
       enemies.setMap(world.activeRooms);
       zombies.setMap(world.activeRooms);
+      tdm.setMap(world.activeRooms);
       barrels.fuses.length = 0;
       health.respawn(); // new spawn point on the new map
     }
-    for (const b of mapTabs) b.classList.toggle('on', b.dataset.map === size);
+    for (const b of mapTabs) b.classList.toggle('on', size !== 'crash' && b.dataset.map === size);
   };
   for (const b of mapTabs) {
     b.addEventListener('click', () => {
@@ -8640,28 +10059,38 @@ function boot() {
   }
 
   // ---- game mode: soldiers (solo / 1v1 online) or zombie defense (solo / co-op) ----
-  let gameMode = (() => { try { return localStorage.getItem(MODE_KEY); } catch (_) { return null; } })() === 'zombies' ? 'zombies' : 'soldiers';
+  const savedMode = (() => { try { return localStorage.getItem(MODE_KEY); } catch (_) { return null; } })();
+  let gameMode = savedMode === 'zombies' || savedMode === 'tdm' ? savedMode : 'soldiers';
   const modeTabs = Array.from(document.querySelectorAll('#mode-tabs button'));
   const modeNote = document.getElementById('mode-note');
   const applyMode = () => {
     const online = net.online;
-    const coop = online ? net.roomMode === 'coop' : gameMode === 'zombies';
-    const shown = online ? (coop ? 'zombies' : 'soldiers') : gameMode;
+    const shown = online ? (net.roomMode === 'coop' ? 'zombies' : net.roomMode === 'tdm' ? 'tdm' : 'soldiers') : gameMode;
+    const coop = shown === 'zombies';
+    const team = shown === 'tdm';
     const locked = net.status === 'connected' || net.status === 'connecting';
     for (const b of modeTabs) {
       b.classList.toggle('on', b.dataset.mode === shown);
       b.disabled = locked;
     }
-    for (const b of mapTabs) b.disabled = locked;
-    mapNote.textContent = locked ? (net.mode === 'guest' ? '(set by the host)' : '') : '';
-    modeNote.textContent = shown === 'zombies'
+    for (const b of mapTabs) b.disabled = locked || team;
+    mapNote.textContent = team ? '(Crash)' : locked ? (net.mode === 'guest' ? '(set by the host)' : '') : '';
+    modeNote.textContent = coop
       ? 'Defend the base in the middle of the map against waves of zombies. Solo, or co-op with up to 2 friends.'
-      : (online ? '1v1 against your friend.' : 'Fight enemy soldiers. Online: 1v1 against a friend.');
-    const wasZombies = zombies.active;
-    enemies.setEnabled(!online && gameMode === 'soldiers');
-    zombies.setActive(coop, online && net.id !== 1 ? 'guest' : 'host');
-    if (zombies.active !== wasZombies) health.respawn(); // to the base, or away from it
-    ui.setKills(coop ? (zombies.scores[zombies.myId] || 0) : online ? null : enemies.kills);
+      : team
+        ? '5v5 team deathmatch on Crash. Bots fill empty places. Up to 10 players online. Hold Tab for the scoreboard.'
+        : (online ? '1v1 against your friend.' : 'Fight enemy soldiers. Online: 1v1 against a friend.');
+    const wasActive = zombies.active || tdm.active;
+    enemies.setEnabled(!online && shown === 'soldiers');
+    // The map follows the mode: Crash for team matches, the facility otherwise.
+    applyMap(team ? 'crash' : online && net.mapSize !== 'crash' ? net.mapSize : mapSize);
+    const role = online && net.id !== 1 ? 'guest' : 'host';
+    tdm.myTeam = online ? net.team : 0;
+    zombies.setActive(coop, role);
+    tdm.setActive(team, role);
+    weapons.setShotFilter(team ? (b) => !(b.enemy && b.enemy.team === tdm.myTeam) : null);
+    if ((zombies.active || tdm.active) !== wasActive) health.respawn(); // to the base / team spawn, or away from it
+    ui.setKills(coop ? (zombies.scores[zombies.myId] || 0) : team ? 0 : online ? null : enemies.kills);
     showNet();
   };
   for (const b of modeTabs) {
@@ -8677,6 +10106,21 @@ function boot() {
   health.chooseSpawn = () => {
     const pts = world.spawnPoints;
     if (zombies.active) return BASE_SPAWNS[Math.floor(Math.random() * BASE_SPAWNS.length)];
+    if (tdm.active) {
+      // Team match: the team spawn farthest from the enemy.
+      const list = CRASH_SPAWNS[tdm.myTeam];
+      const foes = [];
+      for (const [, r] of remotes) if (r.present && !r.dead && r.team !== tdm.myTeam) foes.push(r);
+      for (const e of tdm.list) if (e.alive && e.team !== tdm.myTeam) foes.push(e);
+      let best = list[0], bd = -1;
+      for (const q of list) {
+        let near = 99;
+        for (const f of foes) near = Math.min(near, Math.hypot(q.x - f.x, q.z - f.z));
+        near += Math.random() * 3;
+        if (near > bd) { bd = near; best = q; }
+      }
+      return best;
+    }
     // Against a player: the spawn farthest from them.
     const others = Array.from(remotes.values()).filter((r) => r.present);
     if (net.online && others.length) {
@@ -8705,6 +10149,7 @@ function boot() {
   // ---- multiplayer ----
   const nameOf = (id) => (id === net.id ? 'YOU' : 'P' + id);
   health.onDeath.push(() => {
+    if (tdm.active) { tdm.reportDeath(); return; }
     ui.killedBy = health.lastOwner === 'other' ? 'KILLED BY YOUR OPPONENT' : '';
     net.send({ t: 'died', self: health.lastOwner === 'other' ? 0 : 1 });
   });
@@ -8713,7 +10158,11 @@ function boot() {
 
   net.on('welcome', (m) => {
     for (const r of remotes.values()) r.setPresent(false);
-    for (const id of net.players) remoteFor(id).setPresent(true);
+    for (const id of net.players) {
+      const r = remoteFor(id);
+      r.setPresent(true);
+      if (net.roomMode === 'tdm') { r.setTeam(net.teams[id]); r.setLabel('P' + id, net.teams[id] === 0 ? '#8fb8f0' : '#f0907a'); }
+    }
     // The host's map counts online.
     if (net.mode === 'guest' || net.mode === 'host') applyMap(net.mapSize);
     if (net.roomMode === 'pvp') {
@@ -8740,15 +10189,19 @@ function boot() {
     const r = remoteFor(m.id);
     r.setPresent(!!m.present);
     if (!m.present) r.tx = r.ty = r.tz = 0;
+    if (m.present && net.roomMode === 'tdm') { r.setTeam(m.team); r.setLabel('P' + m.id, m.team === 0 ? '#8fb8f0' : '#f0907a'); }
     showNet();
     if (net.online) {
-      if (net.roomMode === 'coop') ui.feed('P' + m.id + (m.present ? ' JOINED' : ' LEFT'));
+      if (net.roomMode === 'coop' || net.roomMode === 'tdm') ui.feed('P' + m.id + (m.present ? ' JOINED' : ' LEFT'));
       else ui.feed(m.present ? 'OPPONENT JOINED' : 'OPPONENT LEFT');
     }
   });
   net.on('s', (m) => { if (m.from) remoteFor(m.from).setState(m); });
   net.on('dmg', (m) => {
-    if (typeof m.dmg === 'number' && !zombies.active) health.damage(m.dmg, 'bullet', 'other');
+    if (typeof m.dmg === 'number' && !zombies.active) {
+      if (tdm.active) tdm.noteAttacker({ k: 'h', id: m.from });
+      health.damage(m.dmg, 'bullet', 'other');
+    }
   });
   net.on('shot', (m) => {
     const r = remoteFor(m.from || 2);
@@ -8769,6 +10222,17 @@ function boot() {
     else ui.feed(m.killer ? 'YOU FRAGGED OPPONENT' : 'OPPONENT DIED');
   });
   net.on('pdied', (m) => { if (m.id !== net.id) ui.feed(nameOf(m.id) + ' WENT DOWN'); });
+  // 5v5 team deathmatch traffic.
+  net.on('tm', (m) => tdm.applySnapshot(m));
+  net.on('tms', (m) => tdm.applyStats(m));
+  net.on('tev', (m) => { if (tdm.role === 'guest') tdm.handleEvent(m); });
+  net.on('bhit', (m) => tdm.onNetHit(m));
+  net.on('died', (m) => tdm.onDied(m));
+  net.on('bdmg', (m) => {
+    if (typeof m.dmg !== 'number') return;
+    tdm.noteAttacker({ k: 'b', id: m.b, team: m.bt });
+    tdm.hurtLocal(Math.min(100, m.dmg), m.x, m.z);
+  });
   // Zombie defense traffic.
   net.on('zs', (m) => zombies.applySnapshot(m));
   net.on('zhit', (m) => zombies.onNetHit(m));
@@ -8801,18 +10265,19 @@ function boot() {
     if (net.mode === 'host' && st === 'connecting') html = 'Creating a game\u2026';
     else if (net.mode === 'host' && st === 'connected') {
       html = 'Your code: <b>' + net.code + '</b><br>';
-      if (coop) html += count + '/3 players. Friends type the code in and press JOIN.';
+      if (net.roomMode === 'tdm') html += count + '/10 players. Friends type the code in and press JOIN; bots fill the rest.';
+      else if (coop) html += count + '/3 players. Friends type the code in and press JOIN.';
       else html += net.peer ? 'Opponent joined.' : 'Send it to your friend. They type it in and press JOIN.';
     } else if (net.mode === 'guest' && st === 'connecting') html = 'Joining <b>' + net.code + '</b>\u2026';
     else if (net.mode === 'guest' && st === 'connected') {
-      html = 'Connected to <b>' + net.code + '</b>' + (coop ? ' \u00b7 zombie co-op, ' + count + '/3 players' : ' \u00b7 1v1');
+      html = 'Connected to <b>' + net.code + '</b>' + (net.roomMode === 'tdm' ? ' \u00b7 5v5, ' + count + '/10 players' : coop ? ' \u00b7 zombie co-op, ' + count + '/3 players' : ' \u00b7 1v1');
     } else if (st === 'full') html = 'That game is full.';
     else if (st === 'error' && ERRORS[net.error]) html = ERRORS[net.error];
     if (html) {
       ui.netStatus.innerHTML = html;
       ui.netStatus.className = st === 'connected' ? 'ok' : st === 'error' || st === 'full' ? 'bad' : '';
     }
-    netHost.textContent = p2p && busy ? 'LEAVE GAME' : gameMode === 'zombies' ? 'HOST CO-OP (UP TO 3)' : 'HOST 1V1';
+    netHost.textContent = p2p && busy ? 'LEAVE GAME' : gameMode === 'zombies' ? 'HOST CO-OP (UP TO 3)' : gameMode === 'tdm' ? 'HOST 5V5 (UP TO 10)' : 'HOST 1V1';
     netHost.disabled = busy && net.mode === 'ws';
     netJoin.disabled = busy;
     netCode.disabled = busy;
@@ -8824,7 +10289,7 @@ function boot() {
       net.disconnect();
       return;
     }
-    net.host(gameMode === 'zombies' ? 'coop' : 'pvp', mapSize);
+    net.host(gameMode === 'zombies' ? 'coop' : gameMode === 'tdm' ? 'tdm' : 'pvp', gameMode === 'tdm' ? 'crash' : mapSize);
   });
   const join = () => { if (!netJoin.disabled) net.join(netCode.value); };
   netJoin.addEventListener('click', join);
@@ -8876,9 +10341,15 @@ function boot() {
     explosions.update(dt);
     if (input.locked || health.dead) health.update(dt);
     pickups.update(dt);
-    for (const r of remotes.values()) r.update(dt);
+    for (const r of remotes.values()) {
+      r.update(dt);
+      if (r.tag) r.tag.visible = tdm.active && r.team === tdm.myTeam && r.active;
+    }
     enemies.update(dt);
     zombies.update(dt);
+    tdm.update(dt);
+    if (tdm.active) tdm.syncKills();
+    net.flush(dt);
     if (net.online) {
       ui.setMatch(net.roomMode === 'pvp', net.roomMode === 'pvp' && !net.peer);
       sendTimer -= dt;

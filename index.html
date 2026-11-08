@@ -277,6 +277,8 @@ body.zmode #menu #open-shop { display: block; color: var(--gold); border-color: 
 #menu .tabs button:disabled:not(.on) { opacity: 0.35; }
 #menu .tabs button.on:disabled { opacity: 0.85; }
 .tabs.small button { font-size: 10px; letter-spacing: 0; }
+#menu #mode-tabs { flex-wrap: wrap; }
+#menu #mode-tabs button { flex: 1 1 24%; font-size: 10px; }
 #lo-slots button { line-height: 1.35; }
 #lo-slots button small { display: block; margin-top: 2px; font-size: 9px; letter-spacing: 0; font-weight: normal; opacity: 0.8; }
 
@@ -533,6 +535,27 @@ h1 { color: #c9c6ba; letter-spacing: 4px; text-shadow: 3px 3px 0 #000; text-tran
   .brand { margin-bottom: 12px; }
 }
 
+/* ---- Tactical missions ---- */
+#tachud { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); display: none; text-align: center; white-space: nowrap; text-shadow: 2px 2px 0 #000; pointer-events: none; z-index: 4; }
+#tachud.on { display: block; }
+#tac-stage { font-size: 12px; letter-spacing: 3px; color: #a9a79a; }
+#tac-left { margin-top: 2px; font-size: 22px; letter-spacing: 4px; color: #e6e2d2; }
+#tac-gear { margin-top: 3px; font-size: 12px; letter-spacing: 2px; color: #d0a84a; }
+#tacbanner { position: fixed; left: 0; right: 0; top: 28%; display: none; text-align: center; text-shadow: 3px 3px 0 #000; pointer-events: none; z-index: 5; }
+#tacbanner.on { display: block; }
+#tacbanner h2 { margin: 0; font-size: 38px; letter-spacing: 8px; color: #e6e2d2; }
+#tacbanner p { margin: 8px 0 0; font-size: 14px; letter-spacing: 3px; color: #d0a84a; }
+#tacover { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 14%; background: rgba(0, 0, 0, 0.4); text-shadow: 2px 2px 0 #000; pointer-events: none; z-index: 6; }
+#tacover.on { display: flex; }
+#tacover h2 { margin: 0; font-size: 44px; letter-spacing: 7px; color: #9bd07a; text-align: center; }
+#tacover.bad h2 { color: #d9543c; }
+#tacover p { margin: 8px 0 0; letter-spacing: 3px; color: #c9c6ba; text-align: center; }
+#useprompt { position: fixed; left: 50%; top: calc(50% + 70px); transform: translateX(-50%); display: none; padding: 4px 10px; font-size: 13px; letter-spacing: 3px; color: #e6e2d2; background: rgba(14, 14, 16, 0.65); border: 1px solid #77756e; pointer-events: none; z-index: 4; }
+#useprompt.on { display: block; }
+body.touch #tachud { top: calc(44px + env(safe-area-inset-top, 0px)); }
+body.touch #tac-left { font-size: 15px; }
+body.touch #tacbanner h2 { font-size: 26px; }
+
 /* ---- 5v5 team deathmatch ---- */
 #tdmhud {
   position: fixed;
@@ -690,6 +713,25 @@ body.free-mouse, body.free-mouse * { cursor: none; }
 #waiting.on { display: block; }
 #health { z-index: 4; }
 #kills { margin-left: 4px; font-size: 13px; letter-spacing: 2px; color: #d0a84a; }
+#flash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, #ffffff 0%, #fffbe8 55%, #eae6d4 100%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9;
+}
+#snd-dir { position: fixed; left: 50%; top: 50%; width: 0; height: 0; opacity: 0; pointer-events: none; z-index: 3; }
+#snd-dir i {
+  position: absolute;
+  left: -11px;
+  top: -190px;
+  width: 0;
+  height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-bottom: 20px solid rgba(240, 210, 90, 0.9);
+}
 #dmg-dir {
   position: fixed;
   left: 50%;
@@ -812,7 +854,10 @@ body.touch #feed { top: 150px; }
 .tc-grenade { right: 176px; bottom: 104px; width: 58px;  height: 58px; }
 .tc-crouch  { right: 204px; bottom: 22px;  width: 58px;  height: 58px; }
 .tc-mine    { right: 196px; bottom: 170px; width: 52px;  height: 52px; }
-.zonly { display: none !important; }
+.zonly, .mineonly, .taconly { display: none !important; }
+body.tc-editing .mineonly, body.tc-editing .taconly { display: flex !important; }
+body.zmode .mineonly, body.tacmode .mineonly, body.tacmode .taconly { display: flex !important; }
+.tc-use { right: 100px; bottom: 176px; width: 52px; height: 52px; }
 body.tc-editing .zonly { display: flex !important; }
 #touch .custom { position: fixed !important; right: auto !important; bottom: auto !important; transform: translate(-50%, -50%) !important; }
 #touch.editing .tc-btn, #touch.editing #tc-pause, #touch.editing #tc-shop { outline: 2px dashed #d0a84a; outline-offset: 2px; cursor: move; }
@@ -927,6 +972,8 @@ body.touch #ammo-count { font-size: 30px; }
   <div id="reload-bar"><span>RELOADING</span><i><b></b></i></div>
   <div id="scope"></div>
   <div id="damage"></div>
+  <div id="flash"></div>
+  <div id="snd-dir"><i></i></div>
   <div id="dmg-dir"><i></i></div>
   <div id="death"><h2>YOU DIED</h2><p id="death-cause"></p><p id="death-timer"></p></div>
   <div id="health"><div id="health-bar-bg"><div id="health-bar"></div></div><b id="health-num">100</b><span id="kills"></span><span id="gold"></span></div>
@@ -951,13 +998,14 @@ body.touch #ammo-count { font-size: 30px; }
       <div id="view-main">
         <header class="brand">
           <h1>RETRO FPS</h1>
-          <p class="sub">Prototype &middot; build 10 &middot; Milestone 12 merged</p>
+          <p class="sub">Prototype &middot; build 11 &middot; tactical missions</p>
         </header>
 
         <div class="tabs" id="mode-tabs">
           <button type="button" data-mode="soldiers">SOLDIERS</button>
           <button type="button" data-mode="zombies">ZOMBIES</button>
           <button type="button" data-mode="tdm">5V5 TEAM DM</button>
+          <button type="button" data-mode="tac">TACTICAL</button>
         </div>
         <p class="mode-note" id="mode-note"></p>
 
@@ -1022,6 +1070,8 @@ body.touch #ammo-count { font-size: 30px; }
             <li><b>R</b> reload</li>
             <li><b>1-3</b> primary, secondary, sidearm (wheel cycles)</li>
             <li><b>Tab</b> scoreboard (5v5)</li>
+            <li><b>F</b> open / close a door (tactical)</li>
+            <li><b>G</b> throw a flashbang (tactical)</li>
             <li><b>Q</b> previous weapon</li>
             <li><b>E</b> throw grenade</li>
             <li><b>B</b> shop (zombie defense)</li>
@@ -1127,6 +1177,7 @@ const LIMITS = {
   enemyCount: { min: 0, max: 12 },
   fillBots: { min: 0, max: 1 },
   oneShotHead: { min: 0, max: 1 },
+  redDot: { min: 0, max: 1 },
   difficulty: { min: 0, max: 2 },
   viewBob: { min: 0, max: 1 },
   screenShake: { min: 0, max: 1 },
@@ -1157,6 +1208,7 @@ function createDefaults() {
     enemyCount: 6,
     fillBots: 1,
     oneShotHead: 1,
+    redDot: 1,
     difficulty: 1,
     viewBob: 1,
     screenShake: 1,
@@ -1362,6 +1414,8 @@ const SETTINGS_SCHEMA = [
     note: 'Look speed while aiming down sights.' },
   { tab: 'controls', key: 'wheelAimSens', label: 'Wheel adjusts aim sensitivity', toggle: true,
     note: 'While aiming, scroll up for faster and down for slower; middle click resets to 1.00x. Weapon switching by wheel is paused while aiming.' },
+  { tab: 'controls', key: 'redDot', label: 'Red dot sight', toggle: true,
+    note: 'A red dot optic on rifles, SMGs and pistols. Scoped weapons keep their scope.' },
   { tab: 'controls', key: 'crosshairSize', label: 'Crosshair size', step: 1, format: (v) => Math.round(v) + ' px' },
   { tab: 'controls', key: 'invertY', label: 'Invert vertical look', toggle: true },
   { tab: 'controls', key: 'autoSprint', label: 'Always sprint', toggle: true,
@@ -1401,6 +1455,8 @@ class Ui {
     this.reloadLabel = document.getElementById('reload-label');
     this.reloadBar = document.getElementById('reload-bar');
     this.reloadFill = this.reloadBar.querySelector('b');
+    this.sndDir = document.getElementById('snd-dir');
+    this.flashEl = document.getElementById('flash');
     this.healthNum = document.getElementById('health-num');
     this.healthBar = document.getElementById('health-bar');
     this.damageEl = document.getElementById('damage');
@@ -1572,6 +1628,27 @@ class Ui {
     this.killsEl.textContent = n === null ? '' : 'KILLS ' + n;
   }
 
+  /** A yellow arrow towards a loud sound (angle relative to the view). */
+  soundPing(rel, strength) {
+    const el = this.sndDir;
+    el.style.transition = 'none';
+    el.style.transform = 'rotate(' + (-rel) + 'rad)';
+    el.style.opacity = String(Math.max(0.35, Math.min(1, strength)));
+    void el.offsetWidth;
+    el.style.transition = 'opacity 1.1s';
+    el.style.opacity = '0';
+  }
+
+  /** Flashbang: white-out that holds for a moment, then fades over `blind` seconds. */
+  flashEffect(blind, strength) {
+    const el = this.flashEl;
+    el.style.transition = 'none';
+    el.style.opacity = String(Math.min(1, strength));
+    void el.offsetWidth;
+    el.style.transition = 'opacity ' + blind.toFixed(2) + 's ease-in ' + Math.min(0.7, blind * 0.25).toFixed(2) + 's';
+    el.style.opacity = '0';
+  }
+
   /** Red arrow pointing towards whoever just hurt the player (angle relative to the view). */
   damageDir(rel) {
     const el = this.dirEl;
@@ -1637,7 +1714,9 @@ class Ui {
     if (health.dead && this.killedBy) this.deathCause.textContent = this.killedBy;
     if (health.dead) {
       const secs = Math.max(1, Math.ceil(health.deathTimer));
-      if (secs !== this._deathSecs) {
+      if (health.noRespawn) {
+        this.deathTimer.textContent = 'You are down. Your partner can still finish the mission.';
+      } else if (secs !== this._deathSecs) {
         this._deathSecs = secs;
         this.deathTimer.textContent = 'Respawning in ' + secs;
       }
@@ -1928,6 +2007,7 @@ const CROUCH = 'KeyC';
 const GRENADE = 'KeyE';
 const AIM_KEY = 'KeyZ'; // hold to aim down sights (alternative to right click)
 const SHOP_KEY = 'KeyB';
+const USE_KEY = 'KeyF'; // open / close doors
 const MINE_KEY = 'KeyG';
 const SLOT_KEYS = {
   Digit1: 1, Digit2: 2, Digit3: 3, Digit4: 4, Digit5: 5, Digit6: 6, Digit7: 7, Digit8: 8, Digit9: 9,
@@ -2332,6 +2412,14 @@ class Input {
   get crouchToggled() { return this._virtualCrouch; }
 
   pressShop() { this._shopQueued = true; }
+  pressUse() { this._useQueued = true; }
+
+  /** True once per use-key press. */
+  consumeUse() {
+    const q = this._useQueued;
+    this._useQueued = false;
+    return q && !this.blocked;
+  }
   pressMine() { this._mineQueued = true; }
 
   /** True once per shop key press. */
@@ -2412,6 +2500,7 @@ class Input {
     if (e.code === CROUCH) this._crouchPressed = true;
     if (e.code === 'Tab') { e.preventDefault(); this.scoreHeld = true; return; }
     if (e.code === SHOP_KEY) this._shopQueued = true;
+    if (e.code === USE_KEY) this._useQueued = true;
     if (e.code === MINE_KEY) this._mineQueued = true;
     if (SLOT_KEYS[e.code]) this._slotQueued = SLOT_KEYS[e.code];
   }
@@ -2453,6 +2542,7 @@ class Input {
       this._crouchPressed = false;
       this._shopQueued = false;
       this._mineQueued = false;
+      this._useQueued = false;
       this.scoreHeld = false;
     }
     if (this.onLockChange) this.onLockChange(playing);
@@ -2950,6 +3040,8 @@ class Health {
     this.onPickup = [];
     /** Optional () => spawn point, used on every respawn. */
     this.chooseSpawn = null;
+    /** True while a mode wants dead players to stay down (tactical missions). */
+    this.noRespawn = false;
     /** Who caused the last damage: 'me' (own grenade, fall...) or 'other'. */
     this.lastOwner = 'me';
     /** Medkits: { x, y, z, active, timer }. */
@@ -3015,7 +3107,7 @@ class Health {
 
     if (this.dead) {
       this.deathTimer -= dt;
-      if (this.deathTimer <= 0) this.respawn();
+      if (this.deathTimer <= 0 && !this.noRespawn) this.respawn();
       return;
     }
 
@@ -4431,7 +4523,14 @@ class WeaponAudio {
       }
       this.master = this.ctx.createGain();
       this.master.gain.value = 0.45 * this.volume;
-      this.master.connect(this.ctx.destination);
+      // master -> ear (low-pass, closes after a flashbang) -> speakers
+      this.ear = this.ctx.createBiquadFilter();
+      this.ear.type = 'lowpass';
+      this.ear.frequency.value = 22000;
+      this.earGain = this.ctx.createGain();
+      this.master.connect(this.ear);
+      this.ear.connect(this.earGain);
+      this.earGain.connect(this.ctx.destination);
       const length = this.ctx.sampleRate;
       this.noise = this.ctx.createBuffer(1, length, this.ctx.sampleRate);
       const data = this.noise.getChannelData(0);
@@ -4460,7 +4559,7 @@ class WeaponAudio {
     gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     src.connect(filter);
     filter.connect(gain);
-    gain.connect(this.master);
+    gain.connect(this._dest || this.master);
     src.start(t, Math.random() * 0.5, dur + 0.05);
   }
 
@@ -4474,7 +4573,7 @@ class WeaponAudio {
     gain.gain.setValueAtTime(vol, t);
     gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     osc.connect(gain);
-    gain.connect(this.master);
+    gain.connect(this._dest || this.master);
     osc.start(t);
     osc.stop(t + dur + 0.02);
   }
@@ -4526,6 +4625,124 @@ class WeaponAudio {
     const t = this.ctx.currentTime;
     this._click(t, 3200, 0.35);
     if (kill) this._click(t + 0.07, 1800, 0.45);
+  }
+
+  // --- 3D sound ------------------------------------------------------------
+
+  /** Where I am and which way I look (call every frame). */
+  setListener(x, y, z, yaw, pitch) {
+    if (!this.ctx) return;
+    const L = this.ctx.listener;
+    const fx = -Math.sin(yaw) * Math.cos(pitch), fy = Math.sin(pitch), fz = -Math.cos(yaw) * Math.cos(pitch);
+    if (L.positionX) {
+      L.positionX.value = x; L.positionY.value = y; L.positionZ.value = z;
+      L.forwardX.value = fx; L.forwardY.value = fy; L.forwardZ.value = fz;
+      L.upX.value = 0; L.upY.value = 1; L.upZ.value = 0;
+    } else if (L.setPosition) {
+      L.setPosition(x, y, z);
+      L.setOrientation(fx, fy, fz, 0, 1, 0);
+    }
+  }
+
+  /** Play everything `fn` schedules as if it came from the point (x, y, z). `muffled`: behind a wall. */
+  at(x, y, z, muffled, fn, hrtf) {
+    if (!this._ready()) return;
+    const ctx = this.ctx;
+    const panner = ctx.createPanner();
+    panner.panningModel = hrtf ? 'HRTF' : 'equalpower';
+    panner.distanceModel = 'inverse';
+    panner.refDistance = 2.5;
+    panner.maxDistance = 90;
+    panner.rolloffFactor = 1.25;
+    if (panner.positionX) { panner.positionX.value = x; panner.positionY.value = y; panner.positionZ.value = z; }
+    else panner.setPosition(x, y, z);
+    if (muffled) {
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 620;
+      lp.Q.value = 0.5;
+      const g = ctx.createGain();
+      g.gain.value = 0.55;
+      panner.connect(lp);
+      lp.connect(g);
+      g.connect(this.master);
+    } else {
+      panner.connect(this.master);
+    }
+    const prev = this._dest;
+    this._dest = panner;
+    try { fn(); } finally { this._dest = prev; }
+  }
+
+  /** Someone else's footstep. */
+  stepAt(x, y, z, muffled, heavy) {
+    this.at(x, y, z, muffled, () => {
+      const t = this.ctx.currentTime;
+      this._noise(t, 0.07, 'lowpass', 520 + Math.random() * 200, 180, 0.8, heavy ? 0.55 : 0.32);
+      this._tone(t, 0.06, 95, 50, heavy ? 0.4 : 0.22);
+    });
+  }
+
+  /** A door opening or closing. */
+  doorAt(x, y, z, open, muffled) {
+    this.at(x, y, z, muffled, () => {
+      const t = this.ctx.currentTime;
+      this._noise(t, open ? 0.28 : 0.12, 'bandpass', open ? 260 : 380, open ? 520 : 140, 3, 0.35);
+      this._tone(t, 0.18, open ? 160 : 90, open ? 210 : 55, 0.2, 'sawtooth');
+      if (!open) this._click(t + 0.05, 900, 0.5);
+    });
+  }
+
+  /** A shout or call-out. */
+  voiceAt(x, y, z, muffled) {
+    this.at(x, y, z, muffled, () => {
+      const t = this.ctx.currentTime;
+      const f = 110 + Math.random() * 40;
+      this._tone(t, 0.3, f * 1.4, f, 0.34, 'sawtooth');
+      this._noise(t, 0.28, 'bandpass', 900, 600, 2.5, 0.28);
+    }, true);
+  }
+
+  /** A gunshot somewhere in the level. */
+  shotAt(kind, x, y, z, muffled, vol) {
+    this.at(x, y, z, muffled, () => this.shot(kind, vol === undefined ? 1 : vol), true);
+  }
+
+  /** The flashbang itself: a huge crack. */
+  flashAt(x, y, z) {
+    this.at(x, y, z, false, () => {
+      const t = this.ctx.currentTime;
+      this._noise(t, 0.5, 'highpass', 1800, 1800, 0.5, 1.4);
+      this._noise(t, 0.7, 'lowpass', 5200, 300, 0.7, 1.2);
+      this._tone(t, 0.5, 90, 28, 1.2);
+    });
+  }
+
+  /** After a flashbang: sound goes dull and a high whine fades out over `sec`. */
+  deafen(sec) {
+    if (!this._ready() || sec <= 0.1) return;
+    const t = this.ctx.currentTime;
+    this.ear.frequency.cancelScheduledValues(t);
+    this.ear.frequency.setValueAtTime(380, t);
+    this.ear.frequency.setValueAtTime(380, t + sec * 0.25);
+    this.ear.frequency.exponentialRampToValueAtTime(22000, t + sec);
+    this.earGain.gain.cancelScheduledValues(t);
+    this.earGain.gain.setValueAtTime(0.35, t);
+    this.earGain.gain.setValueAtTime(0.35, t + sec * 0.25);
+    this.earGain.gain.linearRampToValueAtTime(1, t + sec);
+    // Tinnitus: goes straight to the speakers, not through the dulled path.
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = 5600;
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.13, t + 0.05);
+    g.gain.setValueAtTime(0.13, t + sec * 0.35);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + sec * 0.95);
+    osc.connect(g);
+    g.connect(this.ctx.destination);
+    osc.start(t);
+    osc.stop(t + sec);
   }
 
   /** A grenade bouncing off something. */
@@ -5402,6 +5619,11 @@ class Net {
     return this.players.size > 0;
   }
 
+  /** Rooms where everybody shares one state channel and teams exist. */
+  get teamMode() {
+    return this.roomMode === 'tdm' || this.roomMode === 'tac';
+  }
+
   get maxPlayers() {
     return this.roomMode === 'coop' ? 3 : this.roomMode === 'tdm' ? 10 : 2;
   }
@@ -5424,7 +5646,7 @@ class Net {
     this.disconnect();
     this.mode = 'host';
     this.mapSize = mapSize || 'middle';
-    this.roomMode = roomMode === 'coop' ? 'coop' : roomMode === 'tdm' ? 'tdm' : 'pvp';
+    this.roomMode = roomMode === 'coop' ? 'coop' : roomMode === 'tdm' ? 'tdm' : roomMode === 'tac' ? 'tac' : 'pvp';
     this._set('connecting');
     const Peer = await loadPeerJs();
     if (this.mode !== 'host') return; // cancelled meanwhile
@@ -5528,7 +5750,7 @@ class Net {
     const msg = Object.assign({}, m, { from });
     switch (m.t) {
       case 's':
-        if (this.roomMode === 'tdm') {
+        if (this.teamMode) {
           // Team matches: states are batched and sent a few times a second (see flush).
           this._latest[from] = m;
           if (from !== 1) this._receive(msg);
@@ -5539,12 +5761,12 @@ class Net {
         break;
       case 'hit': { // my bullet hit player `to`
         const to = m.to || (from === 1 ? 2 : 1);
-        if (this.roomMode === 'tdm' && (this.teams[from] === undefined || this.teams[from] === this.teams[to])) break; // no friendly fire
+        if (this.teamMode && (this.teams[from] === undefined || this.teams[from] === this.teams[to])) break; // no friendly fire
         if (to !== from && typeof m.dmg === 'number') this._deliver(to, { t: 'dmg', dmg: m.head ? HEAD_ONE_SHOT : Math.min(250, Math.max(0, m.dmg)), head: m.head ? 1 : 0, from });
         break;
       }
       case 'died': {
-        if (this.roomMode === 'tdm') {
+        if (this.teamMode) {
           this._receive(msg); // the host's match logic scores it
         } else if (this.roomMode === 'pvp') {
           const killer = m.self ? 0 : (from === 1 ? 2 : 1);
@@ -5563,6 +5785,7 @@ class Net {
       case 'zbuy':
       case 'zmine':
       case 'bhit':
+      case 'tuse':
         if (from !== 1) this._receive(msg);
         break;
       default:
@@ -5577,7 +5800,7 @@ class Net {
 
   /** Host, team matches: send everyone's newest state to every guest (call every frame). */
   flush(dt) {
-    if (this.mode !== 'host' || this.roomMode !== 'tdm' || this.status !== 'connected') return;
+    if (this.mode !== 'host' || !this.teamMode || this.status !== 'connected') return;
     this._flushT -= dt;
     if (this._flushT > 0) return;
     this._flushT = 0.066;
@@ -5677,7 +5900,7 @@ class Net {
     if (m.t === 'welcome') {
       clearTimeout(this._joinTimer);
       this.id = m.id;
-      this.roomMode = m.mode === 'coop' ? 'coop' : m.mode === 'tdm' ? 'tdm' : 'pvp';
+      this.roomMode = m.mode === 'coop' ? 'coop' : m.mode === 'tdm' ? 'tdm' : m.mode === 'tac' ? 'tac' : 'pvp';
       this.team = m.team | 0;
       this.teams = m.teams ? Object.assign({}, m.teams) : { [m.id]: this.team };
       this.mapSize = MAP_SIZES.includes(m.map) ? m.map : 'middle';
@@ -5941,6 +6164,47 @@ class RemotePlayer {
 }
 
 // ===== js/weapon/Weapon.js =====
+/**
+ * A reflex sight: a small frame with a glowing red dot. The eye looks through its window when aiming,
+ * so the aim pose is a little lower than with the iron sights. Returns null for weapons that do not take one.
+ */
+function createOptic(spec) {
+  if (spec.scope || spec.projectile || !spec.aimPose) return null;
+  const sy = -spec.aimPose.y;
+  if (sy < 0.018 || sy > 0.09) return null;
+  const sz = AIM_Z - spec.aimPose.z;
+  const small = spec.hip && spec.hip.z <= -0.2; // pistols get a micro dot
+  const k = small ? 0.8 : 1;
+  const group = new THREE.Group();
+  const dark = new THREE.MeshPhongMaterial({ color: 0x1b1d20, shininess: 40 });
+  const box = (w, h, d, x, y, z, mat) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w * k, h * k, d * k), mat || dark);
+    m.position.set(x, y, z);
+    group.add(m);
+    return m;
+  };
+  const wy = sy + 0.024 * k; // window centre: the eye line goes through here
+  box(0.034, 0.022, 0.056, 0, sy - 0.002 * k, sz);                      // base on the rail
+  box(0.004, 0.030, 0.050, -0.016 * k, wy - 0.002, sz);                 // left post
+  box(0.004, 0.030, 0.050, 0.016 * k, wy - 0.002, sz);                  // right post
+  box(0.036, 0.004, 0.050, 0, wy + 0.014 * k, sz);                      // top bar
+  const lens = box(0.028, 0.022, 0.002, 0, wy, sz - 0.022 * k, new THREE.MeshBasicMaterial({
+    color: 0x9fc4ff, transparent: true, opacity: 0.1, depthWrite: false,
+  }));
+  lens.renderOrder = 2;
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(0.0022, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff2a2a, fog: false }));
+  dot.position.set(0, wy, sz - 0.02 * k);
+  dot.renderOrder = 3;
+  group.add(dot);
+  const glow = new THREE.Mesh(new THREE.SphereGeometry(0.0055, 8, 6), new THREE.MeshBasicMaterial({
+    color: 0xff3030, transparent: true, opacity: 0.22, depthWrite: false, fog: false,
+  }));
+  glow.position.copy(dot.position);
+  glow.renderOrder = 3;
+  group.add(glow);
+  return { group, aimY: -wy };
+}
+
 /** Damage multiplier of a headshot when headshots kill instantly. */
 const HEAD_ONE_SHOT = 1000;
 
@@ -6010,6 +6274,9 @@ class Weapon {
     this.model.root.visible = false;
     engine.viewScene.add(this.model.root);
     this.hands = spec.hands ? new ViewHands(this.model.root, spec.hands, engine.viewScene) : null;
+    this.optic = createOptic(spec);
+    if (this.optic) this.model.root.add(this.optic.group);
+    this._opticPose = this.optic ? { x: spec.aimPose.x, y: this.optic.aimY, z: spec.aimPose.z, ry: spec.aimPose.ry } : null;
     this.reloadEnv = 0;
 
     this.name = spec.name;
@@ -6337,12 +6604,15 @@ class Weapon {
     const breathe = Math.sin(this.time * 1.6) * 0.0012;
     const air = akClamp(-p.vy * 0.001, -0.015, 0.015);
 
-    // Base pose: hip -> aim, then towards the sprint pose.
-    let x = akLerp(spec.hip.x, spec.aimPose.x, aimE);
-    let y = akLerp(spec.hip.y, spec.aimPose.y, aimE);
-    let z = akLerp(spec.hip.z, spec.aimPose.z, aimE);
+    // Base pose: hip -> aim (through the red dot when it is fitted), then towards the sprint pose.
+    const useOptic = !!this.optic && !!this.settings.get('redDot');
+    if (this.optic) this.optic.group.visible = useOptic;
+    const ap = useOptic ? this._opticPose : spec.aimPose;
+    let x = akLerp(spec.hip.x, ap.x, aimE);
+    let y = akLerp(spec.hip.y, ap.y, aimE);
+    let z = akLerp(spec.hip.z, ap.z, aimE);
     let rx = 0;
-    let ry = akLerp(spec.hip.ry, spec.aimPose.ry, aimE);
+    let ry = akLerp(spec.hip.ry, ap.ry, aimE);
     let rz = 0;
 
     const sprintTarget = p.sprinting && !wantsFire && !wantsAim ? 1 : 0;
@@ -6762,31 +7032,45 @@ class GrenadeSystem {
 
     /** Seconds until the next grenade is available (0 = ready). */
     this.cooldown = 0;
-    /** Optional (x, y, z, vx, vy, vz) callback when I throw. */
+    /** Optional (x, y, z, vx, vy, vz, kind) callback when I throw. */
     this.onThrow = null;
+    /** Optional (kind) => bool: may I throw this kind now (tactical gear is limited)? */
+    this.allow = null;
+    /** Optional (kind) when I threw something. */
+    this.onUsed = null;
+    /** Optional (x, y, z, ownerId, owner) when a flashbang goes off (on every client that simulates it). */
+    this.onFlash = null;
+    this._kind = 'frag';
 
     this._pending = 0; // seconds until release, 0 = idle
     this._hit = { dist: 0, x: 0, y: 0, z: 0, nx: 0, ny: 0, nz: 0, box: null };
 
     const bodyGeometry = new THREE.SphereGeometry(GR_RADIUS, 8, 6);
     const capGeometry = new THREE.BoxGeometry(0.03, 0.03, 0.03);
+    const flashGeometry = new THREE.CylinderGeometry(0.028, 0.028, 0.12, 10);
+    const flashMaterial = new THREE.MeshLambertMaterial({ color: 0xb8bcc2 });
     const bodyMaterial = new THREE.MeshLambertMaterial({ color: 0x4b5a3a });
     const capMaterial = new THREE.MeshLambertMaterial({ color: 0x6a6a6a });
     this.list = ['me', 'other', 'other', 'other', 'other', 'other', 'other', 'other', 'other'].map((owner) => {
       const mesh = new THREE.Group();
       const cap = new THREE.Mesh(capGeometry, capMaterial);
       cap.position.y = GR_RADIUS;
-      mesh.add(new THREE.Mesh(bodyGeometry, bodyMaterial), cap);
+      const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+      const flashBody = new THREE.Mesh(flashGeometry, flashMaterial);
+      flashBody.visible = false;
+      mesh.add(body, cap, flashBody);
       mesh.visible = false;
       this.scene.add(mesh);
-      return { owner, ownerId: 0, mesh, active: false, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, life: 0 };
+      return { owner, ownerId: 0, kind: 'frag', body, cap, flashBody, mesh, active: false, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, life: 0 };
     });
   }
 
   update(dt) {
     this.cooldown = Math.max(0, this.cooldown - dt);
 
-    if (this.input.consumeGrenade() && this.player.enabled && this.cooldown <= 0 && this._pending === 0 && this.weapons.canThrow()) {
+    if (this.input.consumeGrenade() && this.player.enabled && this.cooldown <= 0 && this._pending === 0 && this.weapons.canThrow() &&
+        (!this.allow || this.allow('frag'))) {
+      this._kind = 'frag';
       this.cooldown = GR_COOLDOWN;
       this._pending = GR_RELEASE;
       this.weapons.startThrow(GR_THROW_ANIM);
@@ -6801,6 +7085,17 @@ class GrenadeSystem {
     for (const g of this.list) this._fly(g, dt);
   }
 
+  /** Throw a flashbang. Returns false if I cannot right now. */
+  throwFlash() {
+    if (!this.player.enabled || this.cooldown > 0 || this._pending !== 0 || !this.weapons.canThrow()) return false;
+    if (this.allow && !this.allow('flash')) return false;
+    this._kind = 'flash';
+    this.cooldown = GR_COOLDOWN * 0.5;
+    this._pending = GR_RELEASE;
+    this.weapons.startThrow(GR_THROW_ANIM);
+    return true;
+  }
+
   /** The other player threw a grenade. */
   spawnRemote(m) {
     // First free slot of the other players' grenades; the oldest one if all are in flight.
@@ -6811,7 +7106,7 @@ class GrenadeSystem {
       if (!slot || g.life < slot.life) slot = g;
     }
     slot.ownerId = m.from || 0;
-    this._launch(slot, m.x, m.y, m.z, m.vx, m.vy, m.vz);
+    this._launch(slot, m.x, m.y, m.z, m.vx, m.vy, m.vz, m.k === 'flash' ? 'flash' : 'frag');
     this.audio.whoosh();
   }
 
@@ -6832,16 +7127,22 @@ class GrenadeSystem {
     const x = cam.position.x + fx * 0.35;
     const y = cam.position.y + fy * 0.35 - 0.1;
     const z = cam.position.z + fz * 0.35;
-    this._launch(this.list[0], x, y, z, vx, vy, vz);
+    const kind = this._kind;
+    this._launch(this.list[0], x, y, z, vx, vy, vz, kind);
     this.audio.whoosh();
-    if (this.onThrow) this.onThrow(x, y, z, vx, vy, vz);
+    if (this.onUsed) this.onUsed(kind);
+    if (this.onThrow) this.onThrow(x, y, z, vx, vy, vz, kind);
   }
 
-  _launch(g, x, y, z, vx, vy, vz) {
+  _launch(g, x, y, z, vx, vy, vz, kind) {
+    g.kind = kind || 'frag';
+    g.body.visible = g.kind === 'frag';
+    g.cap.visible = g.kind === 'frag';
+    g.flashBody.visible = g.kind === 'flash';
     g.active = true;
     g.x = x; g.y = y; g.z = z;
     g.vx = vx; g.vy = vy; g.vz = vz;
-    g.life = GR_MAX_FLIGHT;
+    g.life = g.kind === 'flash' ? 1.7 : GR_MAX_FLIGHT;
     g.resting = false;
     g.spin = 1;
     g.mesh.position.set(x, y, z);
@@ -6865,7 +7166,7 @@ class GrenadeSystem {
     if (len > 1e-6) {
       const hit = this._hit;
       if (this.collision.raycast(g.x, g.y, g.z, sx / len, sy / len, sz / len, len + GR_RADIUS, hit)) {
-        if (hit.box && hit.box.enemy) {
+        if (hit.box && hit.box.enemy && g.kind !== 'flash') {
           // Straight into a soldier or zombie: goes off on contact.
           this._explode(g, hit.x + hit.nx * 0.15, hit.y + hit.ny * 0.15, hit.z + hit.nz * 0.15, 0, 0, 0, 0, 0, 0);
           return;
@@ -6901,6 +7202,12 @@ class GrenadeSystem {
   _explode(g, x, y, z, hx, hy, hz, nx, ny, nz) {
     g.active = false;
     g.mesh.visible = false;
+    if (g.kind === 'flash') {
+      // No blast: a bang and a flash that blinds and deafens whoever is near.
+      this.audio.flashAt(x, y, z);
+      if (this.onFlash) this.onFlash(x, y, z, g.ownerId || 0, g.owner);
+      return;
+    }
     this.explosions.ownerId = g.ownerId || 0; // who threw it, for team rules
     this.explosions.explode(x, y, z, hx, hy, hz, nx, ny, nz, 1, g.owner);
     this.explosions.ownerId = 0;
@@ -7034,7 +7341,149 @@ const HALL_H = 4.5; // wall height
 const DOOR_H = 3.0; // doorway height
 
 // World size (metres) covered by one texture repeat.
-const TILE = { concrete: 3, floor: 3, panel: 3, ceiling: 3, crate: 1, hazard: 1, lamp: 1, sand: 3, dirt: 4, asphalt: 4, olive: 3, rust: 3 };
+const TILE = { grass: 4, wood: 2, darkwood: 2, tile: 1.5, carpet: 3, carpetB: 3, carpetG: 3, carpetR: 3, marble: 2, rubber: 2, plaster: 3, brick: 2, metalg: 2, whitem: 1.5, blackm: 1.5, plantg: 1, sea: 6, glass: 3, paint: 1, concrete: 3, floor: 3, panel: 3, ceiling: 3, crate: 1, hazard: 1, lamp: 1, sand: 3, dirt: 4, asphalt: 4, olive: 3, rust: 3 };
+
+// ===== Tactical missions: five buildings to clear =====
+const TAC_CELL = 2; // metres per grid cell
+const TAC_H = 3.0; // room height
+const TAC_STAGE_COUNT = 5;
+
+/** A small seeded random generator, so every player builds the same rooms and props. */
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * The five stages. `grid`: one string per row of 2 m cells; the same letter is the same room, '.' is outside.
+ * `rooms`: letter -> [name, type]. `doors`: [roomA, roomB, [x, z] (nearest wall piece) or index, 'open'|'closed'].
+ * `enemies`: letter -> how many hostiles wait in that room. `diff`: how good the hostiles are.
+ */
+const TAC_STAGES = [
+  {
+    name: 'APARTMENT', seed: 11, flash: 3, frag: 1,
+    grid: ['..LLLLKKKK', '..LLLLKKKK', 'EELLLLKKKK', 'EELLLLBBBB', '..HHHHHHHH', '..RRRSSSSS', '..RRRSSSSS'],
+    rooms: { E: ['ENTRY', 'hall'], L: ['LIVING ROOM', 'living'], K: ['KITCHEN', 'kitchen'], B: ['BATHROOM', 'bath'], H: ['HALLWAY', 'hall'], R: ['BEDROOM', 'bedroom'], S: ['MASTER BEDROOM', 'bedroom'] },
+    doors: [['.', 'E', [0, 7], 'closed'], ['E', 'L', [4, 9], 'closed'], ['L', 'H', [7, 8], 'open'], ['L', 'K', [12, 3], 'closed'], ['K', 'B', [15, 6], 'closed'],
+      ['B', 'H', [17, 8], 'closed'], ['H', 'R', [7, 10], 'closed'], ['H', 'S', [15, 10], 'closed']],
+    enemies: { L: 1, K: 1, S: 1 },
+    diff: { hp: 60, speed: 2.4, react: 0.9, acc: 0.17, dmg: 7, burst: 2, pause: [1.5, 2.4], view: 14 },
+  },
+  {
+    name: 'OFFICE FLOOR', seed: 23, flash: 3, frag: 1,
+    grid: ['..MMMMNNNNPPPP', '..MMMMNNNNPPPP', '..CCCCCCCCCCCC', 'VVOOOOOOOOQQQQ', 'VVOOOOOOOOQQQQ', 'VVOOOOOOOOTTTT', '..DDDDDDDDDDDD', '..WWWWXXXXYYYY', '..WWWWXXXXYYYY'],
+    rooms: { M: ['MEETING A', 'meeting'], N: ['MEETING B', 'meeting'], P: ['SERVER ROOM', 'server'], C: ['NORTH CORRIDOR', 'hall'], V: ['LOBBY', 'lobby'], O: ['OPEN OFFICE', 'office'],
+      Q: ['BREAK ROOM', 'kitchen'], T: ['RESTROOM', 'bath'], D: ['SOUTH CORRIDOR', 'hall'], W: ['MANAGER', 'office'], X: ['STORAGE', 'storage'], Y: ['DIRECTOR', 'office'] },
+    doors: [['.', 'V', [0, 9], 'closed'], ['V', 'O', [4, 12], 'open'], ['O', 'C', [11, 6], 'closed'], ['O', 'D', [11, 12], 'closed'], ['C', 'M', [7, 4], 'closed'],
+      ['C', 'N', [15, 4], 'closed'], ['C', 'P', [23, 4], 'closed'], ['O', 'Q', [20, 7], 'open'], ['Q', 'T', [24, 10], 'closed'], ['T', 'D', [24, 12], 'closed'],
+      ['D', 'W', [7, 14], 'closed'], ['D', 'X', [15, 14], 'closed'], ['D', 'Y', [24, 14], 'closed']],
+    enemies: { O: 2, M: 1, N: 1, P: 1, Y: 1 },
+    diff: { hp: 75, speed: 2.9, react: 0.7, acc: 0.24, dmg: 8, burst: 3, pause: [1.2, 2.0], view: 18 },
+  },
+  {
+    name: 'WAREHOUSE', seed: 37, flash: 4, frag: 2,
+    grid: ['GGGGGGGGGGGGAAAA', 'GGGGGGGGGGGGAAAA', 'GGGGGGGGGGGGHHHH', 'GGGGGGGGGGGGBBBB', 'GGGGGGGGGGGGBBBB', 'GGGGGGGGGGGGIIII', 'GGGGGGGGGGGGCCCC', 'GGGGGGGGGGGGCCCC', 'GGGGGGGGGGGGDDDD', 'GGGGGGGGGGGGDDDD'],
+    rooms: { G: ['MAIN FLOOR', 'warehouse'], A: ['OFFICE', 'office'], H: ['SIDE HALL', 'hall'], B: ['BREAK ROOM', 'kitchen'], I: ['BACK HALL', 'hall'], C: ['CAGE', 'storage'], D: ['DOCK OFFICE', 'office'] },
+    doors: [['.', 'G', [0, 10], 'closed'], ['G', 'A', [24, 2], 'closed'], ['G', 'H', [24, 5], 'open'], ['H', 'A', [26, 4], 'closed'], ['H', 'B', [26, 6], 'closed'],
+      ['G', 'B', [24, 8], 'closed'], ['B', 'I', [26, 10], 'closed'], ['G', 'I', [24, 11], 'open'], ['I', 'C', [26, 12], 'closed'], ['G', 'C', [24, 14], 'closed'],
+      ['C', 'D', [26, 16], 'closed'], ['G', 'D', [24, 18], 'closed']],
+    enemies: { G: 5, A: 1, B: 1, C: 1, D: 1 },
+    diff: { hp: 90, speed: 3.2, react: 0.55, acc: 0.31, dmg: 9, burst: 3, pause: [1.0, 1.7], view: 22 },
+  },
+  {
+    name: 'HOTEL', seed: 41, flash: 4, frag: 2,
+    grid: ['..1122334455667788', '..1122334455667788', '..CCCCCCCCCCCCCCCC', 'LLLLRRRRRRKKKKSSSS', 'LLLLRRRRRRKKKKSSSS', 'LLLLRRRRRRKKKKYYYY', 'LLLLRRRRRRKKKKYYYY', '..DDDDDDDDDDDDDDDD', '..aabbccddeeffgghh', '..aabbccddeeffgghh'],
+    rooms: { C: ['NORTH CORRIDOR', 'hall'], L: ['LOBBY', 'lobby'], R: ['BAR', 'bar'], K: ['KITCHEN', 'kitchen'], S: ['STORAGE', 'storage'], Y: ['SECURITY', 'office'], D: ['SOUTH CORRIDOR', 'hall'],
+      1: ['ROOM 101', 'guest'], 2: ['ROOM 102', 'guest'], 3: ['ROOM 103', 'guest'], 4: ['ROOM 104', 'guest'], 5: ['ROOM 105', 'guest'], 6: ['ROOM 106', 'guest'], 7: ['ROOM 107', 'guest'], 8: ['ROOM 108', 'guest'],
+      a: ['ROOM 201', 'guest'], b: ['ROOM 202', 'guest'], c: ['ROOM 203', 'guest'], d: ['ROOM 204', 'guest'], e: ['ROOM 205', 'guest'], f: ['ROOM 206', 'guest'], g: ['ROOM 207', 'guest'], h: ['ROOM 208', 'guest'] },
+    doors: [['.', 'L', [0, 10], 'closed'], ['L', 'R', [8, 10], 'open'], ['R', 'K', [20, 10], 'closed'], ['K', 'S', [28, 7], 'closed'], ['K', 'Y', [28, 11], 'closed'],
+      ['L', 'C', [7, 6], 'closed'], ['R', 'C', [14, 6], 'closed'], ['K', 'C', [24, 6], 'closed'], ['S', 'C', [32, 6], 'closed'], ['L', 'D', [5, 14], 'closed'],
+      ['R', 'D', [14, 14], 'closed'], ['K', 'D', [24, 14], 'closed'], ['Y', 'D', [32, 14], 'closed'],
+      ['C', '1', [5, 4], 'closed'], ['C', '2', [9, 4], 'closed'], ['C', '3', [13, 4], 'closed'], ['C', '4', [17, 4], 'closed'], ['C', '5', [21, 4], 'closed'], ['C', '6', [25, 4], 'closed'], ['C', '7', [29, 4], 'closed'], ['C', '8', [33, 4], 'closed'],
+      ['D', 'a', [5, 16], 'closed'], ['D', 'b', [9, 16], 'closed'], ['D', 'c', [13, 16], 'closed'], ['D', 'd', [17, 16], 'closed'], ['D', 'e', [21, 16], 'closed'], ['D', 'f', [25, 16], 'closed'], ['D', 'g', [29, 16], 'closed'], ['D', 'h', [33, 16], 'closed']],
+    enemies: { R: 3, K: 2, S: 1, Y: 1, L: 1, 3: 1, 6: 1, b: 1, f: 1 },
+    diff: { hp: 105, speed: 3.5, react: 0.42, acc: 0.39, dmg: 11, burst: 4, pause: [0.8, 1.4], view: 26 },
+  },
+  {
+    name: 'COMPOUND', seed: 53, flash: 5, frag: 3,
+    grid: ['..LLLLLAAAAAMMMMTT..', '..LLLLLAAAAAMMMMTT..', '..LLLLLAAAAAMMMMTT..', 'EEWWZZZZZZZZZZXXSS..', 'EEWWZZZZZZZZZZXXSS..', 'EEWWZZZZZZZZZZXXSS..', 'EEWWZZZZZZZZZZXXUU..', '..WWZZZZZZZZZZXXUU..',
+      '..CCCCCCCCCCCCCCCC..', '..DDDDGGGGGGPPPPKK..', '..DDDDGGGGGGPPPPKK..', '..DDDDGGGGGGPPPPKK..'],
+    rooms: { L: ['LIBRARY', 'library'], A: ['ARMORY', 'armory'], M: ['MASTER SUITE', 'bedroom'], T: ['TROPHY ROOM', 'trophy'], E: ['ENTRANCE HALL', 'lobby'], W: ['WEST HALL', 'hall'], Z: ['ATRIUM', 'atrium'],
+      X: ['EAST HALL', 'hall'], S: ['STUDY', 'office'], U: ['GYM', 'gym'], C: ['SOUTH HALL', 'hall'], D: ['DINING ROOM', 'dining'], G: ['GAME ROOM', 'game'], P: ['LOUNGE', 'lounge'], K: ['KITCHEN', 'kitchen'] },
+    doors: [['.', 'E', [0, 10], 'closed'], ['E', 'W', [4, 10], 'closed'], ['W', 'Z', [8, 10], 'open'], ['Z', 'X', [28, 10], 'open'], ['W', 'L', [5, 6], 'closed'], ['Z', 'A', [19, 6], 'closed'],
+      ['X', 'M', [29, 6], 'closed'], ['X', 'S', [32, 9], 'closed'], ['X', 'U', [32, 13], 'closed'], ['S', 'T', [33, 6], 'closed'], ['L', 'A', [14, 3], 'closed'], ['A', 'M', [24, 3], 'closed'],
+      ['M', 'T', [32, 3], 'closed'], ['W', 'C', [5, 16], 'closed'], ['Z', 'C', [18, 16], 'closed'], ['X', 'C', [29, 16], 'closed'], ['C', 'D', [7, 18], 'closed'], ['C', 'G', [17, 18], 'closed'],
+      ['C', 'P', [27, 18], 'closed'], ['C', 'K', [33, 18], 'closed']],
+    enemies: { Z: 4, L: 1, A: 2, M: 2, T: 1, S: 1, U: 1, G: 2, P: 1, D: 1 },
+    heavy: { T: 1 },
+    diff: { hp: 125, speed: 3.8, react: 0.3, acc: 0.48, dmg: 13, burst: 5, pause: [0.6, 1.1], view: 30 },
+  },
+];
+
+/** Floors and how props are chosen, by room type. Props: [name, chance] against a wall; `center`: in the middle of big rooms. */
+const TAC_ROOM_TYPES = {
+  hall: { floor: 'wood', wall: [['plant', 0.25], ['cabinet', 0.2]], center: [] },
+  living: { floor: 'wood', rug: 'carpetB', wall: [['couch', 0.55], ['tv', 0.45], ['plant', 0.3], ['shelf', 0.3]], center: ['table'] },
+  kitchen: { floor: 'tile', wall: [['counter', 0.75], ['fridge', 0.4]], center: ['table'] },
+  bath: { floor: 'tile', wall: [['tub', 0.5], ['toilet', 0.5], ['sink', 0.5]], center: [] },
+  bedroom: { floor: 'carpet', wall: [['bed', 0.7], ['wardrobe', 0.45], ['nightstand', 0.35]], center: [] },
+  office: { floor: 'carpetG', wall: [['desk', 0.6], ['cabinet', 0.3], ['plant', 0.2]], center: ['desk'] },
+  meeting: { floor: 'carpetG', wall: [['shelf', 0.2], ['plant', 0.25]], center: ['table'] },
+  server: { floor: 'concrete', wall: [['rack', 0.85]], center: [] },
+  lobby: { floor: 'marble', wall: [['plant', 0.35], ['couch', 0.3], ['vending', 0.2]], center: ['reception'] },
+  storage: { floor: 'concrete', wall: [['crate', 0.6], ['shelfm', 0.45]], center: ['crate'] },
+  warehouse: { floor: 'concrete', wall: [['crate', 0.5], ['shelfm', 0.45], ['pallet', 0.3]], center: ['pillar', 'crate', 'crate'] },
+  guest: { floor: 'carpet', wall: [['bed', 0.75], ['wardrobe', 0.3], ['nightstand', 0.3], ['desk', 0.3]], center: [] },
+  bar: { floor: 'wood', wall: [['bar', 0.55], ['couch', 0.3], ['plant', 0.2]], center: ['table'] },
+  atrium: { floor: 'marble', wall: [['plant', 0.35], ['couch', 0.25]], center: ['fountain', 'pillar'] },
+  armory: { floor: 'concrete', wall: [['cabinet', 0.5], ['crate', 0.45], ['shelfm', 0.4]], center: ['crate'] },
+  library: { floor: 'wood', wall: [['shelf', 0.85], ['couch', 0.2]], center: ['table'] },
+  gym: { floor: 'rubber', wall: [['crate', 0.2]], center: ['bench'] },
+  lounge: { floor: 'carpetR', wall: [['couch', 0.5], ['plant', 0.3], ['tv', 0.3]], center: ['table'] },
+  dining: { floor: 'wood', wall: [['shelf', 0.3], ['plant', 0.2]], center: ['table', 'table'] },
+  game: { floor: 'carpetR', wall: [['couch', 0.4], ['tv', 0.3], ['plant', 0.2]], center: ['table'] },
+  trophy: { floor: 'marble', wall: [['shelf', 0.5], ['plant', 0.2]], center: ['pedestal'] },
+};
+
+/**
+ * Furniture: [u0, u1, v0, v1, y0, y1, material]. u runs along the wall (0 = middle of the cell),
+ * v is the distance from the wall. `w` and `d`: the footprint.
+ */
+const TAC_PROPS = {
+  couch: { w: 2.1, d: 0.95, parts: [[-1.05, 1.05, 0.05, 0.95, 0, 0.45, 'carpetR'], [-1.05, 1.05, 0.05, 0.35, 0.45, 0.95, 'carpetR'], [-1.05, -0.85, 0.05, 0.95, 0.45, 0.72, 'carpetR'], [0.85, 1.05, 0.05, 0.95, 0.45, 0.72, 'carpetR']] },
+  tv: { w: 1.5, d: 0.5, parts: [[-0.75, 0.75, 0.05, 0.5, 0, 0.5, 'darkwood'], [-0.6, 0.6, 0.15, 0.28, 0.5, 1.1, 'blackm']] },
+  plant: { w: 0.7, d: 0.7, parts: [[-0.25, 0.25, 0.12, 0.62, 0, 0.4, 'darkwood'], [-0.32, 0.32, 0.05, 0.7, 0.4, 1.35, 'plantg']] },
+  shelf: { w: 1.7, d: 0.4, parts: [[-0.85, 0.85, 0.02, 0.4, 0, 2.0, 'darkwood']] },
+  shelfm: { w: 2.4, d: 0.6, parts: [[-1.2, 1.2, 0.02, 0.6, 0, 2.3, 'metalg'], [-1.1, -0.2, 0.08, 0.5, 0.0, 0.0, 'crate']] },
+  cabinet: { w: 0.9, d: 0.55, parts: [[-0.45, 0.45, 0.02, 0.55, 0, 1.3, 'metalg']] },
+  counter: { w: 2.0, d: 0.7, parts: [[-1, 1, 0.02, 0.65, 0, 0.9, 'tile'], [-1, 1, 0.0, 0.7, 0.9, 0.95, 'blackm']] },
+  fridge: { w: 0.85, d: 0.8, parts: [[-0.42, 0.42, 0.02, 0.75, 0, 1.9, 'whitem']] },
+  tub: { w: 1.7, d: 0.85, parts: [[-0.85, 0.85, 0.02, 0.85, 0, 0.55, 'whitem']] },
+  toilet: { w: 0.5, d: 0.75, parts: [[-0.22, 0.22, 0.02, 0.75, 0, 0.45, 'whitem'], [-0.22, 0.22, 0.02, 0.25, 0.45, 0.95, 'whitem']] },
+  sink: { w: 0.65, d: 0.5, parts: [[-0.3, 0.3, 0.02, 0.5, 0, 0.85, 'whitem']] },
+  bed: { w: 2.0, d: 1.0, parts: [[-1.0, 1.0, 0.02, 1.0, 0, 0.5, 'carpet'], [-1.0, -0.85, 0.02, 1.0, 0.5, 1.0, 'darkwood'], [-0.8, -0.2, 0.15, 0.85, 0.5, 0.62, 'whitem']] },
+  wardrobe: { w: 1.4, d: 0.6, parts: [[-0.7, 0.7, 0.02, 0.6, 0, 2.0, 'darkwood']] },
+  nightstand: { w: 0.5, d: 0.45, parts: [[-0.25, 0.25, 0.02, 0.45, 0, 0.55, 'wood']] },
+  desk: { w: 1.6, d: 0.8, parts: [[-0.8, 0.8, 0.02, 0.8, 0, 0.74, 'wood'], [-0.3, 0.3, 0.1, 0.22, 0.74, 1.12, 'blackm'], [-0.25, 0.25, 0.85, 1.15, 0, 0.5, 'blackm']] },
+  rack: { w: 0.85, d: 1.0, parts: [[-0.4, 0.4, 0.02, 1.0, 0, 2.0, 'blackm'], [-0.3, 0.3, 0.99, 1.0, 0.3, 1.8, 'lamp']] },
+  vending: { w: 0.95, d: 0.85, parts: [[-0.45, 0.45, 0.02, 0.85, 0, 1.9, 'metalg'], [-0.35, 0.35, 0.84, 0.85, 0.7, 1.6, 'lamp']] },
+  crate: { w: 1.1, d: 1.1, parts: [[-0.55, 0.55, 0.05, 1.05, 0, 1.0, 'crate']] },
+  pallet: { w: 1.3, d: 1.2, parts: [[-0.65, 0.65, 0.05, 1.15, 0, 0.15, 'wood'], [-0.5, 0.5, 0.15, 1.05, 0.15, 0.9, 'crate']] },
+  bar: { w: 3.0, d: 0.85, parts: [[-1.5, 1.5, 0.05, 0.85, 0, 1.1, 'darkwood'], [-1.5, 1.5, 0.0, 0.95, 1.1, 1.15, 'blackm']] },
+  // Standing in the middle of a room: footprint around the point (u, v measured from the cell centre).
+  table: { w: 1.6, d: 1.0, center: true, parts: [[-0.8, 0.8, -0.5, 0.5, 0, 0.76, 'wood'], [-1.0, -0.6, -0.15, 0.15, 0, 0.45, 'blackm'], [0.6, 1.0, -0.15, 0.15, 0, 0.45, 'blackm']] },
+  reception: { w: 3.0, d: 1.0, center: true, parts: [[-1.5, 1.5, -0.5, 0.5, 0, 1.05, 'wood'], [-1.5, 1.5, -0.55, 0.55, 1.05, 1.1, 'blackm']] },
+  pillar: { w: 0.5, d: 0.5, center: true, parts: [[-0.25, 0.25, -0.25, 0.25, 0, 3.0, 'concrete']] },
+  fountain: { w: 3.0, d: 3.0, center: true, parts: [[-1.4, 1.4, -1.4, 1.4, 0, 0.5, 'whitem'], [-1.2, 1.2, -1.2, 1.2, 0.5, 0.56, 'sea'], [-0.2, 0.2, -0.2, 0.2, 0.5, 1.4, 'whitem']] },
+  bench: { w: 1.6, d: 0.6, center: true, parts: [[-0.8, 0.8, -0.3, 0.3, 0, 0.45, 'blackm']] },
+  pedestal: { w: 0.9, d: 0.9, center: true, parts: [[-0.4, 0.4, -0.4, 0.4, 0, 1.1, 'whitem'], [-0.2, 0.2, -0.2, 0.2, 1.1, 1.4, 'crate']] },
+};
 
 /** Which rooms exist for each map size. 'plug*' rooms are wall pieces that close a doorway to a room that is not there. */
 const ROOMS_BY_SIZE = {
@@ -7042,6 +7491,7 @@ const ROOMS_BY_SIZE = {
   middle: ['hall', 'east', 'pump', 'warehouse', 'corridor', 'control', 'plugPumpEast', 'plugBoiler', 'plugGarage'],
   large: ['hall', 'east', 'pump', 'warehouse', 'corridor', 'control', 'dock', 'boiler', 'garage'],
   crash: ['crash'], // outdoor map for 5v5 team deathmatch
+  tac1: ['tac1'], tac2: ['tac2'], tac3: ['tac3'], tac4: ['tac4'], tac5: ['tac5'], // tactical missions, built when first needed
 };
 const MAP_SIZES = ['small', 'middle', 'large'];
 
@@ -7090,6 +7540,10 @@ class World {
     this.rooms = {}; // name -> { group, boxes, barrels }
     this.outdoor = false;
     this.activeRooms = new Set();
+    this.stageData = {}; // 'tac1'.. -> doors, start points, hostile positions, bounds
+    this.tac = null;
+    this.tacDoors = [];
+    this.tacBox = null;
     this._room = null;
     this.spawn = { x: 0, y: 0, z: 7.5, yaw: 0 };
     /** Explosive barrels of the rooms that exist: { mesh, box, x, y, z, alive, fused, respawn }. */
@@ -7113,6 +7567,26 @@ class World {
     this.materials.asphalt = tint(textures.floor, 0x5c5d63);
     this.materials.olive = tint(textures.panel, 0x6c7658);
     this.materials.rust = tint(textures.panel, 0xa56a4a);
+    // Interior materials for the tactical buildings.
+    this.materials.sea = tint(textures.floor, 0x3a6c9a);
+    this.materials.grass = tint(textures.floor, 0x5d7a46);
+    this.materials.wood = tint(textures.floor, 0x9a7048);
+    this.materials.darkwood = tint(textures.floor, 0x5a3c26);
+    this.materials.tile = tint(textures.floor, 0xcfd2cc);
+    this.materials.marble = tint(textures.floor, 0xe3e0d8);
+    this.materials.rubber = tint(textures.floor, 0x2c2e31);
+    this.materials.carpet = tint(textures.floor, 0x6b6f86);
+    this.materials.carpetB = tint(textures.floor, 0x4a5f80);
+    this.materials.carpetG = tint(textures.floor, 0x6c7068);
+    this.materials.carpetR = tint(textures.floor, 0x7a4a4c);
+    this.materials.plaster = tint(textures.concrete, 0xe9e4d6);
+    this.materials.brick = tint(textures.panel, 0xa0624a);
+    this.materials.metalg = tint(textures.panel, 0x8a9096);
+    this.materials.whitem = tint(textures.concrete, 0xf2f2ee);
+    this.materials.blackm = tint(textures.panel, 0x27292d);
+    this.materials.plantg = tint(textures.floor, 0x3f7a3a);
+    this.materials.glass = new THREE.MeshBasicMaterial({ color: 0x86aed6, transparent: true, opacity: 0.2, depthWrite: false });
+    this.materials.paint = tint(textures.floor, 0xb8a070);
 
     this._geometries = new Map();
     this._barrelGeometry = null;
@@ -7136,6 +7610,12 @@ class World {
   setSize(size) {
     if (!ROOMS_BY_SIZE[size]) size = 'middle';
     this.size = size;
+    const isTac = /^tac[1-5]$/.test(size);
+    if (isTac && !this.rooms[size]) {
+      this._begin(size);
+      this._buildTacStage(Number(size.slice(3)));
+      this._room = null;
+    }
     const on = new Set(ROOMS_BY_SIZE[size]);
     this.activeRooms = new Set(ROOMS_BY_SIZE[size].filter((r) => !r.startsWith('plug')));
     const boxes = this.collision.boxes;
@@ -7164,18 +7644,75 @@ class World {
     // Sky and fog: bright outdoors on Crash, dark inside the facility.
     const outdoor = size === 'crash';
     this.outdoor = outdoor;
-    this.scene.background = new THREE.Color(outdoor ? 0x9ec3e6 : CLEAR_COLOR);
-    this.scene.fog.color.setHex(outdoor ? 0xb9d2ea : CLEAR_COLOR);
+    const night = isTac ? 0x0b111c : null; // the tactical missions are night raids
+    this.scene.background = new THREE.Color(outdoor ? 0x9ec3e6 : night !== null ? night : CLEAR_COLOR);
+    this.scene.fog.color.setHex(outdoor ? 0xb9d2ea : night !== null ? night : CLEAR_COLOR);
     if (this.onFog) this.onFog(outdoor);
     if (this.hemi) {
-      this.hemi.intensity = outdoor ? 3.3 : 2.6;
-      this.hemi.color.set(outdoor ? 0xcfe0f5 : 0x7a7a82);
-      this.hemi.groundColor.set(outdoor ? 0x8a7b62 : 0x3a3a38);
+      this.hemi.intensity = outdoor ? 3.3 : isTac ? 1.9 : 2.6;
+      this.hemi.color.set(outdoor ? 0xcfe0f5 : isTac ? 0x7d8bab : 0x7a7a82);
+      this.hemi.groundColor.set(outdoor ? 0x8a7b62 : isTac ? 0x2c2c34 : 0x3a3a38);
     }
+    // The stage in use: its doors, its start points, where its hostiles wait.
+    this.tac = isTac ? this.stageData[size] : null;
+    this.tacDoors = this.tac ? this.tac.doors : [];
+    this.tacBox = this.tac ? this.tac.box : null;
+    if (this.tac) this.resetDoors();
     this.spawnPoints.length = 0;
     for (const sp of ALL_SPAWNS) if (this.activeRooms.has(sp.room)) this.spawnPoints.push({ x: sp.x, y: sp.y, z: sp.z, yaw: sp.yaw });
     this.spawn.x = 0; this.spawn.y = 0; this.spawn.z = 7.5; this.spawn.yaw = 0;
+    if (this.tac) {
+      for (const sp of this.tac.start) this.spawnPoints.push({ x: sp.x, y: 0, z: sp.z, yaw: sp.yaw });
+      Object.assign(this.spawn, this.tac.start[0], { y: 0 });
+    }
     return size;
+  }
+
+  // --- Doors of a tactical stage ---------------------------------------------
+
+  /** Every door back to the state the stage starts in. */
+  resetDoors() {
+    for (const d of this.tacDoors) {
+      d.open = d.def === 'open';
+      d.angle = d.open ? d.dir * 1.55 : 0;
+      d.pivot.rotation.y = d.angle;
+      this._syncDoorBox(d);
+    }
+  }
+
+  _syncDoorBox(d) {
+    const boxes = this.collision.boxes;
+    const i = boxes.indexOf(d.box);
+    if (d.open && i >= 0) boxes.splice(i, 1);
+    else if (!d.open && i < 0) boxes.push(d.box);
+  }
+
+  /** Open or close door `i`. Returns true if it changed. */
+  setDoor(i, open) {
+    const d = this.tacDoors[i];
+    if (!d || d.open === open) return false;
+    d.open = open;
+    this._syncDoorBox(d);
+    return true;
+  }
+
+  /** Doors swing towards their target angle. */
+  updateDoors(dt) {
+    for (const d of this.tacDoors) {
+      const target = d.open ? d.dir * 1.55 : 0;
+      if (d.angle === target) continue;
+      const step = 6 * dt;
+      d.angle += Math.max(-step, Math.min(step, target - d.angle));
+      d.pivot.rotation.y = d.angle;
+      d.pivot.updateMatrix();
+    }
+  }
+
+  /** Bit mask of the open doors (for the network). */
+  doorMask() {
+    let m = 0;
+    this.tacDoors.forEach((d, i) => { if (d.open && i < 30) m |= 1 << i; });
+    return m;
   }
 
   _begin(name) {
@@ -7497,7 +8034,7 @@ class World {
     for (const o of (openings || []).slice().sort((p, q) => p.a - q.a)) {
       box(cur, o.a, y0, y1);
       const h0 = o.type === 'window' ? y0 + 1.0 : y0;
-      const h1 = o.type === 'window' ? y0 + 2.3 : y0 + 2.6;
+      const h1 = o.type === 'window' ? y0 + 2.3 : y0 + (o.h || 2.6);
       if (h0 > y0) box(o.a, o.b, y0, h0);
       box(o.a, o.b, h1, y1);
       cur = o.b;
@@ -7665,6 +8202,367 @@ class World {
     this._solid('concrete', -34, 0, -10, -33.2, 1.1, -6);
     this._solid('crate', -6, 0, -24, -4.8, 1.2, -22.8);
     this._solid('crate', 5.8, 0, 22, 7, 1.2, 23.2);
+  }
+
+  /**
+   * Build tactical stage n from its grid: ground, fence, floors, ceilings, walls with doors and windows,
+   * furniture, lamps. Everything is axis-aligned boxes, as in the rest of the world.
+   */
+  _buildTacStage(n) {
+    const def = TAC_STAGES[n - 1];
+    const cs = TAC_CELL, H = TAC_H;
+    const grid = def.grid;
+    const D = grid.length, W = grid[0].length;
+    const ch = (c, r) => (c < 0 || r < 0 || c >= W || r >= D ? '.' : grid[r][c]);
+    const rng = mulberry32(def.seed * 977);
+    const X1 = W * cs, Z1 = D * cs, M = 10;
+    const data = { doors: [], start: [], enemies: [], box: { x0: -1, z0: -1, x1: X1 + 1, z1: Z1 + 1 }, name: def.name, def };
+    this.stageData['tac' + n] = data;
+
+    // Ground and a fence around the compound (the invisible part stops anyone from jumping over it).
+    this._solid('grass', -M - 1, -1, -M - 1, X1 + M + 1, 0, Z1 + M + 1);
+    this._solid('brick', -M - 1, -1, -M - 1, X1 + M + 1, 2.4, -M);
+    this._solid('brick', -M - 1, -1, Z1 + M, X1 + M + 1, 2.4, Z1 + M + 1);
+    this._solid('brick', -M - 1, -1, -M, -M, 2.4, Z1 + M);
+    this._solid('brick', X1 + M, -1, -M, X1 + M + 1, 2.4, Z1 + M);
+    const hidden = (x0, y0, z0, x1, y1, z1) => this._room.boxes.push(this.collision.addBox(x0, y0, z0, x1, y1, z1));
+    hidden(-M - 1, 2.4, -M - 1, X1 + M + 1, 20, -M);
+    hidden(-M - 1, 2.4, Z1 + M, X1 + M + 1, 20, Z1 + M + 1);
+    hidden(-M - 1, 2.4, -M, -M, 20, Z1 + M);
+    hidden(X1 + M, 2.4, -M, X1 + M + 1, 20, Z1 + M);
+
+    // Rooms: which cells belong to which letter.
+    const rooms = {};
+    for (let r = 0; r < D; r++) for (let c = 0; c < W; c++) {
+      const k = grid[r][c];
+      if (k === '.') continue;
+      (rooms[k] = rooms[k] || { cells: [] }).cells.push([c, r]);
+    }
+    for (const k of Object.keys(rooms)) {
+      const info = def.rooms[k] || [k, 'hall'];
+      rooms[k].name = info[0];
+      rooms[k].type = info[1];
+      rooms[k].spec = TAC_ROOM_TYPES[info[1]] || TAC_ROOM_TYPES.hall;
+    }
+
+    // Floors (visual) and ceilings (solid), joined into runs along each row.
+    for (const k of Object.keys(rooms)) {
+      for (let r = 0; r < D; r++) {
+        let c = 0;
+        while (c < W) {
+          if (grid[r][c] !== k) { c++; continue; }
+          let c1 = c;
+          while (c1 + 1 < W && grid[r][c1 + 1] === k) c1++;
+          this._addBox(rooms[k].spec.floor, c * cs, 0, r * cs, (c1 + 1) * cs, 0.02, (r + 1) * cs);
+          this._solid('ceiling', c * cs, H, r * cs, (c1 + 1) * cs, H + 0.25, (r + 1) * cs);
+          c = c1 + 1;
+        }
+      }
+    }
+
+    // Wall pieces: one per cell border between different rooms (or a room and the outside).
+    const segs = [];
+    for (let r = 0; r < D; r++) for (let c = 0; c <= W; c++) {
+      const a = ch(c - 1, r), b = ch(c, r);
+      if (a !== b) segs.push({ axis: 'z', fixed: c * cs, a0: r * cs, a1: (r + 1) * cs, a, b, ext: a === '.' || b === '.' });
+    }
+    for (let r = 0; r <= D; r++) for (let c = 0; c < W; c++) {
+      const a = ch(c, r - 1), b = ch(c, r);
+      if (a !== b) segs.push({ axis: 'x', fixed: r * cs, a0: c * cs, a1: (c + 1) * cs, a, b, ext: a === '.' || b === '.' });
+    }
+    const sortKey = (q, w) => (q.axis < w.axis ? -1 : q.axis > w.axis ? 1 : q.fixed - w.fixed || q.a0 - w.a0);
+    const doorCells = new Set();
+    const markCells = (sg) => {
+      const cl = (axis, fixed, mid, side) => (axis === 'z'
+        ? [Math.round((fixed - (side < 0 ? cs : 0)) / cs), Math.floor(mid / cs)]
+        : [Math.floor(mid / cs), Math.round((fixed - (side < 0 ? cs : 0)) / cs)]);
+      const mid = (sg.a0 + sg.a1) / 2;
+      for (const side of [-1, 1]) { const [c, r] = cl(sg.axis, sg.fixed, mid, side); doorCells.add(c + ',' + r); }
+    };
+    for (const dd of def.doors) {
+      const cands = segs.filter((q) => (q.a === dd[0] && q.b === dd[1]) || (q.a === dd[1] && q.b === dd[0])).sort(sortKey);
+      if (!cands.length) { console.warn('tactical stage ' + n + ': no wall between ' + dd[0] + ' and ' + dd[1]); continue; }
+      let pick = cands[0];
+      if (Array.isArray(dd[2])) {
+        let best = Infinity;
+        for (const q of cands) {
+          const mx = q.axis === 'z' ? q.fixed : (q.a0 + q.a1) / 2, mz = q.axis === 'z' ? (q.a0 + q.a1) / 2 : q.fixed;
+          const d2 = (mx - dd[2][0]) ** 2 + (mz - dd[2][1]) ** 2;
+          if (d2 < best) { best = d2; pick = q; }
+        }
+      } else if (typeof dd[2] === 'number') pick = cands[Math.min(dd[2], cands.length - 1)];
+      pick.door = dd[3] || 'closed';
+      pick.doorPair = dd;
+      markCells(pick);
+    }
+    for (const q of segs) {
+      if (!q.door && q.ext && (Math.round(q.a0 / cs) + Math.round(q.fixed / cs)) % 2 === 0 && rng() < 0.85) q.window = true;
+    }
+
+    // Build the walls: plain stretches are merged, pieces with a door or a window are cut open.
+    const T_EXT = 0.4, T_INT = 0.25;
+    const lines = {};
+    for (const q of segs) (lines[q.axis + '|' + q.fixed] = lines[q.axis + '|' + q.fixed] || []).push(q);
+    const wallBox = (q, a0, a1) => {
+      const t = q.ext ? T_EXT : T_INT, kind = q.ext ? 'brick' : 'plaster';
+      if (q.axis === 'z') this._solid(kind, q.fixed - t / 2, 0, a0, q.fixed + t / 2, H, a1);
+      else this._solid(kind, a0, 0, q.fixed - t / 2, a1, H, q.fixed + t / 2);
+    };
+    for (const key of Object.keys(lines)) {
+      const list = lines[key].sort((p0, p1) => p0.a0 - p1.a0);
+      let run = null;
+      const flush = () => { if (run) { wallBox(run.q, run.a0, run.a1); run = null; } };
+      for (const q of list) {
+        if (q.door || q.window) {
+          flush();
+          const mid = (q.a0 + q.a1) / 2, t = q.ext ? T_EXT : T_INT, kind = q.ext ? 'brick' : 'plaster';
+          const op = q.door ? { a: mid - 0.55, b: mid + 0.55, type: 'door', h: 2.2 } : { a: mid - 0.6, b: mid + 0.6, type: 'window' };
+          this._wall(kind, q.axis, q.fixed, q.a0, q.a1, 0, H, t, [op]);
+          if (q.door) {
+            this._tacDoor(data, q, mid, def);
+            // Door frame: two posts and a lintel strip in dark wood.
+            const f = (a0, a1, y0, y1) => (q.axis === 'z'
+              ? this._addBox('darkwood', q.fixed - t / 2 - 0.02, y0, a0, q.fixed + t / 2 + 0.02, y1, a1)
+              : this._addBox('darkwood', a0, y0, q.fixed - t / 2 - 0.02, a1, y1, q.fixed + t / 2 + 0.02));
+            f(mid - 0.62, mid - 0.55, 0, 2.28);
+            f(mid + 0.55, mid + 0.62, 0, 2.28);
+            f(mid - 0.62, mid + 0.62, 2.2, 2.28);
+          } else {
+            // Window pane and sill.
+            if (q.axis === 'z') {
+              this._addBox('glass', q.fixed - 0.02, 1.0, mid - 0.6, q.fixed + 0.02, 2.3, mid + 0.6);
+              this._addBox('whitem', q.fixed - t / 2 - 0.05, 0.96, mid - 0.66, q.fixed + t / 2 + 0.05, 1.02, mid + 0.66);
+            } else {
+              this._addBox('glass', mid - 0.6, 1.0, q.fixed - 0.02, mid + 0.6, 2.3, q.fixed + 0.02);
+              this._addBox('whitem', mid - 0.66, 0.96, q.fixed - t / 2 - 0.05, mid + 0.66, 1.02, q.fixed + t / 2 + 0.05);
+            }
+          }
+        } else if (run && run.q.ext === q.ext && Math.abs(run.a1 - q.a0) < 1e-6) {
+          run.a1 = q.a1;
+        } else {
+          flush();
+          run = { q, a0: q.a0, a1: q.a1 };
+        }
+      }
+      flush();
+    }
+    // Corner posts where walls meet.
+    const hasSeg = new Set(segs.map((q) => q.axis + '|' + q.fixed + '|' + q.a0));
+    for (let r = 0; r <= D; r++) for (let c = 0; c <= W; c++) {
+      const x = c * cs, z = r * cs;
+      const e = [hasSeg.has('z|' + x + '|' + (z - cs)), hasSeg.has('z|' + x + '|' + z), hasSeg.has('x|' + z + '|' + (x - cs)), hasSeg.has('x|' + z + '|' + x)];
+      if (!e.some(Boolean)) continue;
+      const ext = segs.some((q) => q.ext && ((q.axis === 'z' && q.fixed === x && (q.a0 === z || q.a1 === z)) || (q.axis === 'x' && q.fixed === z && (q.a0 === x || q.a1 === x))));
+      const t = ext ? 0.2 : 0.125;
+      this._solid(ext ? 'brick' : 'plaster', x - t, 0, z - t, x + t, H, z + t);
+    }
+
+    // Furniture.
+    this._tacFurnish(def, rooms, ch, W, D, rng, doorCells, data);
+
+    // Lamps on the ceiling and a few real lights in the biggest rooms.
+    for (const k of Object.keys(rooms)) {
+      for (const [c, r] of rooms[k].cells) {
+        if ((c + r) % 2) continue;
+        this._addBox('lamp', c * cs + cs / 2 - 0.35, H - 0.06, r * cs + cs / 2 - 0.35, c * cs + cs / 2 + 0.35, H, r * cs + cs / 2 + 0.35);
+      }
+    }
+    const biggest = Object.keys(rooms).filter((k) => rooms[k].type !== 'hall').sort((p0, p1) => rooms[p1].cells.length - rooms[p0].cells.length).slice(0, 5);
+    for (const k of biggest) {
+      let sx = 0, sz = 0;
+      for (const [c, r] of rooms[k].cells) { sx += c * cs + cs / 2; sz += r * cs + cs / 2; }
+      const n2 = rooms[k].cells.length;
+      this._pointLight(0xffe0b0, 26, 12, sx / n2, 2.5, sz / n2);
+    }
+
+    // Where the players start: just outside the entry door.
+    const entry = segs.find((q) => q.door && q.doorPair && q.doorPair[0] === '.');
+    if (entry) {
+      const mid = (entry.a0 + entry.a1) / 2;
+      const outward = entry.a === '.' ? -1 : 1;
+      for (let i = 0; i < 2; i++) {
+        const off = (i === 0 ? -0.8 : 0.8);
+        let x, z, fx, fz;
+        if (entry.axis === 'z') { x = entry.fixed + outward * 3.2; z = mid + off; fx = -outward; fz = 0; }
+        else { x = mid + off; z = entry.fixed + outward * 3.2; fx = 0; fz = -outward; }
+        data.start.push({ x, y: 0, z, yaw: Math.atan2(-fx, -fz) });
+      }
+    }
+    this._tacEnemies(def, rooms, rng, doorCells, data);
+    this._tacDetail(def, rooms, ch, W, D, rng, doorCells, data, segs);
+    data.rooms = Object.keys(rooms).map((k) => ({ id: k, name: rooms[k].name, cells: rooms[k].cells.length }));
+  }
+
+  /** One door: frame, panel on a hinge and a collision box that is there while it is closed. */
+  _tacDoor(data, q, mid, def) {
+    const kind = 'darkwood';
+    const hinge = mid - 0.55, width = 1.1;
+    const pivot = new THREE.Group();
+    const panel = new THREE.Mesh(
+      createBoxGeometry(q.axis === 'x' ? width : 0.08, 2.2, q.axis === 'x' ? 0.08 : width, TILE[kind]),
+      this.materials[kind],
+    );
+    if (q.axis === 'x') { pivot.position.set(hinge, 0, q.fixed); panel.position.set(width / 2, 1.1, 0); }
+    else { pivot.position.set(q.fixed, 0, hinge); panel.position.set(0, 1.1, width / 2); }
+    pivot.add(panel);
+    this._room.group.add(pivot);
+    const box = q.axis === 'x'
+      ? this.collision.addBox(mid - 0.55, 0, q.fixed - 0.05, mid + 0.55, 2.2, q.fixed + 0.05)
+      : this.collision.addBox(q.fixed - 0.05, 0, mid - 0.55, q.fixed + 0.05, 2.2, mid + 0.55);
+    this._room.boxes.push(box);
+    const d = {
+      i: data.doors.length, axis: q.axis, fixed: q.fixed, mid, x: q.axis === 'x' ? mid : q.fixed, z: q.axis === 'x' ? q.fixed : mid,
+      pivot, panel, box, open: false, angle: 0, dir: q.axis === 'x' ? -1 : 1, def: q.door,
+    };
+    box.door = d;
+    data.doors.push(d);
+  }
+
+  /** Furniture in every room, placed so that doors and paths stay free. */
+  _tacFurnish(def, rooms, ch, W, D, rng, doorCells, data) {
+    const cs = TAC_CELL;
+    data.occ = []; // footprints of furniture [x0, z0, x1, z1]
+    const place = (name, c, r, side) => {
+      const pr = TAC_PROPS[name];
+      if (!pr) return false;
+      const cx = c * cs + cs / 2, cz = r * cs + cs / 2;
+      const loc = (u, v) => {
+        if (pr.center) return [cx + u, cz + v];
+        if (side === 'N') return [cx + u, r * cs + v];
+        if (side === 'S') return [cx + u, (r + 1) * cs - v];
+        if (side === 'W') return [c * cs + v, cz + u];
+        return [(c + 1) * cs - v, cz + u];
+      };
+      for (const [u0, u1, v0, v1, y0, y1, mat] of pr.parts) {
+        if (y1 - y0 < 0.01) continue;
+        const a = loc(u0, v0), b = loc(u1, v1);
+        const x0 = Math.min(a[0], b[0]), x1 = Math.max(a[0], b[0]), z0 = Math.min(a[1], b[1]), z1 = Math.max(a[1], b[1]);
+        if (mat === 'lamp') this._addBox(mat, x0, y0, z0, x1, y1, z1);
+        else { this._solid(mat, x0, y0, z0, x1, y1, z1); data.occ.push([x0, z0, x1, z1]); }
+      }
+      return true;
+    };
+    for (const k of Object.keys(rooms)) {
+      const room = rooms[k], spec = room.spec;
+      const used = new Set();
+      const cells = room.cells.slice().sort(() => rng() - 0.5);
+      const isDoorCell = (c, r) => doorCells.has(c + ',' + r);
+      // Rugs (no collision).
+      if (spec.rug && room.cells.length >= 4) {
+        const [c, r] = room.cells[Math.floor(room.cells.length / 2)];
+        this._addBox(spec.rug, c * cs + 0.2, 0.02, r * cs + 0.2, (c + 1) * cs - 0.2, 0.04, (r + 1) * cs - 0.2);
+      }
+      // Against the walls.
+      for (const [c, r] of cells) {
+        if (isDoorCell(c, r) || used.has(c + ',' + r)) continue;
+        const sides = [];
+        if (ch(c, r - 1) !== k) sides.push('N');
+        if (ch(c, r + 1) !== k) sides.push('S');
+        if (ch(c - 1, r) !== k) sides.push('W');
+        if (ch(c + 1, r) !== k) sides.push('E');
+        if (!sides.length) continue;
+        const side = sides[Math.floor(rng() * sides.length)];
+        for (const [name, chance] of spec.wall) {
+          if (TAC_PROPS[name].center) continue;
+          if (rng() < chance * 0.75) { if (place(name, c, r, side)) { used.add(c + ',' + r); break; } }
+        }
+      }
+      // In the middle of big rooms: only cells whose four neighbours are in the same room.
+      if (room.cells.length >= 4 && spec.center.length) {
+        const inner = room.cells.filter(([c, r]) => !used.has(c + ',' + r) && !isDoorCell(c, r) && ch(c - 1, r) === k && ch(c + 1, r) === k && ch(c, r - 1) === k && ch(c, r + 1) === k);
+        const picks = inner.sort(() => rng() - 0.5);
+        let n = 0;
+        for (const [c, r] of picks) {
+          if (n >= Math.max(1, Math.floor(room.cells.length / 6))) break;
+          const name = spec.center[n % spec.center.length];
+          // Keep big pieces a cell apart.
+          if (TAC_PROPS[name].w > 2.4 && n > 0) continue;
+          if (place(name, c, r)) { used.add(c + ',' + r); n++; }
+        }
+      }
+    }
+  }
+
+  /** Things that make a place look lived in: pictures on the walls, bushes, bins, a car, a path to the door. */
+  _tacDetail(def, rooms, ch, W, D, rng, doorCells, data, segs) {
+    const cs = TAC_CELL;
+    const colours = ['carpetB', 'carpetR', 'plantg', 'paint', 'whitem', 'darkwood'];
+    const doorSpots = data.doors.map((d) => [d.x, d.z]);
+    const nearDoor = (x, z, r) => doorSpots.some((q) => Math.hypot(q[0] - x, q[1] - z) < r);
+    // Pictures: thin boxes on the inner face of a wall, above where furniture would stand.
+    const fancy = new Set(['living', 'lobby', 'hall', 'library', 'dining', 'bar', 'atrium', 'trophy', 'lounge', 'game', 'bedroom', 'guest', 'office', 'meeting']);
+    for (const k of Object.keys(rooms)) {
+      if (!fancy.has(rooms[k].type)) continue;
+      for (const [c, r] of rooms[k].cells) {
+        if (rng() > 0.5) continue;
+        const side = ['N', 'S', 'W', 'E'][Math.floor(rng() * 4)];
+        const nc = side === 'W' ? c - 1 : side === 'E' ? c + 1 : c, nr = side === 'N' ? r - 1 : side === 'S' ? r + 1 : r;
+        if (ch(nc, nr) === k) continue; // not a wall
+        const cx = c * cs + cs / 2, cz = r * cs + cs / 2;
+        if (nearDoor(cx + (side === 'E' ? 1 : side === 'W' ? -1 : 0), cz + (side === 'S' ? 1 : side === 'N' ? -1 : 0), 1.1)) continue;
+        const mat = colours[Math.floor(rng() * colours.length)];
+        const w = 0.5 + rng() * 0.4, y0 = 1.35 + rng() * 0.2, h = 0.5 + rng() * 0.35;
+        const th = 0.04;
+        if (side === 'N') this._addBox(mat, cx - w / 2, y0, r * cs + 0.14, cx + w / 2, y0 + h, r * cs + 0.14 + th);
+        else if (side === 'S') this._addBox(mat, cx - w / 2, y0, (r + 1) * cs - 0.14 - th, cx + w / 2, y0 + h, (r + 1) * cs - 0.14);
+        else if (side === 'W') this._addBox(mat, c * cs + 0.14, y0, cz - w / 2, c * cs + 0.14 + th, y0 + h, cz + w / 2);
+        else this._addBox(mat, (c + 1) * cs - 0.14 - th, y0, cz - w / 2, (c + 1) * cs - 0.14, y0 + h, cz + w / 2);
+      }
+    }
+    // Outside: a path to the entry door, bushes along the walls, bins, a parked car.
+    const entry = segs.find((q) => q.door && q.doorPair && q.doorPair[0] === '.');
+    if (entry) {
+      const mid = (entry.a0 + entry.a1) / 2;
+      const outward = entry.a === '.' ? -1 : 1;
+      if (entry.axis === 'z') {
+        const x0 = entry.fixed + (outward < 0 ? -6 : 0), x1 = entry.fixed + (outward < 0 ? 0 : 6);
+        this._addBox('tile', x0, 0, mid - 0.9, x1, 0.03, mid + 0.9);
+        this._addBox('blackm', entry.fixed + outward * 0.8 - 0.4, 0.03, mid - 0.5, entry.fixed + outward * 0.8 + 0.4, 0.045, mid + 0.5); // door mat
+        this._pointLight(0xffd9a0, 22, 11, entry.fixed + outward * 1.2, 2.5, mid);
+      }
+    }
+    const X1 = W * cs, Z1 = D * cs;
+    const free = (x, z, r) => !nearDoor(x, z, r) && (!data.start.some((q) => Math.hypot(q.x - x, q.z - z) < 3.2));
+    for (const q of segs) {
+      if (!q.ext || q.door) continue;
+      const mid = (q.a0 + q.a1) / 2;
+      const outward = q.a === '.' ? -1 : 1;
+      const x = q.axis === 'z' ? q.fixed + outward * 0.9 : mid, z = q.axis === 'z' ? mid : q.fixed + outward * 0.9;
+      if (!free(x, z, 3)) continue;
+      const roll = rng();
+      if (roll < 0.34) this._solid('plantg', x - 0.45, 0, z - 0.45, x + 0.45, 0.9, z + 0.45); // bush
+      else if (roll < 0.4) { this._solid('metalg', x - 0.3, 0, z - 0.3, x + 0.3, 0.95, z + 0.3); this._solid('blackm', x - 0.32, 0.95, z - 0.32, x + 0.32, 1.02, z + 0.32); } // bin
+    }
+    // A car in the yard (axis-aligned, so it is just a long box with a darker cabin).
+    const cx = -5.5, cz = Z1 / 2 + 6;
+    if (!data.start.some((q) => Math.hypot(q.x - cx, q.z - cz) < 4)) {
+      this._solid('metalg', cx - 1.0, 0.25, cz - 2.2, cx + 1.0, 0.9, cz + 2.2);
+      this._solid('blackm', cx - 0.9, 0.9, cz - 1.2, cx + 0.9, 1.45, cz + 1.0);
+      this._addBox('glass', cx - 0.92, 0.95, cz - 1.15, cx + 0.92, 1.4, cz + 0.95);
+    }
+    this._solid('metalg', X1 + 4, 0.25, 3, X1 + 6, 1.3, 7.4); // a van behind the building
+    this._solid('blackm', X1 + 4.1, 1.3, 3.2, X1 + 5.9, 1.75, 6.4);
+  }
+
+  /** Hostile positions: free spots in their rooms, away from furniture and doors. */
+  _tacEnemies(def, rooms, rng, doorCells, data) {
+    const cs = TAC_CELL;
+    const free = (x, z) => !data.occ.some((o) => x > o[0] - 0.55 && x < o[2] + 0.55 && z > o[1] - 0.55 && z < o[3] + 0.55);
+    const add = (k, heavy) => {
+      const room = rooms[k];
+      if (!room) return;
+      for (let tries = 0; tries < 60; tries++) {
+        const [c, r] = room.cells[Math.floor(rng() * room.cells.length)];
+        if (doorCells.has(c + ',' + r) && tries < 40) continue;
+        const x = c * cs + 0.5 + rng() * (cs - 1), z = r * cs + 0.5 + rng() * (cs - 1);
+        if (!free(x, z)) continue;
+        if (data.enemies.some((e) => Math.hypot(e.x - x, e.z - z) < 1.2)) continue;
+        data.enemies.push({ room: k, x, z, yaw: rng() * Math.PI * 2, heavy: !!heavy });
+        return;
+      }
+    };
+    for (const k of Object.keys(def.enemies)) for (let i = 0; i < def.enemies[k]; i++) add(k, false);
+    for (const k of Object.keys(def.heavy || {})) for (let i = 0; i < def.heavy[k]; i++) add(k, true);
   }
 
   /** Wall pieces for doorways whose room is not part of the current map. */
@@ -7853,6 +8751,7 @@ const SPAWN_NODES = ['corr3', 'corr5', 'ctrl', 'ctrlL', 'ctrlR', 'wh2', 'wh3', '
 
 const rand = (a, b) => a + Math.random() * (b - a);
 const NOT_ENEMY = (b) => !b.enemy && !b.isBase;
+const NAV_FILTER = (b) => !b.enemy && !b.isBase && !b.door; // closed doors do not stop path planning (they get opened)
 const TRACER_TIME = 1.0; // seconds a bullet trail stays visible
 const TRACER_POOL = 30;
 
@@ -7901,8 +8800,52 @@ class Enemies {
 
   // --- Setup ---------------------------------------------------------------
 
+  /** A 1 m grid of waypoints through a tactical building, wherever a person fits. Doors count as open. */
+  _buildTacGrid() {
+    this.nodes = [];
+    this.spawnNodes = [];
+    this.teamSpawnNodes = [[], []];
+    const box = this.world.tacBox;
+    if (!box) return;
+    const col = this.collision;
+    const solid = [];
+    for (const b of col.boxes) if (!b.enemy && !b.door && !b.isBase && b.minY < 1.75 && b.maxY > 0.1) solid.push(b);
+    const solidAt = (x, z) => {
+      for (const b of solid) if (x + 0.32 > b.minX && x - 0.32 < b.maxX && z + 0.32 > b.minZ && z - 0.32 < b.maxZ) return true;
+      return false;
+    };
+    const index = new Map();
+    for (let x = Math.ceil(box.x0); x <= box.x1; x++) {
+      for (let z = Math.ceil(box.z0); z <= box.z1; z++) {
+        if (solidAt(x, z)) continue;
+        index.set(x + ',' + z, this.nodes.length);
+        this.nodes.push({ name: 't' + x + '_' + z, x, z, y: 0, links: [] });
+      }
+    }
+    for (const n of this.nodes) {
+      for (const [dx, dz] of [[1, 0], [0, 1], [1, 1], [1, -1]]) {
+        const j = index.get(n.x + dx + ',' + (n.z + dz));
+        if (j === undefined) continue;
+        if (dx && dz && (!index.has(n.x + dx + ',' + n.z) || !index.has(n.x + ',' + (n.z + dz)))) continue; // no cutting corners
+        const m = this.nodes[j];
+        if (!this._clearPath(n.x, 0.4, n.z, m.x, 0.4, m.z) || !this._clearPath(n.x, 1.0, n.z, m.x, 1.0, m.z)) continue;
+        n.links.push(j);
+        m.links.push(this.nodes.indexOf(n));
+      }
+    }
+  }
+
+  /** True if nothing but a closed door lies between the points (for path planning, not for sight). */
+  _clearPath(ax, ay, az, bx, by, bz) {
+    const dx = bx - ax, dy = by - ay, dz = bz - az;
+    const d = Math.hypot(dx, dy, dz);
+    if (d < 0.01) return true;
+    return !this.collision.raycast(ax, ay, az, dx / d, dy / d, dz / d, d, this._hit, NAV_FILTER);
+  }
+
   /** Waypoints of the rooms that exist. Call again when the map changes. */
   _buildNav(rooms) {
+    if (rooms && Array.from(rooms).some((r) => /^tac[1-5]$/.test(r))) { this._buildTacGrid(); return; }
     this.nodes = [];
     const index = {};
     for (const name of Object.keys(NAV_NODES)) {
@@ -10250,8 +11193,13 @@ class TeamMatch extends Enemies {
     e.flashT = 0.05;
     const p = this.player;
     const vol = Math.max(0.1, 0.7 / (1 + Math.hypot(p.x - e.x, p.z - e.z) * 0.12));
-    this.audio.shot('ak', vol);
+    this._botShotSound(e, vol);
     if (hit) this._hurt(t, diff.dmg * rand(0.85, 1.15), e);
+  }
+
+  /** The sound of a bot's shot (overridden where sounds are placed in the room). */
+  _botShotSound(e, vol) {
+    this.audio.shot('ak', vol);
   }
 
   /** A bot's bullet hit target t. */
@@ -10407,14 +11355,20 @@ class TeamMatch extends Enemies {
     this.timeLeft = m.tl;
     this.phase = m.ph === 0 ? 'play' : 'over';
     this.winner = m.w;
+    this._applyBotRows(m.b);
+  }
+
+  /** Guests: bots as puppets, from the rows [id, team, x, y, z, yaw, state, heavy] of a snapshot. */
+  _applyBotRows(rows) {
     const seen = new Set();
-    for (const row of m.b || []) {
-      const [id, team, x, y, z, yaw, st] = row;
+    for (const row of rows || []) {
+      const [id, team, x, y, z, yaw, st, heavy] = row;
       seen.add(id);
       let e = this.byId.get(id);
       if (!e) {
         if (st === 2) continue;
-        e = this._createBot(team);
+        e = this._createBot(team, !!heavy);
+        e.heavy = !!heavy;
         e.id = id;
         e.x = e.tx = x; e.y = e.ty = y; e.z = e.tz = z; e.yaw = e.tyaw = yaw;
         e.alive = true;
@@ -10424,7 +11378,8 @@ class TeamMatch extends Enemies {
         this.byId.set(id, e);
       }
       e.tx = x; e.ty = y; e.tz = z; e.tyaw = yaw;
-      if (st === 1) { e.flash.visible = true; e.flashT = 0.05; e.flash.rotation.z = Math.random() * 3; }
+      if (st === 1) { e.flash.visible = true; e.flashT = 0.05; e.flash.rotation.z = Math.random() * 3; this._botShotSound(e, 0.7); }
+      if (st === 3) e.stunT = 0.3;
       if (st === 2 && e.alive) { e.alive = false; e.deadT = 0; this._removeBox(e); }
       if (st !== 2 && !e.alive) {
         // Respawned: stand up again.
@@ -10485,6 +11440,645 @@ class TeamMatch extends Enemies {
   }
 }
 
+// ===== js/game/TacMission.js =====
+const TAC_BRIEF = 5;     // seconds of briefing before a stage starts
+const TAC_END = 8;       // seconds the result stays up
+const TAC_PHASES = ['brief', 'play', 'clear', 'fail', 'done'];
+
+/**
+ * Tactical missions: clear five buildings with a partner. Hostiles wait in their rooms behind doors,
+ * hear footsteps and gunfire, and are blinded and deafened by flashbangs. Reuses the team match's bots,
+ * snapshots and hit handling: the players are team 0, the hostiles team 1.
+ */
+class TacMission extends TeamMatch {
+  constructor(opts) {
+    super(opts);
+    this.loadStage = opts.loadStage; // (n) => switch the world to stage n and put everyone at the start
+    this.stage = 1;
+    this.phase = 'brief';
+    this.phaseT = 0;
+    this.stageTime = 0;
+    this.gear = { flash: 3, frag: 1 };
+    this.hostilesLeft = 0;
+    this.useTarget = -1;
+    this._noiseT = 0;
+    this._lastPos = {};
+    this._time = 0;
+  }
+
+  get difficulty() {
+    const def = TAC_STAGES[Math.max(0, this.stage - 1)].diff;
+    const k = [0.8, 1, 1.2][Math.round(this.settings.get('difficulty'))] || 1;
+    return Object.assign({}, def, { acc: def.acc * k, dmg: def.dmg * k });
+  }
+
+  // --- HUD -----------------------------------------------------------------
+
+  _buildHud() {
+    const root = document.createElement('div');
+    root.id = 'tachud';
+    root.innerHTML = '<div id="tac-stage"></div><div id="tac-left"></div><div id="tac-gear"></div>';
+    document.body.appendChild(root);
+    const banner = document.createElement('div');
+    banner.id = 'tacbanner';
+    banner.innerHTML = '<h2></h2><p></p>';
+    document.body.appendChild(banner);
+    const over = document.createElement('div');
+    over.id = 'tacover';
+    over.innerHTML = '<h2></h2><p id="tac-over-a"></p><p id="tac-over-b"></p>';
+    document.body.appendChild(over);
+    const use = document.createElement('div');
+    use.id = 'useprompt';
+    document.body.appendChild(use);
+    this._board = document.createElement('div'); // the team match's scoreboard is not used here
+    this._hud = {
+      root, over, banner, use, last: {},
+      stage: root.querySelector('#tac-stage'), left: root.querySelector('#tac-left'), gear: root.querySelector('#tac-gear'),
+      bannerH: banner.querySelector('h2'), bannerP: banner.querySelector('p'),
+      overH: over.querySelector('h2'), overA: over.querySelector('#tac-over-a'), overB: over.querySelector('#tac-over-b'),
+    };
+  }
+
+  _updateHud(dt) {
+    const h = this._hud, def = TAC_STAGES[this.stage - 1];
+    const touch = document.body.classList.contains('touch');
+    this._setText(h.stage, 'stage', 'STAGE ' + this.stage + '/' + TAC_STAGES.length + ' \u00b7 ' + def.name);
+    this._setText(h.left, 'left', this.phase === 'brief' ? 'GET READY' : 'HOSTILES ' + this.hostilesLeft);
+    this._setText(h.gear, 'gear', (touch ? '' : '[G] ') + 'FLASH ' + this.gear.flash + '   ' + (touch ? '' : '[E] ') + 'FRAG ' + this.gear.frag);
+    const t = Math.max(0, Math.ceil(this.phaseT));
+    const m = Math.floor(this.stageTime / 60), sec = Math.floor(this.stageTime % 60);
+    const clock = m + ':' + String(sec).padStart(2, '0');
+    if (this.phase === 'brief') {
+      this._setText(h.bannerH, 'bh', 'STAGE ' + this.stage + ' \u00b7 ' + def.name);
+      this._setText(h.bannerP, 'bp', 'Clear the building. Starting in ' + t);
+      h.banner.classList.add('on');
+    } else {
+      h.banner.classList.remove('on');
+    }
+    if (this.phase === 'clear' || this.phase === 'fail' || this.phase === 'done') {
+      const title = this.phase === 'clear' ? 'STAGE CLEARED' : this.phase === 'fail' ? 'MISSION FAILED' : 'OPERATION COMPLETE';
+      this._setText(h.overH, 'oh', title);
+      this._setText(h.overA, 'oa', 'Time ' + clock);
+      this._setText(h.overB, 'ob', this.phase === 'clear' ? 'Next stage in ' + t : this.phase === 'fail' ? 'Trying again in ' + t : 'Back to stage 1 in ' + t);
+      h.over.classList.add('on');
+      h.over.classList.toggle('bad', this.phase === 'fail');
+    } else {
+      h.over.classList.remove('on');
+    }
+    // "[F] open door" when a door is in front of me.
+    const idx = this._doorInFront();
+    this.useTarget = idx;
+    if (idx >= 0 && this.phase === 'play' && !this.health.dead) {
+      const open = this.world.tacDoors[idx].open;
+      this._setText(h.use, 'use', (touch ? '' : '[F] ') + (open ? 'CLOSE DOOR' : 'OPEN DOOR'));
+      h.use.classList.add('on');
+    } else {
+      h.use.classList.remove('on');
+    }
+  }
+
+  // --- Doors ---------------------------------------------------------------
+
+  /** The door I could use now: within reach and in front of me. */
+  _doorInFront() {
+    const p = this.player;
+    const fx = -Math.sin(p.yaw), fz = -Math.cos(p.yaw);
+    let best = -1, bd = 2.3;
+    for (const d of this.world.tacDoors) {
+      const dx = d.x - p.x, dz = d.z - p.z;
+      const dist = Math.hypot(dx, dz);
+      if (dist > bd || dist < 0.01) continue;
+      if ((dx * fx + dz * fz) / dist < 0.45) continue;
+      best = d.i;
+      bd = dist;
+    }
+    return best;
+  }
+
+  /** The use key / button. */
+  tryUse() {
+    if (!this.active || this.health.dead || this.phase !== 'play') return;
+    const i = this.useTarget >= 0 ? this.useTarget : this._doorInFront();
+    if (i < 0) return;
+    const d = this.world.tacDoors[i];
+    if (this.role === 'host') this._setDoor(i, !d.open);
+    else this.net.send({ t: 'tuse', i, o: d.open ? 0 : 1 });
+  }
+
+  /** Host: a guest used a door. */
+  onNetUse(m) {
+    if (this.role !== 'host' || !this.active) return;
+    const d = this.world.tacDoors[m.i | 0];
+    if (d) this._setDoor(d.i, !!m.o);
+  }
+
+  _setDoor(i, open) {
+    if (!this.world.setDoor(i, open)) return;
+    this._event({ k: 'door', i, o: open ? 1 : 0 });
+    const d = this.world.tacDoors[i];
+    this.noise(d.x, d.z, open ? 5 : 9);
+  }
+
+  // --- Stage flow (host) ---------------------------------------------------
+
+  _reset() {
+    this._clearBots();
+    this._startStage(1);
+  }
+
+  _startStage(n) {
+    this.stage = n;
+    this.phase = 'brief';
+    this.phaseT = TAC_BRIEF;
+    this.stageTime = 0;
+    const def = TAC_STAGES[n - 1];
+    this._event({ k: 'stage', n, f: def.flash, g: def.frag }); // everybody loads the stage
+    this._clearBots();
+    for (const h of this.world.tac.enemies) this._addHostile(h);
+    this.hostilesLeft = this.list.length;
+  }
+
+  _addHostile(h) {
+    const e = this._createBot(1, h.heavy);
+    e.id = this.nextBotId++;
+    e.heavy = !!h.heavy;
+    const diff = this.difficulty;
+    e.x = h.x; e.z = h.z; e.y = 0.05; e.yaw = h.yaw;
+    e.hp = diff.hp * (h.heavy ? 4 : 1);
+    e.alive = true;
+    e.state = 'idle';
+    e.sees = false;
+    e.target = null;
+    e.stunT = 0;
+    e.home = { x: h.x, z: h.z, yaw: h.yaw };
+    e.goalNode = -1;
+    e.pathT = 0;
+    e.reactT = 0;
+    e.burst = diff.burst;
+    e.shotT = 0;
+    e.roam = Math.random() < 0.3; // some of them walk around
+    e.roamT = rand(2, 6);
+    e.phaseSeed = Math.random() * 6;
+    e.root.visible = true;
+    e.root.rotation.set(0, e.yaw, 0);
+    for (const mat of e.mats) mat.emissive.setRGB(0, 0, 0);
+    this._addBox(e);
+    this.list.push(e);
+    this.byId.set(e.id, e);
+    return e;
+  }
+
+  _createBot(team, heavy) {
+    const e = this._createEnemy();
+    e.team = team;
+    e.mats[0].color.setHex(team === 0 ? TEAM_HEX[0] : heavy ? 0x2c2f33 : 0x5b5446);
+    e.mats[1].color.setHex(team === 0 ? 0x24405f : heavy ? 0x15181b : 0x23262a);
+    if (heavy) e.root.scale.set(1.18, 1.1, 1.18);
+    e.goalNode = -1;
+    e.target = null;
+    e.lastY = 0;
+    e.tx = 0; e.ty = 0; e.tz = 0; e.tyaw = 0;
+    e.stunT = 0;
+    e._stride = Math.random();
+    return e;
+  }
+
+  _fillTeams() {}
+  _respawnBot() {}
+
+  _updateHost(dt) {
+    if (!this.net.online && !this.input.locked) return; // solo: everything waits while the menu is open
+    this._collectTargets();
+    this._time += dt;
+    let alive = 0;
+    for (const e of this.list) if (e.alive) alive++;
+    this.hostilesLeft = alive;
+
+    this.phaseT -= dt;
+    if (this.phase === 'brief') {
+      if (this.phaseT <= 0) { this.phase = 'play'; this.phaseT = 0; }
+    } else if (this.phase === 'play') {
+      this.stageTime += dt;
+      let humans = this.health.dead ? 0 : 1;
+      for (const [, r] of this.remotes) if (r.present && !r.dead) humans++;
+      if (alive === 0) {
+        this.phase = this.stage >= TAC_STAGES.length ? 'done' : 'clear';
+        this.phaseT = TAC_END;
+        this._event({ k: this.phase === 'done' ? 'done' : 'clear', n: this.stage, t: Math.floor(this.stageTime) });
+      } else if (humans === 0) {
+        this.phase = 'fail';
+        this.phaseT = TAC_END;
+        this._event({ k: 'fail', n: this.stage, t: Math.floor(this.stageTime) });
+      }
+      this._listenToPlayers(dt);
+    } else if (this.phaseT <= 0) {
+      if (this.phase === 'clear') this._startStage(this.stage + 1);
+      else if (this.phase === 'fail') this._startStage(this.stage);
+      else this._startStage(1);
+    }
+
+    for (let i = this.list.length - 1; i >= 0; i--) {
+      const e = this.list[i];
+      if (!e.alive) { this._updateDeadBot(e, dt); continue; }
+      if (this.phase === 'play') this._thinkBot(e, dt);
+      else e.speedNow = 0;
+      this._physics(e, dt);
+      this._animate(e, dt);
+    }
+
+    if (this.net.online && this.net.peer) {
+      this._snapT -= dt;
+      if (this._snapT <= 0) {
+        this._snapT = TM_SNAPSHOT;
+        this.net.send({
+          t: 'tm', st: this.stage, ph: TAC_PHASES.indexOf(this.phase), pt: Math.ceil(this.phaseT), tt: Math.floor(this.stageTime),
+          hl: alive, dm: this.world.doorMask(),
+          b: this.list.map((e) => [e.id, e.team, tr2(e.x), tr2(e.y), tr2(e.z), tr2(e.yaw), e.alive ? (e.flashT > 0 ? 1 : e.stunT > 0 ? 3 : 0) : 2, e.heavy ? 1 : 0]),
+        });
+      }
+    }
+  }
+
+  update(dt) {
+    this._updateTracers(dt);
+    if (!this.active) return;
+    this.world.updateDoors(dt);
+    // Players can only move while the stage is running (and not while down).
+    if (!this.health.dead) this.player.enabled = this.phase === 'play' || this.phase === 'clear';
+    if (this.role === 'host') this._updateHost(dt);
+    else this._updateGuest(dt);
+    for (const p of this.puffs) {
+      if (p.t < 0) continue;
+      p.t += dt;
+      const k = p.t / 0.35;
+      if (k >= 1) { p.t = -1; p.sprite.visible = false; continue; }
+      p.sprite.scale.setScalar(0.15 + 0.4 * k);
+      p.sprite.material.opacity = 0.9 * (1 - k);
+    }
+    this._updateHud(dt);
+  }
+
+  // --- Events --------------------------------------------------------------
+
+  handleEvent(ev) {
+    if (ev.k === 'stage') {
+      this.stage = ev.n;
+      this.phase = 'brief';
+      this.phaseT = TAC_BRIEF;
+      this.stageTime = 0;
+      this.gear = { flash: ev.f | 0, frag: ev.g | 0 };
+      this._clearBotsLocal();
+      if (this.loadStage) this.loadStage(ev.n); // switch the world, doors back to their start, everyone to the entrance
+      this.ui.feed('STAGE ' + ev.n + ': ' + TAC_STAGES[ev.n - 1].name);
+    } else if (ev.k === 'clear' || ev.k === 'done' || ev.k === 'fail') {
+      this.phase = ev.k;
+      this.phaseT = TAC_END;
+      this.stageTime = ev.t | 0;
+      if (ev.k !== 'fail') this.audio.horn();
+    } else if (ev.k === 'door') {
+      if (this.role === 'guest') this.world.setDoor(ev.i, !!ev.o);
+      const d = this.world.tacDoors[ev.i];
+      if (d) {
+        const p = this.player;
+        const muffled = !this._clearNav(p.x, p.y + 1.5, p.z, d.x, 1.5, d.z);
+        this.audio.doorAt(d.x, 1.2, d.z, !!ev.o, muffled && Math.hypot(d.x - p.x, d.z - p.z) > 1.5);
+      }
+    } else if (ev.k === 'kill') {
+      this.ui.feed(ev.head ? 'HEADSHOT' : ev.a + ' DOWNED A HOSTILE');
+    } else if (ev.k === 'down') {
+      this.ui.feed(ev.who + ' IS DOWN');
+    }
+    if (this.onEvent) this.onEvent(ev);
+  }
+
+  _clearBotsLocal() {
+    for (const e of this.list) {
+      this._removeBox(e);
+      this.scene.remove(e.root);
+    }
+    this.list = [];
+    this.byId.clear();
+  }
+
+  // --- Hostiles ------------------------------------------------------------
+
+  /** Loud things make hostiles come and look: a shot, a door, a runner. Walls dampen it. */
+  noise(x, z, r) {
+    if (!this.active || this.role !== 'host' || this.phase !== 'play') return;
+    const p = this.player;
+    if (x === undefined) { x = p.x; z = p.z; r = 26; }
+    for (const e of this.list) {
+      if (!e.alive || e.stunT > 0 || e.state === 'combat') continue;
+      const d = Math.hypot(e.x - x, e.z - z);
+      const reach = this._clearNav(e.x, e.y + 1.4, e.z, x, 1.4, z) ? r : r * 0.55;
+      if (d > reach) continue;
+      if (e.state === 'idle' || e.state === 'search' || e.state === 'investigate') {
+        e.state = 'investigate';
+        e.lastX = x; e.lastZ = z; e.lastY = 0;
+        e.searchT = 12;
+        e.pathT = 0;
+      }
+    }
+  }
+
+  /** Footsteps of the players alert hostiles close by (running is loud, creeping is silent). */
+  _listenToPlayers(dt) {
+    this._noiseT -= dt;
+    if (this._noiseT > 0) return;
+    this._noiseT = 0.4;
+    const p = this.player;
+    const now = this._time;
+    const check = (id, x, z, crouch) => {
+      const last = this._lastPos[id];
+      this._lastPos[id] = { x, z, t: now };
+      if (!last || now - last.t <= 0) return;
+      const speed = Math.hypot(x - last.x, z - last.z) / (now - last.t);
+      if (speed > 4.2) this.noise(x, z, 11);
+      else if (speed > 2.4 && !crouch) this.noise(x, z, 4.5);
+    };
+    if (!this.health.dead) check(this.myId, p.x, p.z, p.crouching);
+    for (const [id, r] of this.remotes) if (r.present && !r.dead) check(id, r.x, r.z, false);
+  }
+
+  /** A flashbang went off (every client calls this; only the host acts on hostiles). */
+  onFlash(x, y, z) {
+    this._flashPlayer(x, y, z);
+    if (!this.active || this.role !== 'host') return;
+    for (const e of this.list) {
+      if (!e.alive) continue;
+      const d = Math.hypot(e.x - x, e.z - z);
+      if (d > 14) continue;
+      const seen = this._clearNav(x, y, z, e.x, e.y + 1.5, e.z);
+      if (!seen && d > 3.5) continue;
+      // Looking towards the flash is worst.
+      const fx = -Math.sin(e.yaw), fz = -Math.cos(e.yaw);
+      const dot = d > 0.05 ? (fx * (x - e.x) + fz * (z - e.z)) / d : 1;
+      const factor = 0.45 + 0.55 * Math.max(0, dot);
+      const stun = Math.max(1.6, (6.8 - d * 0.36) * factor * (e.heavy ? 0.6 : 1));
+      e.stunT = Math.max(e.stunT, stun);
+      e.state = 'stunned';
+      e.sees = false;
+      e.target = null;
+      e.lastX = x; e.lastZ = z;
+    }
+  }
+
+  /** What a flashbang does to me: white-out, ringing ears. Worse when it is close and I am looking at it. */
+  _flashPlayer(x, y, z) {
+    const p = this.player;
+    if (this.health.dead) return;
+    const ey = p.y + p.eyeHeight;
+    const d = Math.hypot(p.x - x, ey - y, p.z - z);
+    if (d > 16) return;
+    const seen = this._clearNav(x, y, z, p.x, ey, p.z);
+    const fx = -Math.sin(p.yaw) * Math.cos(p.pitch), fy = Math.sin(p.pitch), fz = -Math.cos(p.yaw) * Math.cos(p.pitch);
+    const dot = d > 0.05 ? (fx * (x - p.x) + fy * (y - ey) + fz * (z - p.z)) / d : 1;
+    const near = Math.max(0, 1 - d / 16);
+    const blind = seen ? near * (0.3 + 0.7 * Math.max(0, dot)) : (d < 5 ? near * 0.3 : 0);
+    const deaf = seen ? near : d < 8 ? near * 0.7 : 0;
+    if (blind > 0.04) this.ui.flashEffect(0.6 + 5.4 * blind, Math.min(1, 0.55 + blind));
+    if (deaf > 0.05) this.audio.deafen(1.2 + 7 * deaf);
+  }
+
+  // --- Hostile behaviour ---------------------------------------------------
+
+  _thinkBot(e, dt) {
+    const diff = this.difficulty;
+    const ex = e.x, ey = e.y, ez = e.z;
+    const speedMul = e.heavy ? 0.75 : 1;
+
+    // Blind and deaf after a flashbang: stumbling about, no sight, no shooting.
+    if (e.stunT > 0) {
+      e.stunT -= dt;
+      e.sees = false;
+      e.target = null;
+      e.speedNow = 0;
+      e.yaw += Math.sin(this._time * 3 + e.phaseSeed) * dt * 2.5;
+      if (e.stunT <= 0) { e.state = 'search'; e.searchT = 9; e.pathT = 0; }
+      return;
+    }
+
+    // Seeing: a cone in front (all around once alerted), blocked by walls and closed doors.
+    e.senseT -= dt;
+    if (e.senseT <= 0) {
+      e.senseT = 0.2;
+      const alert = e.state !== 'idle';
+      const fx = -Math.sin(e.yaw), fz = -Math.cos(e.yaw);
+      let best = null, bd = Infinity;
+      for (const t of this._tl) {
+        if (t.team === e.team) continue;
+        const dx = t.x - ex, dz = t.z - ez;
+        const d = Math.hypot(dx, dz);
+        if (d >= bd || d > diff.view) continue;
+        if (!alert && d > 3 && (fx * dx + fz * dz) / d < 0.3) continue;
+        if (!this._clearNav(ex, ey + EN_EYE, ez, t.x, t.y + 1.45, t.z) && !this._clearNav(ex, ey + EN_EYE, ez, t.x, t.y + 0.7, t.z)) continue;
+        best = t;
+        bd = d;
+      }
+      if (best && (!e.target || e.target.id !== best.id)) {
+        e.reactT = diff.react * rand(0.8, 1.3);
+        if (e.state !== 'combat') this._spotted(e, best);
+      }
+      e.target = best;
+      e.sees = !!best;
+      if (best) { e.lastX = best.x; e.lastZ = best.z; e.lastY = best.y; e.lostT = 0; e.state = 'combat'; }
+    }
+    if (!e.sees && e.state === 'combat') {
+      e.lostT += dt;
+      if (e.lostT > 0.7) { e.state = 'search'; e.searchT = 9; }
+    }
+    if (e.state === 'search' || e.state === 'investigate') {
+      e.searchT -= dt;
+      if (e.searchT <= 0 || Math.hypot(e.lastX - ex, e.lastZ - ez) < 1.4) {
+        e.state = e.state === 'investigate' ? 'search' : 'idle';
+        e.searchT = e.state === 'search' ? 5 : 0;
+        e.pathT = 0;
+      }
+    }
+
+    let tx = ex, tz = ez, speed = 0, face = null;
+    const t = e.target;
+    if (e.state === 'combat' && t) {
+      const dxp = t.x - ex, dzp = t.z - ez;
+      const dist = Math.hypot(dxp, dzp);
+      face = Math.atan2(-dxp, -dzp);
+      e.strafeT -= dt;
+      if (e.strafeT <= 0) { e.strafe = Math.random() < 0.5 ? -1 : 1; e.strafeT = rand(0.7, 1.8); }
+      const nx = dist > 0 ? dxp / dist : 0, nz = dist > 0 ? dzp / dist : 0;
+      let mx = -nz * e.strafe, mz = nx * e.strafe;
+      if (dist > 11) { mx = nx; mz = nz; }
+      else if (dist < 3.5) { mx = -nx * 0.8 + mx * 0.6; mz = -nz * 0.8 + mz * 0.6; }
+      tx = ex + mx; tz = ez + mz;
+      speed = diff.speed * speedMul * (dist > 11 ? 0.95 : 0.55);
+      this._shootBot(e, dt, t, dist);
+    } else if (e.state === 'search' || e.state === 'investigate') {
+      const goal = this._goalPoint(e, e.lastX, e.lastZ, dt, 0);
+      tx = goal.x; tz = goal.z;
+      speed = diff.speed * speedMul * (e.state === 'investigate' ? 0.55 : 0.8);
+    } else {
+      // Idle: hold the spot and watch the room, or walk a short round.
+      const h = e.home;
+      if (e.roam) {
+        e.roamT -= dt;
+        if (e.roamT <= 0 || e.goalNode < 0) {
+          e.roamT = rand(4, 9);
+          let pick = -1;
+          for (let k = 0; k < 14 && pick < 0; k++) {
+            const i = Math.floor(Math.random() * this.nodes.length);
+            if (Math.hypot(this.nodes[i].x - h.x, this.nodes[i].z - h.z) < 5) pick = i;
+          }
+          e.goalNode = pick;
+        }
+        if (e.goalNode >= 0) {
+          const n = this.nodes[e.goalNode];
+          if (Math.hypot(n.x - ex, n.z - ez) > 0.8) {
+            const goal = this._goalPoint(e, n.x, n.z, dt, 0);
+            tx = goal.x; tz = goal.z;
+            speed = 1.2 * speedMul;
+          }
+        }
+      } else if (Math.hypot(h.x - ex, h.z - ez) > 0.7) {
+        const goal = this._goalPoint(e, h.x, h.z, dt, 0);
+        tx = goal.x; tz = goal.z;
+        speed = diff.speed * speedMul * 0.6;
+      } else {
+        face = h.yaw + Math.sin(this._time * 0.5 + e.phaseSeed) * 0.7;
+      }
+    }
+
+    // Doors: hostiles open a closed door that is in the way.
+    if (speed > 0) this._openDoorsAhead(e, tx - ex, tz - ez);
+
+    const mvx = tx - ex, mvz = tz - ez;
+    const ml = Math.hypot(mvx, mvz);
+    if (ml > 0.05 && speed > 0) {
+      e.moveX = mvx / ml; e.moveZ = mvz / ml;
+      e.speedNow = speed;
+      if (face === null) face = Math.atan2(-e.moveX, -e.moveZ);
+    } else {
+      e.speedNow = 0;
+    }
+    if (face !== null) {
+      let d = face - e.yaw;
+      d = Math.atan2(Math.sin(d), Math.cos(d));
+      e.yaw += d * Math.min(1, dt * 7);
+    }
+  }
+
+  _openDoorsAhead(e, dx, dz) {
+    const len = Math.hypot(dx, dz) || 1;
+    for (const d of this.world.tacDoors) {
+      if (d.open) continue;
+      const ox = d.x - e.x, oz = d.z - e.z;
+      const dist = Math.hypot(ox, oz);
+      if (dist > 1.5) continue;
+      if ((ox * dx + oz * dz) / (dist * len + 1e-6) < 0.3) continue;
+      this._setDoor(d.i, true);
+    }
+  }
+
+  /** A hostile saw a player: shouts, and the others close by come running. */
+  _spotted(e, t) {
+    this._voice(e);
+    for (const o of this.list) {
+      if (o === e || !o.alive || o.stunT > 0 || o.state === 'combat') continue;
+      if (Math.hypot(o.x - e.x, o.z - e.z) > 14) continue;
+      o.state = 'investigate';
+      o.lastX = t.x; o.lastZ = t.z; o.lastY = 0;
+      o.searchT = 10;
+      o.pathT = 0;
+    }
+  }
+
+  _voice(e) {
+    const p = this.player;
+    const d = Math.hypot(p.x - e.x, p.z - e.z);
+    if (d > 28) return;
+    const muffled = !this._clearNav(p.x, p.y + 1.5, p.z, e.x, e.y + 1.5, e.z);
+    this.audio.voiceAt(e.x, e.y + 1.6, e.z, muffled);
+    this._ping(e.x, e.z, d, muffled);
+  }
+
+  /** A yellow arrow at the edge of the screen for loud things I cannot see. */
+  _ping(x, z, d, muffled) {
+    const p = this.player;
+    if (!muffled && d < 8) return;
+    const rel = Math.atan2(x - p.x, z - p.z) - (p.yaw + Math.PI);
+    this.ui.soundPing(rel, Math.max(0.4, 1 - d / 40));
+  }
+
+  _botShotSound(e, vol) {
+    const p = this.player;
+    const d = Math.hypot(p.x - e.x, p.z - e.z);
+    const muffled = !this._clearNav(p.x, p.y + 1.5, p.z, e.x, e.y + 1.3, e.z);
+    this.audio.shotAt('ak', e.x, e.y + 1.3, e.z, muffled, 1);
+    this._ping(e.x, e.z, d, muffled);
+  }
+
+  _animate(e, dt) {
+    super._animate(e, dt);
+    // Footsteps you can hear through the walls.
+    if (e.alive && e.speedNow > 0.5 && e.onGround) {
+      e._stride += dt * e.speedNow * 0.55;
+      if (e._stride >= 1) {
+        e._stride -= 1;
+        const p = this.player;
+        const d = Math.hypot(p.x - e.x, p.z - e.z);
+        if (d < 24) {
+          const muffled = !this._clearNav(p.x, p.y + 1.5, p.z, e.x, e.y + 1.2, e.z);
+          this.audio.stepAt(e.x, 0.1, e.z, muffled, e.heavy || e.speedNow > 3);
+        }
+      }
+    }
+    e.root.rotation.z = e.stunT > 0 ? Math.sin(this._time * 7 + e.phaseSeed) * 0.22 : 0;
+    if (e.stunT > 0 && this.role === 'guest') e.stunT -= dt;
+  }
+
+  _hurt(t, dmg, bot) {
+    super._hurt(t, dmg * (bot.heavy ? 1.4 : 1), bot);
+  }
+
+  // --- Damage, deaths ------------------------------------------------------
+
+  onDied(m) {
+    if (!this.active || this.role !== 'host' || this.phase !== 'play') return;
+    this._event({ k: 'down', who: this.label(m.from | 0) });
+  }
+
+  _killBot(e, by, head) {
+    e.alive = false;
+    e.deadT = 0;
+    e.flash.visible = false;
+    for (const m of e.mats) m.emissive.setRGB(0, 0, 0);
+    this._removeBox(e);
+    this._event({ k: 'kill', a: by.k === 'h' ? this.label(by.id) : 'A HOSTILE', head: head ? 1 : 0 });
+  }
+
+  _updateDeadBot(e, dt) {
+    e.deadT += dt;
+    const fall = Math.min(1, e.deadT / 0.45);
+    e.root.rotation.x = (Math.PI / 2) * fall * fall;
+    e.root.rotation.z = 0;
+    e.root.position.set(e.x, e.y, e.z);
+    if (e.deadT > 30 && this.role === 'host') e.root.position.y = e.y - 0.4;
+  }
+
+  // --- Guests --------------------------------------------------------------
+
+  applySnapshot(m) {
+    if (!this.active || this.role !== 'guest') return;
+    if (m.st !== this.stage) return; // wait for the stage event first
+    this.phase = TAC_PHASES[m.ph] || 'play';
+    this.phaseT = m.pt;
+    this.stageTime = m.tt;
+    this.hostilesLeft = m.hl;
+    for (let i = 0; i < this.world.tacDoors.length; i++) this.world.setDoor(i, !!(m.dm & (1 << i)));
+    this._applyBotRows(m.b);
+  }
+
+  syncKills() {}
+}
+
 // ===== js/input/TouchControls.js =====
 const TOUCH_LOOK_SCALE = 1.4;
 const TOUCH_LAYOUT_KEY = 'retrofps.touchLayout';  // finger pixels -> look pixels at touch sensitivity 1
@@ -10529,7 +12123,8 @@ class TouchControls {
       '<div class="tc-btn tc-crouch" role="button">DUCK</div>',
       '<div class="tc-btn tc-reload" role="button">RELOAD</div>',
       '<div class="tc-btn tc-grenade" role="button">NADE</div>',
-      '<div class="tc-btn tc-mine zonly" role="button">MINE</div>',
+      '<div class="tc-btn tc-mine mineonly" role="button">MINE</div>',
+      '<div class="tc-btn tc-use taconly" role="button">USE</div>',
       '</div>',
     ].join('');
     document.body.appendChild(root);
@@ -10547,7 +12142,7 @@ class TouchControls {
     this.movable = {
       fire: root.querySelector('.tc-fire'), aim: this.aimEl, jump: root.querySelector('.tc-jump'),
       crouch: this.duckEl, reload: root.querySelector('.tc-reload'), grenade: root.querySelector('.tc-grenade'),
-      mine: root.querySelector('.tc-mine'), lfire: this.lfireEl, pause: root.querySelector('#tc-pause'),
+      mine: root.querySelector('.tc-mine'), use: root.querySelector('.tc-use'), lfire: this.lfireEl, pause: root.querySelector('#tc-pause'),
       shop: root.querySelector('#tc-shop'),
       hud: document.getElementById('hud'),
       health: document.getElementById('health'),
@@ -10600,6 +12195,7 @@ class TouchControls {
     this._button(root.querySelector('#tc-pause'), () => input.pause(), null, null, true);
     this._button(root.querySelector('#tc-shop'), () => input.pressShop(), null, null, true);
     this._button(root.querySelector('.tc-mine'), () => input.pressMine());
+    this._button(root.querySelector('.tc-use'), () => input.pressUse());
 
     // iOS Safari ignores user-scalable=no; stop pinch-zoom gestures.
     document.addEventListener('gesturestart', (e) => e.preventDefault());
@@ -10990,6 +12586,9 @@ function boot() {
   let enemies = null;
   let zombies = null;
   let tdm = null;
+  let tac = null;
+  /** The running team game (tactical mission or 5v5), if any. */
+  const teamOn = () => (tac && tac.active ? tac : tdm && tdm.active ? tdm : null);
   const net = new Net();
 
   // Other players, by id. Created on demand.
@@ -11008,14 +12607,15 @@ function boot() {
     lastId: 0,
     get active() {
       if (zombies && zombies.active) return false;
-      for (const r of remotes.values()) if (r.active && !(tdm && tdm.active && r.team === tdm.myTeam)) return true;
+      for (const r of remotes.values()) if (r.active && !(teamOn() && r.team === teamOn().myTeam)) return true;
       return false;
     },
     raycast(ox, oy, oz, dx, dy, dz, max) {
       let best = -1;
       for (const [id, r] of remotes) {
         if (!r.active) continue;
-        if (tdm && tdm.active && r.team === tdm.myTeam) continue; // no friendly fire
+        const to = teamOn();
+        if (to && r.team === to.myTeam) continue; // no friendly fire
         const d = r.raycast(ox, oy, oz, dx, dy, dz, best < 0 ? max : best);
         if (d >= 0 && (best < 0 || d < best)) { best = d; this.head = r.head; this.lastId = id; }
       }
@@ -11032,6 +12632,7 @@ function boot() {
     onShoot: (slot, impact) => {
       net.send({ t: 'shot', w: slot, i: impact ? impact.map(r2) : null });
       if (enemies) enemies.noise();
+      if (tac && tac.active) tac.noise(player.x, player.z, /sil/.test(weapons.active.spec.sound) ? 9 : 32);
     },
     onTargetHit: (dmg, head) => {
       net.send({ t: 'hit', to: targets.lastId, dmg, head: head ? 1 : 0 });
@@ -11052,6 +12653,10 @@ function boot() {
   projectiles = new Projectiles({ scene: engine.scene, collision: world.collision, explosions, audio: weapons.audio, targets });
   const grenades = new GrenadeSystem({ engine, input, player, collision: world.collision, weapons, explosions });
   barrels = new Barrels({ world, explosions });
+  grenades.allow = (kind) => !(tac && tac.active) || tac.gear[kind] > 0;
+  grenades.onUsed = (kind) => { if (tac && tac.active) tac.gear[kind] = Math.max(0, tac.gear[kind] - 1); };
+  grenades.onFlash = (x, y, z) => { if (tac && tac.active) tac.onFlash(x, y, z); };
+  explosions.onExplode.push((x, y, z) => { if (tac && tac.active) tac.noise(x, z, 42); });
 
   const health = new Health({ player, spots: world.pickupSpots });
   health.setRooms(world.activeRooms);
@@ -11059,7 +12664,8 @@ function boot() {
   explosions.onPlayerBlast = (damage, owner) => {
     if (owner === 'mine') return; // landmines only hurt zombies
     // A teammate's grenade does not hurt me.
-    if (tdm && tdm.active && owner === 'other' && tdm.teamOf(explosions.ownerId) === tdm.myTeam) return;
+    const to = teamOn();
+    if (to && owner === 'other' && to.teamOf(explosions.ownerId) === to.myTeam) return;
     if (zombies.active && owner === 'other') return; // no friendly fire in co-op
     health.damage(damage, 'explosion', owner);
   };
@@ -11088,6 +12694,7 @@ function boot() {
   enemies = new Enemies(common);
   zombies = new Zombies(Object.assign({ net, remotes }, common));
   tdm = new TeamMatch(Object.assign({ net, remotes }, common));
+  tac = new TacMission(Object.assign({ net, remotes, loadStage: (n) => loadStage(n) }, common));
   tdm.onEvent = (ev) => {
     // A new match: everybody starts over at their team's spawn.
     if (ev.k === 'reset' && (input.locked || net.online)) health.respawn();
@@ -11142,7 +12749,7 @@ function boot() {
   const mapTabs = Array.from(document.querySelectorAll('#map-tabs button'));
   const mapNote = document.getElementById('map-note');
   const applyMap = (size) => {
-    if (!MAP_SIZES.includes(size) && size !== 'crash') size = 'middle';
+    if (!MAP_SIZES.includes(size) && size !== 'crash' && !/^tac[1-5]$/.test(size)) size = 'middle';
     const changed = size !== world.size;
     if (size !== 'crash') mapSize = size; // the facility size the player picked
     if (changed) {
@@ -11151,10 +12758,17 @@ function boot() {
       enemies.setMap(world.activeRooms);
       zombies.setMap(world.activeRooms);
       tdm.setMap(world.activeRooms);
+      tac.setMap(world.activeRooms);
       barrels.fuses.length = 0;
       health.respawn(); // new spawn point on the new map
     }
     for (const b of mapTabs) b.classList.toggle('on', size !== 'crash' && b.dataset.map === size);
+  };
+  /** Tactical missions: switch to stage n, doors back as they start, everybody to the entrance. */
+  const loadStage = (n) => {
+    applyMap('tac' + n);
+    world.resetDoors();
+    health.respawn();
   };
   for (const b of mapTabs) {
     b.addEventListener('click', () => {
@@ -11166,37 +12780,46 @@ function boot() {
 
   // ---- game mode: soldiers (solo / 1v1 online) or zombie defense (solo / co-op) ----
   const savedMode = (() => { try { return localStorage.getItem(MODE_KEY); } catch (_) { return null; } })();
-  let gameMode = savedMode === 'zombies' || savedMode === 'tdm' ? savedMode : 'soldiers';
+  let gameMode = savedMode === 'zombies' || savedMode === 'tdm' || savedMode === 'tac' ? savedMode : 'soldiers';
   const modeTabs = Array.from(document.querySelectorAll('#mode-tabs button'));
   const modeNote = document.getElementById('mode-note');
   const applyMode = () => {
     const online = net.online;
-    const shown = online ? (net.roomMode === 'coop' ? 'zombies' : net.roomMode === 'tdm' ? 'tdm' : 'soldiers') : gameMode;
+    const shown = online ? (net.roomMode === 'coop' ? 'zombies' : net.roomMode === 'tdm' ? 'tdm' : net.roomMode === 'tac' ? 'tac' : 'soldiers') : gameMode;
     const coop = shown === 'zombies';
     const team = shown === 'tdm';
+    const tacOn = shown === 'tac';
     const locked = net.status === 'connected' || net.status === 'connecting';
     for (const b of modeTabs) {
       b.classList.toggle('on', b.dataset.mode === shown);
       b.disabled = locked;
     }
-    for (const b of mapTabs) b.disabled = locked || team;
-    mapNote.textContent = team ? '(Crash)' : locked ? (net.mode === 'guest' ? '(set by the host)' : '') : '';
+    for (const b of mapTabs) b.disabled = locked || team || tacOn;
+    mapNote.textContent = team ? '(Crash)' : tacOn ? '(5 stages)' : locked ? (net.mode === 'guest' ? '(set by the host)' : '') : '';
     modeNote.textContent = coop
       ? 'Defend the base in the middle of the map against waves of zombies. Solo, or co-op with up to 2 friends.'
+      : tacOn
+        ? 'Clear five buildings, alone or with a friend. F opens doors, G throws a flashbang. Listen for footsteps, hostiles hear you too.'
       : team
         ? '5v5 team deathmatch on Crash. Bots fill empty places. Up to 10 players online. Hold Tab for the scoreboard.'
         : (online ? '1v1 against your friend.' : 'Fight enemy soldiers. Online: 1v1 against a friend.');
-    const wasActive = zombies.active || tdm.active;
+    const wasActive = zombies.active || tdm.active || tac.active;
     enemies.setEnabled(!online && shown === 'soldiers');
     // The map follows the mode: Crash for team matches, the facility otherwise.
-    applyMap(team ? 'crash' : online && net.mapSize !== 'crash' ? net.mapSize : mapSize);
+    applyMap(team ? 'crash' : tacOn ? 'tac' + (tac.active ? tac.stage : 1) : online && net.mapSize !== 'crash' && !/^tac/.test(net.mapSize) ? net.mapSize : mapSize);
     const role = online && net.id !== 1 ? 'guest' : 'host';
     tdm.myTeam = online ? net.team : 0;
     zombies.setActive(coop, role);
     tdm.setActive(team, role);
+    tac.myTeam = 0;
+    tac.setActive(tacOn, role);
+    health.noRespawn = tacOn; // down means down until the next stage
+    document.body.classList.toggle('tacmode', tacOn);
+    const mineBtn = document.querySelector('.tc-mine');
+    if (mineBtn) mineBtn.textContent = tacOn ? 'FLASH' : 'MINE';
     weapons.setShotFilter(team ? (b) => !(b.enemy && b.enemy.team === tdm.myTeam) : null);
-    if ((zombies.active || tdm.active) !== wasActive) health.respawn(); // to the base / team spawn, or away from it
-    ui.setKills(coop ? (zombies.scores[zombies.myId] || 0) : team ? 0 : online ? null : enemies.kills);
+    if ((zombies.active || tdm.active || tac.active) !== wasActive) health.respawn(); // to the base / team spawn, or away from it
+    ui.setKills(coop ? (zombies.scores[zombies.myId] || 0) : team ? 0 : tacOn ? null : online ? null : enemies.kills);
     showNet();
   };
   for (const b of modeTabs) {
@@ -11212,6 +12835,7 @@ function boot() {
   health.chooseSpawn = () => {
     const pts = world.spawnPoints;
     if (zombies.active) return BASE_SPAWNS[Math.floor(Math.random() * BASE_SPAWNS.length)];
+    if (tac.active && world.tac) return world.tac.start[(tac.myId - 1) % world.tac.start.length];
     if (tdm.active) {
       // Team match: the team spawn farthest from the enemy.
       const list = CRASH_SPAWNS[tdm.myTeam];
@@ -11255,11 +12879,12 @@ function boot() {
   // ---- multiplayer ----
   const nameOf = (id) => (id === net.id ? 'YOU' : 'P' + id);
   health.onDeath.push(() => {
-    if (tdm.active) { tdm.reportDeath(); return; }
+    const to = teamOn();
+    if (to) { to.reportDeath(); return; }
     ui.killedBy = health.lastOwner === 'other' ? 'KILLED BY YOUR OPPONENT' : '';
     net.send({ t: 'died', self: health.lastOwner === 'other' ? 0 : 1 });
   });
-  grenades.onThrow = (x, y, z, vx, vy, vz) => net.send({ t: 'grenade', x: r2(x), y: r2(y), z: r2(z), vx: r2(vx), vy: r2(vy), vz: r2(vz) });
+  grenades.onThrow = (x, y, z, vx, vy, vz, kind) => net.send({ t: 'grenade', x: r2(x), y: r2(y), z: r2(z), vx: r2(vx), vy: r2(vy), vz: r2(vz), k: kind === 'flash' ? 'flash' : 'frag' });
   barrels.onIgnite = (i) => net.send({ t: 'barrel', i });
 
   net.on('welcome', (m) => {
@@ -11267,10 +12892,10 @@ function boot() {
     for (const id of net.players) {
       const r = remoteFor(id);
       r.setPresent(true);
-      if (net.roomMode === 'tdm') { r.setTeam(net.teams[id]); r.setLabel('P' + id, net.teams[id] === 0 ? '#8fb8f0' : '#f0907a'); }
+      if (net.teamMode) { r.setTeam(net.teams[id]); r.setLabel('P' + id, net.teams[id] === 0 ? '#8fb8f0' : '#f0907a'); }
     }
     // The host's map counts online.
-    if (net.mode === 'guest' || net.mode === 'host') applyMap(net.mapSize);
+    if ((net.mode === 'guest' || net.mode === 'host') && net.roomMode !== 'tac') applyMap(net.mapSize);
     if (net.roomMode === 'pvp') {
       // Player 1 starts at the first spawn point, player 2 at the one farthest from it.
       const pts = world.spawnPoints;
@@ -11295,23 +12920,24 @@ function boot() {
     const r = remoteFor(m.id);
     r.setPresent(!!m.present);
     if (!m.present) r.tx = r.ty = r.tz = 0;
-    if (m.present && net.roomMode === 'tdm') { r.setTeam(m.team); r.setLabel('P' + m.id, m.team === 0 ? '#8fb8f0' : '#f0907a'); }
+    if (m.present && net.teamMode) { r.setTeam(m.team); r.setLabel('P' + m.id, m.team === 0 ? '#8fb8f0' : '#f0907a'); }
     showNet();
     if (net.online) {
-      if (net.roomMode === 'coop' || net.roomMode === 'tdm') ui.feed('P' + m.id + (m.present ? ' JOINED' : ' LEFT'));
+      if (net.roomMode === 'coop' || net.teamMode) ui.feed('P' + m.id + (m.present ? ' JOINED' : ' LEFT'));
       else ui.feed(m.present ? 'OPPONENT JOINED' : 'OPPONENT LEFT');
     }
   });
   net.on('s', (m) => { if (m.from) remoteFor(m.from).setState(m); });
   net.on('dmg', (m) => {
     if (typeof m.dmg === 'number' && !zombies.active) {
-      if (tdm.active) tdm.noteAttacker({ k: 'h', id: m.from });
+      if (teamOn()) teamOn().noteAttacker({ k: 'h', id: m.from });
       health.damage(m.dmg, 'bullet', 'other');
     }
   });
   net.on('shot', (m) => {
     const r = remoteFor(m.from || 2);
     r.shotFx();
+    if (tac.active && tac.role === 'host') tac.noise(r.x, r.z, 32);
     if (Array.isArray(m.i) && m.i.length === 6) weapons.effects.spawn(m.i[0], m.i[1], m.i[2], m.i[3], m.i[4], m.i[5]);
     const spec = WEAPON_SPECS[(m.w | 0) - 1];
     if (spec) {
@@ -11333,15 +12959,17 @@ function boot() {
   });
   net.on('pdied', (m) => { if (m.id !== net.id) ui.feed(nameOf(m.id) + ' WENT DOWN'); });
   // 5v5 team deathmatch traffic.
-  net.on('tm', (m) => tdm.applySnapshot(m));
+  net.on('tm', (m) => (teamOn() || tdm).applySnapshot(m));
   net.on('tms', (m) => tdm.applyStats(m));
-  net.on('tev', (m) => { if (tdm.role === 'guest') tdm.handleEvent(m); });
-  net.on('bhit', (m) => tdm.onNetHit(m));
-  net.on('died', (m) => tdm.onDied(m));
+  net.on('tev', (m) => { const to = teamOn(); if (to && to.role === 'guest') to.handleEvent(m); });
+  net.on('bhit', (m) => (teamOn() || tdm).onNetHit(m));
+  net.on('died', (m) => (teamOn() || tdm).onDied(m));
+  net.on('tuse', (m) => tac.onNetUse(m));
   net.on('bdmg', (m) => {
     if (typeof m.dmg !== 'number') return;
-    tdm.noteAttacker({ k: 'b', id: m.b, team: m.bt });
-    tdm.hurtLocal(Math.min(100, m.dmg), m.x, m.z);
+    const to = teamOn() || tdm;
+    to.noteAttacker({ k: 'b', id: m.b, team: m.bt });
+    to.hurtLocal(Math.min(100, m.dmg), m.x, m.z);
   });
   // Zombie defense traffic.
   net.on('zs', (m) => zombies.applySnapshot(m));
@@ -11375,19 +13003,20 @@ function boot() {
     if (net.mode === 'host' && st === 'connecting') html = 'Creating a game\u2026';
     else if (net.mode === 'host' && st === 'connected') {
       html = 'Your code: <b>' + net.code + '</b><br>';
-      if (net.roomMode === 'tdm') html += count + '/10 players. Friends type the code in and press JOIN; bots fill the rest.';
+      if (net.roomMode === 'tac') html += count + '/2 players. Your partner types the code in and presses JOIN.';
+      else if (net.roomMode === 'tdm') html += count + '/10 players. Friends type the code in and press JOIN; bots fill the rest.';
       else if (coop) html += count + '/3 players. Friends type the code in and press JOIN.';
       else html += net.peer ? 'Opponent joined.' : 'Send it to your friend. They type it in and press JOIN.';
     } else if (net.mode === 'guest' && st === 'connecting') html = 'Joining <b>' + net.code + '</b>\u2026';
     else if (net.mode === 'guest' && st === 'connected') {
-      html = 'Connected to <b>' + net.code + '</b>' + (net.roomMode === 'tdm' ? ' \u00b7 5v5, ' + count + '/10 players' : coop ? ' \u00b7 zombie co-op, ' + count + '/3 players' : ' \u00b7 1v1');
+      html = 'Connected to <b>' + net.code + '</b>' + (net.roomMode === 'tac' ? ' \u00b7 tactical mission, ' + count + '/2 players' : net.roomMode === 'tdm' ? ' \u00b7 5v5, ' + count + '/10 players' : coop ? ' \u00b7 zombie co-op, ' + count + '/3 players' : ' \u00b7 1v1');
     } else if (st === 'full') html = 'That game is full.';
     else if (st === 'error' && ERRORS[net.error]) html = ERRORS[net.error];
     if (html) {
       ui.netStatus.innerHTML = html;
       ui.netStatus.className = st === 'connected' ? 'ok' : st === 'error' || st === 'full' ? 'bad' : '';
     }
-    netHost.textContent = p2p && busy ? 'LEAVE GAME' : gameMode === 'zombies' ? 'HOST CO-OP (UP TO 3)' : gameMode === 'tdm' ? 'HOST 5V5 (UP TO 10)' : 'HOST 1V1';
+    netHost.textContent = p2p && busy ? 'LEAVE GAME' : gameMode === 'zombies' ? 'HOST CO-OP (UP TO 3)' : gameMode === 'tdm' ? 'HOST 5V5 (UP TO 10)' : gameMode === 'tac' ? 'HOST MISSION (2 PLAYERS)' : 'HOST 1V1';
     netHost.disabled = busy && net.mode === 'ws';
     netJoin.disabled = busy;
     netCode.disabled = busy;
@@ -11399,7 +13028,7 @@ function boot() {
       net.disconnect();
       return;
     }
-    net.host(gameMode === 'zombies' ? 'coop' : gameMode === 'tdm' ? 'tdm' : 'pvp', gameMode === 'tdm' ? 'crash' : mapSize);
+    net.host(gameMode === 'zombies' ? 'coop' : gameMode === 'tdm' ? 'tdm' : gameMode === 'tac' ? 'tac' : 'pvp', gameMode === 'tdm' ? 'crash' : mapSize);
   });
   const join = () => { if (!netJoin.disabled) net.join(netCode.value); };
   netJoin.addEventListener('click', join);
@@ -11441,7 +13070,11 @@ function boot() {
       ui.pendingView = 'shop';
       input.pause();
     }
-    if (input.consumeMine() && zombies.active) zombies.placeMine();
+    if (input.consumeMine()) {
+      if (zombies.active) zombies.placeMine();
+      else if (tac.active) grenades.throwFlash(); // tactical gear: flashbang
+    }
+    if (input.consumeUse() && tac.active) tac.tryUse();
     // The world keeps rendering behind the menu, but the player only
     // simulates while playing.
     if (input.locked) player.update(dt);
@@ -11463,12 +13096,13 @@ function boot() {
     pickups.update(dt);
     for (const r of remotes.values()) {
       r.update(dt);
-      if (r.tag) r.tag.visible = tdm.active && r.team === tdm.myTeam && r.active;
+      if (r.tag) r.tag.visible = !!teamOn() && r.team === teamOn().myTeam && r.active;
     }
     enemies.update(dt);
     zombies.update(dt);
     tdm.update(dt);
-    if (tdm.active) tdm.syncKills();
+    tac.update(dt);
+    { const to = teamOn(); if (to) to.syncKills(); }
     net.flush(dt);
     if (net.online) {
       ui.setMatch(net.roomMode === 'pvp', net.roomMode === 'pvp' && !net.peer);
@@ -11483,6 +13117,7 @@ function boot() {
       }
     }
     ui.updateHud(weapons.active, grenades, health);
+    weapons.audio.setListener(player.x, player.y + player.eyeHeight, player.z, player.yaw, player.pitch);
     touch.update();
   });
 }
